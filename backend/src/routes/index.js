@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const registerRoutes = require('./auth/register.routes');
+const loginRoutes = require('./auth/login.routes');
 
 // Base health-check route
 router.get('/', (req, res) => {
@@ -13,5 +14,6 @@ router.get('/', (req, res) => {
 
 // Mount routes
 router.use('/auth', registerRoutes);
+router.use('/auth', loginRoutes);
 
 module.exports = router;
