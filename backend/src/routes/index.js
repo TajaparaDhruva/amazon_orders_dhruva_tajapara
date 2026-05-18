@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const registerRoutes = require('./auth/register.routes');
+
 // Base health-check route
 router.get('/', (req, res) => {
     res.status(200).json({
@@ -8,5 +10,8 @@ router.get('/', (req, res) => {
         message: 'Amazon Orders API is up and running!'
     });
 });
+
+// Mount routes
+router.use('/auth', registerRoutes);
 
 module.exports = router;
