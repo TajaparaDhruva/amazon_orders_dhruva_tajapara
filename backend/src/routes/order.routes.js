@@ -4,6 +4,7 @@ const router = express.Router();
 const { createOrder }                = require('../controllers/order/createOrder.controller');
 const { getAllOrders, getOrderById } = require('../controllers/order/getOrders.controller');
 const { replaceOrder, updateOrder }  = require('../controllers/order/updateOrder.controller');
+const { deleteOrder }                = require('../controllers/order/deleteOrder.controller');
 
 // POST /api/v1/orders
 router.post('/', createOrder);
@@ -19,5 +20,8 @@ router.put('/:orderId', replaceOrder);
 
 // PATCH /api/v1/orders/:orderId
 router.patch('/:orderId', updateOrder);
+
+// DELETE /api/v1/orders/:orderId
+router.delete('/:orderId', deleteOrder);
 
 module.exports = router;
