@@ -15,5 +15,6 @@ router.get('/', (req, res) => {
 // Mount routes
 router.use('/auth', registerRoutes);
 router.use('/auth', loginRoutes);
+router.use('/products', require('./product.routes'));
 
 module.exports = router;
