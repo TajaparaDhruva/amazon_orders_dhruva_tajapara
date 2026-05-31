@@ -2,7 +2,7 @@ const Product = require('../../models/product.model');
 
 // @desc    Create a new product
 // @route   POST /api/v1/products
-// @access  Public (for now, until we add auth)
+// @access  Public (for now)
 const createProduct = async (req, res) => {
     try {
         const product = await Product.create(req.body);

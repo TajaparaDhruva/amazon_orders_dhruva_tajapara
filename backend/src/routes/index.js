@@ -12,9 +12,11 @@ router.get('/', (req, res) => {
     });
 });
 
+const createProductRoutes = require('./product/createProduct.routes');
+
 // Mount routes
 router.use('/auth', registerRoutes);
 router.use('/auth', loginRoutes);
-router.use('/products', require('./product.routes'));
+router.use('/', createProductRoutes);
 
 module.exports = router;
