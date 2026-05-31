@@ -13,10 +13,12 @@ router.get('/', (req, res) => {
 });
 
 const createProductRoutes = require('./product/createProduct.routes');
+const getProductsRoutes = require('./product/getProducts.routes');
 
 // Mount routes
 router.use('/auth', registerRoutes);
 router.use('/auth', loginRoutes);
 router.use('/', createProductRoutes);
+router.use('/', getProductsRoutes);
 
 module.exports = router;
