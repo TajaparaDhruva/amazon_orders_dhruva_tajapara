@@ -150,6 +150,13 @@ const orderSchema = new mongoose.Schema(
             required: [true, 'SellerID is required'],
             trim: true,
             index: true
+        },
+
+        // ── Archive ──────────────────────────────────────────────────────────
+        isArchived: {
+            type: Boolean,
+            default: false,
+            index: true
         }
     },
     {
