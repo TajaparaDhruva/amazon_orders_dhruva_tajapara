@@ -8,6 +8,7 @@ const { deleteOrder }                = require('../controllers/order/deleteOrder
 const { checkOrderExists, getOrderSummary } = require('../controllers/order/orderUtility.controller');
 const { getOrderItems, getOrderHistory }    = require('../controllers/order/orderDetails.controller');
 const { archiveOrder, restoreOrder }         = require('../controllers/order/archiveOrder.controller');
+const { cancelOrder }                        = require('../controllers/order/cancelOrder.controller');
 
 // POST /api/v1/orders
 router.post('/', createOrder);
@@ -32,6 +33,9 @@ router.patch('/:orderId/archive', archiveOrder);
 
 // PATCH /api/v1/orders/:orderId/restore
 router.patch('/:orderId/restore', restoreOrder);
+
+// PATCH /api/v1/orders/:orderId/cancel
+router.patch('/:orderId/cancel', cancelOrder);
 
 // GET /api/v1/orders/:orderId
 router.get('/:orderId', getOrderById);
