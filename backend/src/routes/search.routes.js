@@ -20,6 +20,14 @@ const {
     searchTracking
 } = require('../controllers/search/advancedSearch.controller');
 
+const {
+    searchFuzzy,
+    searchAutocomplete,
+    searchHighlight,
+    searchRecent,
+    searchPopular
+} = require('../controllers/search/searchEnhancement.controller');
+
 // GET /api/v1/search
 router.get('/', searchGeneral);
 
@@ -49,5 +57,20 @@ router.get('/date', searchDate);
 
 // GET /api/v1/search/tracking
 router.get('/tracking', searchTracking);
+
+// GET /api/v1/search/fuzzy
+router.get('/fuzzy', searchFuzzy);
+
+// GET /api/v1/search/autocomplete
+router.get('/autocomplete', searchAutocomplete);
+
+// GET /api/v1/search/highlight
+router.get('/highlight', searchHighlight);
+
+// GET /api/v1/search/recent
+router.get('/recent', searchRecent);
+
+// GET /api/v1/search/popular
+router.get('/popular', searchPopular);
 
 module.exports = router;
