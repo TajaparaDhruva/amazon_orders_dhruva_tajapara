@@ -12,6 +12,14 @@ const {
     searchBrand
 } = require('../controllers/search/categorySearch.controller');
 
+const {
+    searchStatus,
+    searchPayment,
+    searchLocation,
+    searchDate,
+    searchTracking
+} = require('../controllers/search/advancedSearch.controller');
+
 // GET /api/v1/search
 router.get('/', searchGeneral);
 
@@ -26,5 +34,20 @@ router.get('/category', searchCategory);
 
 // GET /api/v1/search/brand
 router.get('/brand', searchBrand);
+
+// GET /api/v1/search/status
+router.get('/status', searchStatus);
+
+// GET /api/v1/search/payment
+router.get('/payment', searchPayment);
+
+// GET /api/v1/search/location
+router.get('/location', searchLocation);
+
+// GET /api/v1/search/date
+router.get('/date', searchDate);
+
+// GET /api/v1/search/tracking
+router.get('/tracking', searchTracking);
 
 module.exports = router;
