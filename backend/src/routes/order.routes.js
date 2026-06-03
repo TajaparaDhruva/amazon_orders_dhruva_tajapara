@@ -10,12 +10,19 @@ const { getOrderItems, getOrderHistory }    = require('../controllers/order/orde
 const { archiveOrder, restoreOrder }         = require('../controllers/order/archiveOrder.controller');
 const { cancelOrder }                        = require('../controllers/order/cancelOrder.controller');
 const { duplicateOrder, getOrderInvoice }    = require('../controllers/order/orderExtras.controller');
+const { getPagedOrders, getInfiniteOrders }  = require('../controllers/pagination.controller');
 
 // POST /api/v1/orders
 router.post('/', createOrder);
 
 // GET /api/v1/orders
 router.get('/', getAllOrders);
+
+// GET /api/v1/orders/paged
+router.get('/paged', getPagedOrders);
+
+// GET /api/v1/orders/infinite
+router.get('/infinite', getInfiniteOrders);
 
 // GET /api/v1/orders/:orderId/exists
 router.get('/:orderId/exists', checkOrderExists);
