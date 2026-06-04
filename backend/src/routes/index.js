@@ -6,6 +6,7 @@ const loginRoutes = require('./auth/login.routes');
 const orderRoutes = require('./order.routes');
 const searchRoutes = require('./search.routes');
 const analyticsRoutes = require('./analytics.routes');
+const statsRoutes = require('./stats.routes');
 
 // Base health-check route
 router.get('/', (req, res) => {
@@ -21,5 +22,6 @@ router.use('/auth', loginRoutes);
 router.use('/orders', orderRoutes);
 router.use('/search', searchRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/stats', statsRoutes);
 
 module.exports = router;
