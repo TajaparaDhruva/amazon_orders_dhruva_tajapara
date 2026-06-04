@@ -11,6 +11,7 @@ const { archiveOrder, restoreOrder }         = require('../controllers/order/arc
 const { cancelOrder }                        = require('../controllers/order/cancelOrder.controller');
 const { duplicateOrder, getOrderInvoice }    = require('../controllers/order/orderExtras.controller');
 const { getPagedOrders, getInfiniteOrders }  = require('../controllers/pagination.controller');
+const { getSortedOrdersByField, getSortedOrdersByQuery } = require('../controllers/sorting.controller');
 
 // POST /api/v1/orders
 router.post('/', createOrder);
@@ -23,6 +24,12 @@ router.get('/paged', getPagedOrders);
 
 // GET /api/v1/orders/infinite
 router.get('/infinite', getInfiniteOrders);
+
+// GET /api/v1/orders/sort
+router.get('/sort', getSortedOrdersByQuery);
+
+// GET /api/v1/orders/sort/:field
+router.get('/sort/:field', getSortedOrdersByField);
 
 // GET /api/v1/orders/:orderId/exists
 router.get('/:orderId/exists', checkOrderExists);
