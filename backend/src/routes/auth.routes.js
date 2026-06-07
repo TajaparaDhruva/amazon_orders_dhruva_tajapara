@@ -5,6 +5,7 @@ const { register, login, logout } = require('../controllers/auth/auth.controller
 const { getProfile, updateProfile, deleteProfile } = require('../controllers/auth/profile.controller');
 const { forgotPassword, resetPassword, changePassword } = require('../controllers/auth/password.controller');
 const { sendOtp, verifyOtp, verifyEmail } = require('../controllers/auth/verification.controller');
+const { getUserSessions, deleteSession, refreshAccessToken } = require('../controllers/auth/session.controller');
 const { protect } = require('../middlewares/auth.middleware');
 
 // Helper middleware: extracts user info if Bearer token is provided, but does not block request if token is missing.
@@ -50,5 +51,14 @@ router.post('/verify-otp', optionalProtect, verifyOtp);
 
 // POST /api/v1/auth/verify-email (public or protected)
 router.post('/verify-email', optionalProtect, verifyEmail);
+
+// GET /api/v1/auth/sessions (protected)
+router.get('/sessions', protect, getUserSessions);
+
+// DELETE /api/v1/auth/sessions/:id (protected)
+router.delete('/sessions/:id', protect, deleteSession);
+
+// POST /api/v1/auth/refresh-token (public)
+router.post('/refresh-token', refreshAccessToken);
 
 module.exports = router;

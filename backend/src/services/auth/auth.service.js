@@ -1,5 +1,6 @@
 const User = require('../../models/user.model');
 const jwt = require('jsonwebtoken');
+const { createSessionService } = require('./session.service');
 
 /**
  * Generate a signed JWT token for the user
@@ -7,7 +8,7 @@ const jwt = require('jsonwebtoken');
 const generateToken = (userId) => {
     return jwt.sign(
         { id: userId },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET || 'defaultsecret123',
         { expiresIn: '7d' }
     );
 };
@@ -15,7 +16,7 @@ const generateToken = (userId) => {
 /**
  * Register a new user
  */
-const registerService = async ({ name, email, password, phone, role }) => {
+const registerService = async ({ name, email, password, phone, role, ipAddress, userAgent }) => {
     const existingUser = await User.findOne({ email });
     if (existingUser) {
         throw new Error('USER_EXISTS');
@@ -30,9 +31,11 @@ const registerService = async ({ name, email, password, phone, role }) => {
     });
 
     const token = generateToken(user._id);
+    const session = await createSessionService(user._id, { ipAddress, userAgent });
 
     return {
         token,
+        refreshToken: session.refreshToken,
         user: {
             _id: user._id,
             name: user.name,
@@ -50,7 +53,7 @@ const registerService = async ({ name, email, password, phone, role }) => {
 /**
  * Login an existing user
  */
-const loginService = async ({ email, password }) => {
+const loginService = async ({ email, password, ipAddress, userAgent }) => {
     const user = await User.findOne({ email }).select('+password');
 
     if (!user) throw new Error('INVALID_CREDENTIALS');
@@ -61,9 +64,11 @@ const loginService = async ({ email, password }) => {
     if (user.isBanned) throw new Error('ACCOUNT_BANNED');
 
     const token = generateToken(user._id);
+    const session = await createSessionService(user._id, { ipAddress, userAgent });
 
     return {
         token,
+        refreshToken: session.refreshToken,
         user: {
             _id: user._id,
             name: user.name,
