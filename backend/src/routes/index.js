@@ -14,6 +14,7 @@ const validationRoutes = require('./validation.routes');
 const notificationRoutes = require('./notification.routes');
 const dashboardRoutes = require('./dashboard.routes');
 const recommendationRoutes = require('./recommendation.routes');
+const systemRoutes = require('./system.routes');
 
 // Base health-check route
 router.get('/', (req, res) => {
@@ -37,5 +38,6 @@ router.use('/validate', validationRoutes);
 router.use('/notifications', notificationRoutes);
 router.use('/dashboard', dashboardRoutes);
 router.use('/', recommendationRoutes);
+router.use('/system', systemRoutes);
 
 module.exports = router;
