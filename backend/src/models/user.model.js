@@ -45,6 +45,16 @@ const userSchema = new mongoose.Schema(
         isDeleted: {
             type: Boolean,
             default: false
+        },
+
+        // ── Password Reset ────────────────────────────────────────────────────
+        resetPasswordToken: {
+            type: String,
+            select: false
+        },
+        resetPasswordExpire: {
+            type: Date,
+            select: false
         }
     },
     {
