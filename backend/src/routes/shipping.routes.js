@@ -12,6 +12,14 @@ const {
     rescheduleDelivery
 } = require('../controllers/shipping/shippingManagement.controller');
 
+const {
+    getPendingShipments,
+    getDeliveredShipments,
+    getReturnedShipments,
+    createShippingLabel,
+    getCarriers
+} = require('../controllers/shipping/delivery.controller');
+
 // GET /api/v1/shipping/tracking/:orderId
 router.get('/tracking/:orderId', getShipmentTracking);
 
@@ -26,5 +34,20 @@ router.patch('/change-address/:orderId', changeShippingAddress);
 
 // POST /api/v1/shipping/reschedule/:orderId
 router.post('/reschedule/:orderId', rescheduleDelivery);
+
+// GET /api/v1/shipping/pending
+router.get('/pending', getPendingShipments);
+
+// GET /api/v1/shipping/delivered
+router.get('/delivered', getDeliveredShipments);
+
+// GET /api/v1/shipping/returned
+router.get('/returned', getReturnedShipments);
+
+// POST /api/v1/shipping/create-label
+router.post('/create-label', createShippingLabel);
+
+// GET /api/v1/shipping/carriers
+router.get('/carriers', getCarriers);
 
 module.exports = router;
