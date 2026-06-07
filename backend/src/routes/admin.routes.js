@@ -19,6 +19,8 @@ const {
     getBackups
 } = require('../controllers/admin/adminReport.controller');
 
+const { getSystemHealthOverview } = require('../controllers/system/system.controller');
+
 const { protect } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
 
@@ -61,5 +63,8 @@ router.post('/system/maintenance', setMaintenanceMode);
 
 // GET /api/v1/admin/backups
 router.get('/backups', getBackups);
+
+// GET /api/v1/admin/system/health
+router.get('/system/health', getSystemHealthOverview);
 
 module.exports = router;
