@@ -14,12 +14,16 @@ const register = async (req, res) => {
             });
         }
 
-        const result = await registerService({ name, email, password, phone, role });
+        const ipAddress = req.ip || req.connection.remoteAddress;
+        const userAgent = req.headers['user-agent'];
+
+        const result = await registerService({ name, email, password, phone, role, ipAddress, userAgent });
 
         res.status(201).json({
             success: true,
             message: 'User registered successfully',
             token: result.token,
+            refreshToken: result.refreshToken,
             data: result.user
         });
 
@@ -65,12 +69,16 @@ const login = async (req, res) => {
             });
         }
 
-        const result = await loginService({ email, password });
+        const ipAddress = req.ip || req.connection.remoteAddress;
+        const userAgent = req.headers['user-agent'];
+
+        const result = await loginService({ email, password, ipAddress, userAgent });
 
         res.status(200).json({
             success: true,
             message: 'Logged in successfully',
             token: result.token,
+            refreshToken: result.refreshToken,
             data: result.user
         });
 
