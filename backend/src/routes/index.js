@@ -12,6 +12,7 @@ const shippingRoutes = require('./shipping.routes');
 const adminRoutes = require('./admin.routes');
 const validationRoutes = require('./validation.routes');
 const notificationRoutes = require('./notification.routes');
+const dashboardRoutes = require('./dashboard.routes');
 
 // Base health-check route
 router.get('/', (req, res) => {
@@ -33,5 +34,6 @@ router.use('/shipping', shippingRoutes);
 router.use('/admin', adminRoutes);
 router.use('/validate', validationRoutes);
 router.use('/notifications', notificationRoutes);
+router.use('/dashboard', dashboardRoutes);
 
 module.exports = router;
