@@ -9,6 +9,16 @@ const {
     updateUserRole
 } = require('../controllers/admin/userManagement.controller');
 
+const {
+    getAdminOrders,
+    getSalesReport,
+    getRevenueReport,
+    clearSystemCache,
+    getSystemLogs,
+    setMaintenanceMode,
+    getBackups
+} = require('../controllers/admin/adminReport.controller');
+
 const { protect } = require('../middlewares/auth.middleware');
 const { authorize } = require('../middlewares/role.middleware');
 
@@ -30,5 +40,26 @@ router.patch('/users/:id/unban', unbanUser);
 
 // PATCH /api/v1/admin/users/:id/role
 router.patch('/users/:id/role', updateUserRole);
+
+// GET /api/v1/admin/orders
+router.get('/orders', getAdminOrders);
+
+// GET /api/v1/admin/reports/sales
+router.get('/reports/sales', getSalesReport);
+
+// GET /api/v1/admin/reports/revenue
+router.get('/reports/revenue', getRevenueReport);
+
+// DELETE /api/v1/admin/cache/clear
+router.delete('/cache/clear', clearSystemCache);
+
+// GET /api/v1/admin/system/logs
+router.get('/system/logs', getSystemLogs);
+
+// POST /api/v1/admin/system/maintenance
+router.post('/system/maintenance', setMaintenanceMode);
+
+// GET /api/v1/admin/backups
+router.get('/backups', getBackups);
 
 module.exports = router;
