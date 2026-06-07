@@ -10,6 +10,7 @@ const analyticsRoutes = require('./analytics.routes');
 const statsRoutes = require('./stats.routes');
 const shippingRoutes = require('./shipping.routes');
 const adminRoutes = require('./admin.routes');
+const validationRoutes = require('./validation.routes');
 
 // Base health-check route
 router.get('/', (req, res) => {
@@ -29,5 +30,6 @@ router.use('/analytics', analyticsRoutes);
 router.use('/stats', statsRoutes);
 router.use('/shipping', shippingRoutes);
 router.use('/admin', adminRoutes);
+router.use('/validate', validationRoutes);
 
 module.exports = router;
