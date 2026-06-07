@@ -7,6 +7,7 @@ const orderRoutes = require('./order.routes');
 const searchRoutes = require('./search.routes');
 const analyticsRoutes = require('./analytics.routes');
 const statsRoutes = require('./stats.routes');
+const shippingRoutes = require('./shipping.routes');
 
 // Base health-check route
 router.get('/', (req, res) => {
@@ -23,5 +24,6 @@ router.use('/orders', orderRoutes);
 router.use('/search', searchRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/stats', statsRoutes);
+router.use('/shipping', shippingRoutes);
 
 module.exports = router;
