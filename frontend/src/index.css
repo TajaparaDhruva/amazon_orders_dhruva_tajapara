@@ -1,27 +1,176 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+* { box-sizing: border-box; }
+
+:root {
+  /* ── Light Cream-White & Bronze Theme ── */
+  --bg-left-panel: #F7F2EE;
+  --bg-right-panel: #FAF7F5;
+  --color-grid: rgba(141, 90, 43, 0.04);
+  
+  --text-primary: #1F1F1F;
+  --text-secondary: #5F5F5F;
+  --text-muted: #8A8A8A;
+  
+  --gold-accent: #8D5A2B;
+  --gold-hover: #744A21;
+  --gold-bg-pill: rgba(141, 90, 43, 0.06);
+  --gold-border-pill: rgba(141, 90, 43, 0.22);
+  --gold-gradient: linear-gradient(135deg, #A8713D 0%, #8D5A2B 100%);
+  
+  --navy-accent: #24324A;
+  --navy-hover: #1E293B;
+  
+  --card-bg: #FFFFFF;
+  --card-border: #EBE3DE;
+  --card-shadow: 0 25px 50px -12px rgba(31, 31, 31, 0.08), 0 1px 5px rgba(31, 31, 31, 0.03);
+  
+  --input-bg: #FFFFFF;
+  --input-border: #E5E7EB;
+  --input-text: #1F1F1F;
+  --input-focus-border: #8D5A2B;
+  --input-focus-shadow: rgba(141, 90, 43, 0.15);
+}
+
+.theme-dark {
+  /* ── Dark Burgundy-Black & Rose-Maroon Theme ── */
+  --bg-left-panel: #16080A;
+  --bg-right-panel: #1B0B0E;
+  --color-grid: rgba(197, 62, 87, 0.04);
+  
+  --text-primary: #F7EFEF;
+  --text-secondary: #C8B6B8;
+  --text-muted: #7E696B;
+  
+  --gold-accent: #C53E57;
+  --gold-hover: #D75A72;
+  --gold-bg-pill: rgba(197, 62, 87, 0.1);
+  --gold-border-pill: rgba(197, 62, 87, 0.3);
+  --gold-gradient: linear-gradient(135deg, #D75A72 0%, #A3293E 100%);
+  
+  --navy-accent: #1B0B0E;
+  --navy-hover: #261014;
+  
+  --card-bg: rgba(22, 8, 10, 0.9);
+  --card-border: rgba(197, 62, 87, 0.25);
+  --card-shadow: 0 24px 80px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(197, 62, 87, 0.1) inset;
+  
+  --input-bg: rgba(22, 8, 10, 0.9);
+  --input-border: rgba(197, 62, 87, 0.3);
+  --input-text: #F7EFEF;
+  --input-focus-border: rgba(197, 62, 87, 0.75);
+  --input-focus-shadow: rgba(197, 62, 87, 0.2);
+}
+
 body {
   margin: 0;
-  font-family: Inter, system-ui, -apple-system, sans-serif;
-  background-color: #090d16;
-  color: #f3f4f6;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-right-panel);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-right-panel); }
+::-webkit-scrollbar-thumb { background: var(--gold-accent); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-hover); }
+
+/* ── Keyframes ─────────────────────────────────────── */
+@keyframes fadeInUp    { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+@keyframes fadeIn      { from { opacity:0; } to { opacity:1; } }
+@keyframes slideInRight{ from { opacity:0; transform:translateX(24px); } to { opacity:1; transform:translateX(0); } }
+@keyframes scale-up    { from { opacity:0; transform:scale(0.97); } to { opacity:1; transform:scale(1); } }
+
+@keyframes gold-glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(196, 155, 57, 0.15); }
+  50%      { box-shadow: 0 0 25px rgba(196, 155, 57, 0.35); }
+}
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50%      { transform: translateY(-8px) rotate(0.4deg); }
+}
+@keyframes float-medium {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-5px); }
+}
+@keyframes live-pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
 }
 
+/* ── Utilities ─────────────────────────────────────── */
 @layer utilities {
-  .animate-fadeIn {
-    animation: fadeIn 0.5s ease-out forwards;
+  .animate-fade-in-up    { animation: fadeInUp 0.5s cubic-bezier(0.25, 1, 0.5, 1) both; }
+  .animate-fade-in       { animation: fadeIn 0.35s ease-out both; }
+  .animate-slide-right   { animation: slideInRight 0.5s cubic-bezier(0.25, 1, 0.5, 1) both; }
+  .animate-scale-up      { animation: scale-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .animate-gold-glow     { animation: gold-glow-pulse 2.8s ease-in-out infinite; }
+  .animate-float-slow    { animation: float-slow 7s ease-in-out infinite; }
+  .animate-float-medium  { animation: float-medium 5s ease-in-out infinite; }
+  .animate-live-pulse    { animation: live-pulse 2s ease-in-out infinite; }
+
+  .animation-delay-100 { animation-delay: 0.1s; }
+  .animation-delay-200 { animation-delay: 0.2s; }
+  .animation-delay-300 { animation-delay: 0.3s; }
+  .animation-delay-400 { animation-delay: 0.4s; }
+
+  /* ── Grid Pattern ── */
+  .grid-pattern {
+    background-image: linear-gradient(var(--color-grid) 1px, transparent 1px),
+                      linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+  }
+
+  /* ── Gradient text ── */
+  .gradient-text-gold {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+
+  /* ── Luxury Cards ── */
+  .luxury-card {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    box-shadow: var(--card-shadow) !important;
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .btn-gold {
+    background: #8D5A2B !important;
+    color: #FFFFFF !important;
+    font-weight: 700;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 14px rgba(141, 90, 43, 0.25);
+  }
+  .btn-gold:hover {
+    transform: translateY(-1.5px);
+    background: #744A21 !important;
+    box-shadow: 0 6px 20px rgba(141, 90, 43, 0.35);
+  }
+  .btn-gold:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(141, 90, 43, 0.2);
+  }
+
+  /* ── Luxury Inputs ── */
+  .luxury-input {
+    background-color: var(--input-bg) !important;
+    border: 1px solid var(--input-border) !important;
+    color: var(--input-text) !important;
+    transition: all 0.25s ease !important;
+  }
+  .luxury-input::placeholder { color: var(--text-muted) !important; opacity: 0.75; }
+  .luxury-input:focus {
+    border-color: var(--input-focus-border) !important;
+    box-shadow: 0 0 0 3px var(--input-focus-shadow) !important;
+    outline: none !important;
   }
 }
