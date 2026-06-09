@@ -34,6 +34,20 @@
   --input-text: #1F1F1F;
   --input-focus-border: #8D5A2B;
   --input-focus-shadow: rgba(141, 90, 43, 0.15);
+
+  /* Extra layout theme bindings */
+  --tab-bg: #F4EDE7;
+  --tab-border: #EBE3DE;
+  --logo-bg: #FFFFFF;
+  --logo-border: #EBE3DE;
+  --badge-bg: #F3ECE6;
+  --badge-border: #EBE3DE;
+  --widget-bg: #FFFFFF;
+  --widget-border: #EBE3DE;
+  --social-btn-bg: #FFFFFF;
+  --social-btn-border: #E5E7EB;
+  --social-btn-text: #1F1F1F;
+  --input-label: #3F3F3F;
 }
 
 .theme-dark {
@@ -64,6 +78,20 @@
   --input-text: #F7EFEF;
   --input-focus-border: rgba(197, 62, 87, 0.75);
   --input-focus-shadow: rgba(197, 62, 87, 0.2);
+
+  /* Extra layout theme bindings */
+  --tab-bg: rgba(22, 8, 10, 0.6);
+  --tab-border: rgba(197, 62, 87, 0.2);
+  --logo-bg: rgba(22, 8, 10, 0.8);
+  --logo-border: rgba(197, 62, 87, 0.3);
+  --badge-bg: rgba(197, 62, 87, 0.08);
+  --badge-border: rgba(197, 62, 87, 0.25);
+  --widget-bg: rgba(22, 8, 10, 0.7);
+  --widget-border: rgba(197, 62, 87, 0.2);
+  --social-btn-bg: rgba(22, 8, 10, 0.7);
+  --social-btn-border: rgba(197, 62, 87, 0.25);
+  --social-btn-text: #F7EFEF;
+  --input-label: #C8B6B8;
 }
 
 body {
@@ -144,20 +172,20 @@ body {
   }
 
   .btn-gold {
-    background: #8D5A2B !important;
+    background: var(--gold-gradient) !important;
     color: #FFFFFF !important;
     font-weight: 700;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-shadow: 0 4px 14px rgba(141, 90, 43, 0.25);
+    box-shadow: 0 4px 14px var(--input-focus-shadow);
   }
   .btn-gold:hover {
     transform: translateY(-1.5px);
-    background: #744A21 !important;
-    box-shadow: 0 6px 20px rgba(141, 90, 43, 0.35);
+    filter: brightness(1.08);
+    box-shadow: 0 6px 20px var(--input-focus-shadow);
   }
   .btn-gold:active {
     transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(141, 90, 43, 0.2);
+    box-shadow: 0 2px 8px var(--input-focus-shadow);
   }
 
   /* ── Luxury Inputs ── */
@@ -172,5 +200,22 @@ body {
     border-color: var(--input-focus-border) !important;
     box-shadow: 0 0 0 3px var(--input-focus-shadow) !important;
     outline: none !important;
+  }
+
+  /* Focus and toggle additions */
+  .luxury-input-group svg {
+    color: var(--text-muted);
+    transition: color 0.25s ease;
+  }
+  .luxury-input-group:focus-within svg {
+    color: var(--gold-accent) !important;
+  }
+
+  .theme-toggle-btn {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .theme-toggle-btn:hover {
+    transform: rotate(15deg) scale(1.05);
+    box-shadow: 0 0 15px var(--input-focus-shadow);
   }
 }

@@ -114,7 +114,7 @@ export default function Login() {
             <div className="absolute -bottom-40 -right-40 w-96 h-96 rounded-full bg-[#24324A]/5 blur-3xl pointer-events-none" />
 
             {/* Ambient Plant Twigs Illustration (Bottom Left) */}
-            <div className="absolute bottom-0 left-0 p-8 pointer-events-none hidden xl:block z-10 opacity-75">
+            <div className="absolute bottom-0 left-0 p-8 pointer-events-none hidden xl:block z-10 opacity-75 animate-float-slow">
                 <svg width="120" height="240" viewBox="0 0 120 240" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M 60 140 Q 30 90 20 60" stroke="#5C685A" strokeWidth="1.5" strokeLinecap="round" />
                     <path d="M 60 140 Q 80 80 90 50" stroke="#5C685A" strokeWidth="1.5" strokeLinecap="round" />
@@ -132,14 +132,14 @@ export default function Login() {
             {/* Global Theme Toggle (Accessible on all screen sizes) */}
             <button 
                 onClick={() => setIsDark(!isDark)} 
-                className="absolute top-6 right-6 h-9 w-9 rounded-xl flex items-center justify-center border hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer z-30 shadow-sm bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm"
+                className="absolute top-6 right-6 h-9 w-9 rounded-xl flex items-center justify-center border hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer z-30 shadow-sm bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm theme-toggle-btn"
                 style={{ borderColor: 'var(--card-border)', color: 'var(--text-primary)' }}
             >
                 {isDark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
             </button>
 
             {/* The unified premium SaaS dual-panel card */}
-            <div className="w-full max-w-[1100px] min-h-[660px] rounded-2xl flex flex-col md:flex-row overflow-hidden border shadow-2xl relative z-10 transition-colors duration-300"
+            <div className="w-full max-w-[1100px] min-h-[660px] rounded-2xl flex flex-col md:flex-row overflow-hidden border shadow-2xl relative z-10 transition-colors duration-300 animate-scale-up"
                  style={{ backgroundColor: 'var(--bg-right-panel)', borderColor: 'var(--card-border)' }}>
                 
                 {/* ═══════════════════════════════════════════
@@ -158,18 +158,19 @@ export default function Login() {
                     {/* ── Brand Header ── */}
                     <div className="relative z-10 flex items-center justify-between w-full">
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-[#FFFFFF] border border-[#EBE3DE] shadow-sm">
-                                <svg className="h-5 w-5 text-[#8D5A2B]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                            <div className="h-10 w-10 rounded-xl flex items-center justify-center border shadow-sm"
+                                 style={{ backgroundColor: 'var(--logo-bg)', borderColor: 'var(--logo-border)' }}>
+                                <svg className="h-5 w-5" style={{ color: 'var(--gold-accent)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
                                     <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                     <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                                     <line x1="12" y1="22.08" x2="12" y2="12" />
                                 </svg>
                             </div>
                             <div>
-                                <div className="font-['Outfit'] text-xl font-bold tracking-tight" style={{ color: '#1F1F1F' }}>
+                                <div className="font-['Outfit'] text-xl font-bold tracking-tight" style={{ color: 'var(--text-primary)' }}>
                                     VenderFlow
                                 </div>
-                                <div className="text-[8px] font-black tracking-[0.2em] uppercase" style={{ color: '#8D5A2B' }}>
+                                <div className="text-[8px] font-black tracking-[0.2em] uppercase" style={{ color: 'var(--gold-accent)' }}>
                                     PREMIUM COMMERCE PLATFORM
                                 </div>
                             </div>
@@ -179,17 +180,17 @@ export default function Login() {
                     {/* ── Middle Hero & HTML/CSS Dashboard Mockup ── */}
                     <div className="relative z-10 flex-1 flex flex-col justify-center my-6">
                         <div className="max-w-md mb-5">
-                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 w-fit text-[9px] font-bold tracking-wider uppercase bg-[#F3ECE6] border border-[#EBE3DE]"
-                                style={{ color: '#8D5A2B' }}>
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full mb-3 w-fit text-[9px] font-bold tracking-wider uppercase border"
+                                style={{ color: 'var(--gold-accent)', backgroundColor: 'var(--badge-bg)', borderColor: 'var(--badge-border)' }}>
                                 ENTERPRISE ORDER & VENDOR PORTAL
                             </div>
 
-                            <h1 className="font-['Outfit'] text-4xl lg:text-[2.75rem] font-extrabold tracking-tight mb-3 leading-[1.12]" style={{ color: '#1F1F1F' }}>
+                            <h1 className="font-['Outfit'] text-4xl lg:text-[2.75rem] font-extrabold tracking-tight mb-3 leading-[1.12]" style={{ color: 'var(--text-primary)' }}>
                                 Powering <br />
-                                Modern <span style={{ color: '#8D5A2B' }}>Commerce.</span>
+                                Modern <span style={{ color: 'var(--gold-accent)' }}>Commerce.</span>
                             </h1>
 
-                            <p className="text-xs lg:text-sm leading-relaxed font-medium" style={{ color: '#5F5F5F' }}>
+                            <p className="text-xs lg:text-sm leading-relaxed font-medium" style={{ color: 'var(--text-secondary)' }}>
                                 Manage orders, vendors, inventory, customers and analytics from one unified platform.
                             </p>
                         </div>
@@ -202,12 +203,14 @@ export default function Login() {
                                 { icon: Shield, title: 'Secure', desc: 'Payments' },
                                 { icon: Truck, title: 'Smart Order', desc: 'Tracking' }
                             ].map(({ icon: Icon, title, desc }, idx) => (
-                                <div key={idx} className="flex items-center gap-1.5 p-1.5 rounded-xl bg-white/70 border border-[#EBE3DE]/50 shadow-sm backdrop-blur-sm">
-                                    <div className="h-7 w-7 rounded-lg flex items-center justify-center bg-[#FAF6F2] border border-[#EBE3DE] shrink-0">
-                                        <Icon className="h-3.5 w-3.5" style={{ color: '#8D5A2B' }} />
+                                <div key={idx} className="flex items-center gap-1.5 p-1.5 rounded-xl border shadow-sm backdrop-blur-sm"
+                                     style={{ backgroundColor: 'var(--tab-bg)', borderColor: 'var(--tab-border)' }}>
+                                    <div className="h-7 w-7 rounded-lg flex items-center justify-center border shrink-0"
+                                         style={{ backgroundColor: 'var(--logo-bg)', borderColor: 'var(--logo-border)' }}>
+                                        <Icon className="h-3.5 w-3.5" style={{ color: 'var(--gold-accent)' }} />
                                     </div>
                                     <div className="min-w-0">
-                                        <div className="text-[8px] font-bold leading-tight" style={{ color: '#1F1F1F' }}>{title}</div>
+                                        <div className="text-[8px] font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>{title}</div>
                                         <div className="text-[7px] font-semibold leading-tight text-slate-400">{desc}</div>
                                     </div>
                                 </div>
@@ -215,14 +218,16 @@ export default function Login() {
                         </div>
 
                         {/* High-Fidelity HTML/CSS/SVG Overview Dashboard Widget Mockup */}
-                        <div className="w-full bg-white rounded-2xl border border-[#EBE3DE] shadow-xl p-4 relative overflow-hidden">
+                        <div className="w-full rounded-2xl border shadow-xl p-4 relative overflow-hidden animate-float-medium"
+                             style={{ backgroundColor: 'var(--widget-bg)', borderColor: 'var(--widget-border)' }}>
                             {/* Dashboard Header Bar */}
-                            <div className="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
-                                <div className="flex items-center gap-1.5 font-bold text-xs" style={{ color: '#1F1F1F' }}>
-                                    <span className="h-2 w-2 rounded-full bg-[#8D5A2B] animate-pulse" />
+                            <div className="flex items-center justify-between border-b pb-3 mb-3" style={{ borderColor: 'var(--tab-border)' }}>
+                                <div className="flex items-center gap-1.5 font-bold text-xs" style={{ color: 'var(--text-primary)' }}>
+                                    <span className="h-2 w-2 rounded-full animate-pulse" style={{ backgroundColor: 'var(--gold-accent)' }} />
                                     Overview
                                 </div>
-                                <div className="text-[9px] font-bold px-2 py-0.5 rounded-md border border-[#EBE3DE] bg-[#FAF9F7] cursor-pointer" style={{ color: '#5F5F5F' }}>
+                                <div className="text-[9px] font-bold px-2 py-0.5 rounded-md border cursor-pointer"
+                                     style={{ borderColor: 'var(--widget-border)', backgroundColor: 'var(--tab-bg)', color: 'var(--text-secondary)' }}>
                                     This Week
                                 </div>
                             </div>
@@ -235,9 +240,10 @@ export default function Login() {
                                     { label: 'Active Vendors', val: '1,942', percent: '↑ 12.6%' },
                                     { label: 'Products Listed', val: '48,210', percent: '↑ 16.3%' }
                                 ].map(({ label, val, percent }, idx) => (
-                                    <div key={idx} className="bg-[#FAF9F7] border border-[#EBE3DE]/60 rounded-xl p-2">
+                                    <div key={idx} className="border rounded-xl p-2"
+                                         style={{ backgroundColor: 'var(--tab-bg)', borderColor: 'var(--widget-border)' }}>
                                         <div className="text-[8px] font-semibold text-slate-400 truncate">{label}</div>
-                                        <div className="text-xs font-black mt-0.5" style={{ color: '#1F1F1F' }}>{val}</div>
+                                        <div className="text-xs font-black mt-0.5" style={{ color: 'var(--text-primary)' }}>{val}</div>
                                         <div className="text-[7px] font-bold text-emerald-600 mt-0.5 flex items-center gap-0.5">{percent}</div>
                                     </div>
                                 ))}
@@ -246,21 +252,21 @@ export default function Login() {
                             {/* Charts Row */}
                             <div className="grid grid-cols-2 gap-3">
                                 {/* Left Chart card */}
-                                <div className="border border-slate-100 rounded-xl p-2.5 bg-white">
+                                <div className="border rounded-xl p-2.5" style={{ borderColor: 'var(--widget-border)', backgroundColor: 'var(--card-bg)' }}>
                                     <div className="text-[8px] font-bold text-slate-400 mb-1">Revenue Trend</div>
                                     <svg viewBox="0 0 160 80" className="w-full">
                                         <defs>
                                             <linearGradient id="chart-fill" x1="0" y1="0" x2="0" y2="1">
-                                                <stop offset="0%" stopColor="#8D5A2B" stopOpacity="0.15" />
-                                                <stop offset="100%" stopColor="#8D5A2B" stopOpacity="0.0" />
+                                                <stop offset="0%" stopColor="var(--gold-accent)" stopOpacity="0.15" />
+                                                <stop offset="100%" stopColor="var(--gold-accent)" stopOpacity="0.0" />
                                             </linearGradient>
                                         </defs>
-                                        <line x1="0" y1="20" x2="160" y2="20" stroke="#FAF8F5" strokeWidth="1" />
-                                        <line x1="0" y1="40" x2="160" y2="40" stroke="#FAF8F5" strokeWidth="1" />
-                                        <line x1="0" y1="60" x2="160" y2="60" stroke="#FAF8F5" strokeWidth="1" />
+                                        <line x1="0" y1="20" x2="160" y2="20" stroke="var(--tab-border)" strokeWidth="1" />
+                                        <line x1="0" y1="40" x2="160" y2="40" stroke="var(--tab-border)" strokeWidth="1" />
+                                        <line x1="0" y1="60" x2="160" y2="60" stroke="var(--tab-border)" strokeWidth="1" />
                                         <path d="M 0 65 Q 25 50 50 55 T 100 40 T 150 25 L 150 80 L 0 80 Z" fill="url(#chart-fill)" />
-                                        <path d="M 0 65 Q 25 50 50 55 T 100 40 T 150 25" stroke="#8D5A2B" strokeWidth="1.8" fill="none" strokeLinecap="round" />
-                                        <circle cx="150" cy="25" r="2.5" fill="#8D5A2B" />
+                                        <path d="M 0 65 Q 25 50 50 55 T 100 40 T 150 25" stroke="var(--gold-accent)" strokeWidth="1.8" fill="none" strokeLinecap="round" />
+                                        <circle cx="150" cy="25" r="2.5" fill="var(--gold-accent)" />
                                     </svg>
                                     <div className="flex justify-between text-[7px] font-semibold text-slate-400 mt-1.5 px-0.5">
                                         <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
@@ -268,21 +274,21 @@ export default function Login() {
                                 </div>
 
                                 {/* Right Orders list card */}
-                                <div className="border border-slate-100 rounded-xl p-2.5 bg-white">
+                                <div className="border rounded-xl p-2.5" style={{ borderColor: 'var(--widget-border)', backgroundColor: 'var(--card-bg)' }}>
                                     <div className="flex items-center justify-between mb-1.5">
                                         <div className="text-[8px] font-bold text-slate-400">Recent Orders</div>
-                                        <div className="text-[8px] font-bold text-[#8D5A2B] cursor-pointer hover:underline">View all</div>
+                                        <div className="text-[8px] font-bold cursor-pointer hover:underline" style={{ color: 'var(--gold-accent)' }}>View all</div>
                                     </div>
                                     <div className="space-y-1.5">
                                         {[
-                                            { id: '#ORD-12543', store: 'TechStore', tag: 'Delivered', style: 'bg-emerald-50 text-emerald-600 border-emerald-100' },
-                                            { id: '#ORD-12542', store: 'GadgetHub', tag: 'In Transit', style: 'bg-amber-50 text-amber-600 border-amber-100' },
-                                            { id: '#ORD-12541', store: 'FashionWorld', tag: 'Processing', style: 'bg-blue-50 text-blue-600 border-blue-100' }
+                                            { id: '#ORD-12543', store: 'TechStore', tag: 'Delivered', style: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20' },
+                                            { id: '#ORD-12542', store: 'GadgetHub', tag: 'In Transit', style: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20' },
+                                            { id: '#ORD-12541', store: 'FashionWorld', tag: 'Processing', style: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20' }
                                         ].map(({ id, store, tag, style }, idx) => (
-                                            <div key={idx} className="flex items-center justify-between text-[8px] border-b border-slate-50 pb-1 last:border-b-0 last:pb-0">
+                                            <div key={idx} className="flex items-center justify-between text-[8px] border-b pb-1 last:border-b-0 last:pb-0" style={{ borderColor: 'var(--tab-border)' }}>
                                                 <div className="flex items-center gap-1">
                                                     <User className="h-2.5 w-2.5 text-slate-400" />
-                                                    <span className="font-bold text-slate-600">{id}</span>
+                                                    <span className="font-bold" style={{ color: 'var(--text-primary)' }}>{id}</span>
                                                 </div>
                                                 <div className="text-slate-400 truncate max-w-[40px]">{store}</div>
                                                 <div className={`px-1 rounded font-bold border text-[7px] ${style}`}>{tag}</div>
@@ -305,12 +311,14 @@ export default function Login() {
                             ].map(({ val, label, icon: Icon }, idx) => (
                                 <div 
                                     key={idx}
-                                    className="p-2.5 rounded-xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md cursor-default select-none bg-[#FAF9F6] border-[#EBE3DE] shadow-[0_4px_6px_-1px_rgba(31,31,31,0.02),0_2px_4px_-1px_rgba(31,31,31,0.01)]"
+                                    className="p-2.5 rounded-xl border transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md cursor-default select-none shadow-[0_4px_6px_-1px_rgba(31,31,31,0.02),0_2px_4px_-1px_rgba(31,31,31,0.01)]"
+                                    style={{ backgroundColor: 'var(--tab-bg)', borderColor: 'var(--tab-border)' }}
                                 >
-                                    <div className="h-6 w-6 mx-auto rounded-lg flex items-center justify-center bg-[#FAF6F2] border border-[#EBE3DE] mb-1">
-                                        <Icon className="h-3.5 w-3.5 text-[#8D5A2B]" />
+                                    <div className="h-6 w-6 mx-auto rounded-lg flex items-center justify-center border mb-1"
+                                         style={{ backgroundColor: 'var(--logo-bg)', borderColor: 'var(--logo-border)' }}>
+                                        <Icon className="h-3.5 w-3.5" style={{ color: 'var(--gold-accent)' }} />
                                     </div>
-                                    <div className="text-xs font-black tracking-tight" style={{ color: '#1F1F1F' }}>
+                                    <div className="text-xs font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
                                         {val}
                                     </div>
                                     <div className="text-[7px] font-bold uppercase tracking-wider text-slate-400 mt-0.5 leading-none">
@@ -339,18 +347,28 @@ export default function Login() {
                     <div className="w-full max-w-[400px] mx-auto py-6">
 
                         {/* ── Main Form Card (Elevated Soft Mockup) ── */}
-                        <div className="rounded-3xl p-6 md:p-8 luxury-card" style={{ backgroundColor: '#FFFFFF', borderColor: '#EBE3DE' }}>
+                        <div className="rounded-3xl p-6 md:p-8 luxury-card">
                             
                             {/* Role selection tab bar */}
-                            <div className="flex p-1 bg-[#F4EDE7] rounded-xl mb-8 border border-[#EBE3DE]">
+                            <div className="flex p-1 rounded-xl mb-8 border relative" style={{ backgroundColor: 'var(--tab-bg)', borderColor: 'var(--tab-border)' }}>
+                                {/* Sliding Pill */}
+                                <div 
+                                    className="absolute top-1 bottom-1 left-1 rounded-lg transition-all duration-300 ease-out shadow-sm border"
+                                    style={{
+                                        width: 'calc(50% - 4px)',
+                                        transform: isSeller ? 'translateX(100%)' : 'translateX(0%)',
+                                        backgroundColor: 'var(--card-bg)',
+                                        borderColor: 'var(--card-border)'
+                                    }}
+                                />
+                                
                                 <button
                                     type="button"
                                     onClick={() => setRole('customer')}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer ${
-                                        !isSeller 
-                                            ? 'bg-white text-[#8D5A2B] shadow-sm border-b-2 border-[#8D5A2B]' 
-                                            : 'text-[#8A8A8A] hover:text-[#5F5F5F]'
-                                    }`}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer relative z-10"
+                                    style={{
+                                        color: !isSeller ? 'var(--gold-accent)' : 'var(--text-muted)'
+                                    }}
                                 >
                                     <User className="h-4 w-4" />
                                     Customer Portal
@@ -358,11 +376,10 @@ export default function Login() {
                                 <button
                                     type="button"
                                     onClick={() => setRole('seller')}
-                                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer ${
-                                        isSeller 
-                                            ? 'bg-white text-[#8D5A2B] shadow-sm border-b-2 border-[#8D5A2B]' 
-                                            : 'text-[#8A8A8A] hover:text-[#5F5F5F]'
-                                    }`}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 cursor-pointer relative z-10"
+                                    style={{
+                                        color: isSeller ? 'var(--gold-accent)' : 'var(--text-muted)'
+                                    }}
                                 >
                                     <Building2 className="h-4 w-4" />
                                     Seller Console
@@ -371,10 +388,10 @@ export default function Login() {
 
                             {/* Welcome Header */}
                             <div className="mb-6">
-                                <h1 className="font-['Outfit'] text-2xl lg:text-3xl font-black tracking-tight" style={{ color: '#1F1F1F' }}>
+                                <h1 className="font-['Outfit'] text-2xl lg:text-3xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>
                                     {mode === 'login' ? 'Welcome Back' : 'Create Account'}
                                 </h1>
-                                <p className="text-xs font-semibold mt-1" style={{ color: '#5F5F5F' }}>
+                                <p className="text-xs font-semibold mt-1" style={{ color: 'var(--text-secondary)' }}>
                                     {mode === 'login' 
                                         ? 'Sign in to access your account and manage your business.' 
                                         : 'Register to get started with VenderFlow.'}
@@ -401,9 +418,9 @@ export default function Login() {
                                 {/* Full Name (Only for Register Mode) */}
                                 {mode === 'register' && (
                                     <div className="animate-fade-in-up">
-                                        <label className="block text-xs font-bold mb-1.5" style={{ color: '#3F3F3F' }}>Full Name</label>
-                                        <div className="relative group">
-                                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+                                        <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--input-label)' }}>Full Name</label>
+                                        <div className="relative group luxury-input-group">
+                                            <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors" />
                                             <input 
                                                 id="input-name" 
                                                 type="text" 
@@ -419,9 +436,9 @@ export default function Login() {
 
                                 {/* Email Address */}
                                 <div>
-                                    <label className="block text-xs font-bold mb-1.5" style={{ color: '#3F3F3F' }}>Email Address</label>
-                                    <div className="relative group">
-                                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+                                    <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--input-label)' }}>Email Address</label>
+                                    <div className="relative group luxury-input-group">
+                                        <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors" />
                                         <input 
                                             id="input-email" 
                                             type="email" 
@@ -436,9 +453,9 @@ export default function Login() {
 
                                 {/* Password */}
                                 <div>
-                                    <label className="block text-xs font-bold mb-1.5" style={{ color: '#3F3F3F' }}>Password</label>
-                                    <div className="relative group">
-                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+                                    <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--input-label)' }}>Password</label>
+                                    <div className="relative group luxury-input-group">
+                                        <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors" />
                                         <input 
                                             id="input-password" 
                                             type={showPass ? 'text' : 'password'} 
@@ -463,7 +480,7 @@ export default function Login() {
                                     {mode === 'register' && form.password && (
                                         <div className="mt-2 space-y-1 animate-fade-in">
                                             <div className="flex justify-between items-center text-[10px] font-bold">
-                                                <span style={{ color: '#5F5F5F' }}>Password Strength:</span>
+                                                <span style={{ color: 'var(--text-secondary)' }}>Password Strength:</span>
                                                 <span style={{ color: getPasswordStrength(form.password).colorHex }}>
                                                     {getPasswordStrength(form.password).text}
                                                 </span>
@@ -478,9 +495,9 @@ export default function Login() {
                                 {/* Confirm Password (Only for Register Mode) */}
                                 {mode === 'register' && (
                                     <div className="animate-fade-in-up">
-                                        <label className="block text-xs font-bold mb-1.5" style={{ color: '#3F3F3F' }}>Confirm Password</label>
-                                        <div className="relative group">
-                                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--text-muted)' }} />
+                                        <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--input-label)' }}>Confirm Password</label>
+                                        <div className="relative group luxury-input-group">
+                                            <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 transition-colors" />
                                             <input 
                                                 id="input-confirm-password" 
                                                 type={showConfirm ? 'text' : 'password'} 
@@ -506,7 +523,7 @@ export default function Login() {
                                 {/* Remember Me and Forgot Password (Only for Login Mode) */}
                                 {mode === 'login' && (
                                     <div className="flex items-center justify-between mt-1 text-xs">
-                                        <label className="flex items-center gap-2 font-semibold cursor-pointer select-none" style={{ color: '#5F5F5F' }}>
+                                        <label className="flex items-center gap-2 font-semibold cursor-pointer select-none" style={{ color: 'var(--text-secondary)' }}>
                                             <input 
                                                 type="checkbox" 
                                                 checked={rememberMe} 
@@ -518,9 +535,9 @@ export default function Login() {
                                         <button 
                                             type="button" 
                                             className="font-bold transition-colors cursor-pointer"
-                                            style={{ color: '#8D5A2B' }}
-                                            onMouseEnter={e => e.currentTarget.style.color = '#744A21'}
-                                            onMouseLeave={e => e.currentTarget.style.color = '#8D5A2B'}
+                                            style={{ color: 'var(--gold-accent)' }}
+                                            onMouseEnter={e => e.currentTarget.style.color = 'var(--gold-hover)'}
+                                            onMouseLeave={e => e.currentTarget.style.color = 'var(--gold-accent)'}
                                         >
                                             Forgot password?
                                         </button>
@@ -530,7 +547,7 @@ export default function Login() {
                                 {/* Account Type Selector (Only for Register Mode) */}
                                 {mode === 'register' && (
                                     <div className="animate-fade-in-up pt-1">
-                                        <label className="block text-xs font-bold mb-1.5" style={{ color: '#3F3F3F' }}>Account Type</label>
+                                        <label className="block text-xs font-bold mb-1.5" style={{ color: 'var(--input-label)' }}>Account Type</label>
                                         <div className="flex gap-2">
                                             <button 
                                                 type="button" 
@@ -589,8 +606,8 @@ export default function Login() {
                             <div className="grid grid-cols-2 gap-4 mt-2">
                                 <button 
                                     type="button"
-                                    className="flex items-center justify-center gap-2.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 border hover:-translate-y-0.5 hover:shadow-sm bg-white hover:bg-slate-50/80 cursor-pointer"
-                                    style={{ borderColor: '#E5E7EB', color: '#1F1F1F' }}
+                                    className="flex items-center justify-center gap-2.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 border hover:-translate-y-0.5 hover:shadow-sm cursor-pointer"
+                                    style={{ backgroundColor: 'var(--social-btn-bg)', borderColor: 'var(--social-btn-border)', color: 'var(--social-btn-text)' }}
                                 >
                                     <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24">
                                         <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
@@ -603,8 +620,8 @@ export default function Login() {
 
                                 <button 
                                     type="button"
-                                    className="flex items-center justify-center gap-2.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 border hover:-translate-y-0.5 hover:shadow-sm bg-white hover:bg-slate-50/80 cursor-pointer"
-                                    style={{ borderColor: '#E5E7EB', color: '#1F1F1F' }}
+                                    className="flex items-center justify-center gap-2.5 py-2.5 rounded-lg text-xs font-bold transition-all duration-300 border hover:-translate-y-0.5 hover:shadow-sm cursor-pointer"
+                                    style={{ backgroundColor: 'var(--social-btn-bg)', borderColor: 'var(--social-btn-border)', color: 'var(--social-btn-text)' }}
                                 >
                                     <svg className="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                                         <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.1.09 2.27-.56 2.95-1.39z" />
@@ -621,7 +638,8 @@ export default function Login() {
                                         <button
                                             type="button"
                                             onClick={() => { setMode('register'); setError(''); setSuccess('') }}
-                                            className="font-bold text-[#8D5A2B] hover:underline cursor-pointer"
+                                            className="font-bold hover:underline cursor-pointer"
+                                            style={{ color: 'var(--gold-accent)' }}
                                         >
                                             Register for free
                                         </button>
@@ -632,7 +650,8 @@ export default function Login() {
                                         <button
                                             type="button"
                                             onClick={() => { setMode('login'); setError(''); setSuccess('') }}
-                                            className="font-bold text-[#8D5A2B] hover:underline cursor-pointer"
+                                            className="font-bold hover:underline cursor-pointer"
+                                            style={{ color: 'var(--gold-accent)' }}
                                         >
                                             Sign In
                                         </button>
@@ -643,25 +662,25 @@ export default function Login() {
                     </div>
 
                     {/* Right Panel Footer trust indicators */}
-                    <div className="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between text-[10px] text-slate-400">
+                    <div className="mt-4 pt-4 border-t flex items-center justify-between text-[10px] text-slate-400" style={{ borderColor: 'var(--card-border)' }}>
                         <div className="flex items-center gap-1">
                             <ShieldCheck className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <div>
-                                <div className="font-bold text-slate-600">Enterprise Security</div>
+                                <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>Enterprise Security</div>
                                 <div className="text-[8px] text-slate-400 leading-none">Bank-level protection</div>
                             </div>
                         </div>
-                        <div className="flex items-center gap-1 border-x border-slate-100 px-3">
+                        <div className="flex items-center gap-1 border-x px-3" style={{ borderColor: 'var(--card-border)' }}>
                             <Lock className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <div>
-                                <div className="font-bold text-slate-600">End-to-end Encryption</div>
+                                <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>End-to-end Encryption</div>
                                 <div className="text-[8px] text-slate-400 leading-none">Your data is always safe</div>
                             </div>
                         </div>
                         <div className="flex items-center gap-1">
                             <CheckCircle className="h-3.5 w-3.5 text-slate-400 shrink-0" />
                             <div>
-                                <div className="font-bold text-slate-600">99.9% Uptime</div>
+                                <div className="font-bold" style={{ color: 'var(--text-secondary)' }}>99.9% Uptime</div>
                                 <div className="text-[8px] text-slate-400 leading-none">Reliable & always on</div>
                             </div>
                         </div>
