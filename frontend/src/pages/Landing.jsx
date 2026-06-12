@@ -114,7 +114,7 @@ export default function Landing() {
               to="/login" 
               className="px-5 py-2.5 rounded-xl btn-gold text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0"
             >
-              Start Free Trial
+              Portal Access
             </Link>
           </div>
 
@@ -143,7 +143,7 @@ export default function Landing() {
               to="/login" 
               className="w-full text-center py-3.5 rounded-xl btn-gold text-base transition-all duration-300"
             >
-              Start Free Trial
+              Portal Access
             </Link>
           </nav>
         </div>
@@ -184,14 +184,14 @@ export default function Landing() {
                 to="/login" 
                 className="group/btn flex items-center gap-2.5 px-8 py-4 rounded-2xl animate-shimmer-sweep text-white font-bold transition-all duration-350 hover:shadow-xl hover:shadow-bronze-500/25 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Start Free Trial 
+                Customer Portal 
                 <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover/btn:translate-x-1" />
               </Link>
               <button 
                 onClick={() => navigate('/login')}
                 className="group/demo px-8 py-4 rounded-2xl border border-bronze-500/20 bg-white/40 backdrop-blur-sm text-neutral-800 hover:bg-white/80 hover:border-bronze-500/40 font-bold transition-all duration-350 hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 flex items-center gap-2"
               >
-                View Live Demo
+                Seller Console
                 <span className="w-1.5 h-1.5 rounded-full bg-bronze-500 group-hover/demo:scale-150 transition-transform duration-350"></span>
               </button>
             </div>
@@ -199,9 +199,9 @@ export default function Landing() {
             {/* Checkmark benefits */}
             <div className="flex flex-wrap items-center gap-x-5 gap-y-3 pt-6 border-t border-bronze-200/40 animate-fade-in animation-delay-300">
               {[
-                "No credit card required",
-                "14-day free trial",
-                "Cancel anytime"
+                "Real-time Order Tracking",
+                "Multi-Vendor Operations",
+                "Instant Status Sync"
               ].map((benefit, idx) => (
                 <div 
                   key={idx} 
@@ -570,13 +570,13 @@ export default function Landing() {
                 to="/login" 
                 className="flex items-center gap-2 px-7 py-3.5 rounded-xl btn-gold text-white font-bold transition-all duration-300 hover:shadow-lg hover:shadow-bronze-500/20 hover:-translate-y-0.5 active:translate-y-0"
               >
-                Start Free Trial <ArrowRight className="w-4 h-4" />
+                Customer Portal <ArrowRight className="w-4 h-4" />
               </Link>
               <button 
                 onClick={() => navigate('/login')}
                 className="px-7 py-3.5 rounded-xl border border-white/20 hover:border-white/40 text-white hover:bg-white/10 font-bold transition-all duration-300 hover:-translate-y-0.5"
               >
-                View Live Demo
+                Seller Console
               </button>
             </div>
             
@@ -584,17 +584,17 @@ export default function Landing() {
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs font-semibold text-neutral-300 pt-2">
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-bronze-200" />
-                No credit card required
+                Secure Authentication
               </div>
               <span className="hidden sm:inline text-white/20">|</span>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-bronze-200" />
-                14-day free trial
+                Interactive Dashboards
               </div>
               <span className="hidden sm:inline text-white/20">|</span>
               <div className="flex items-center gap-1.5">
                 <CheckCircle2 className="w-4 h-4 text-bronze-200" />
-                Cancel anytime
+                Role-Based Access
               </div>
             </div>
           </div>
