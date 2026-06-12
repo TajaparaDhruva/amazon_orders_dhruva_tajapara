@@ -67,6 +67,12 @@ export default function Login() {
         if (mode === 'register' && !form.name.trim()) return 'Full name is required.'
         if (!form.email.trim() || !/\S+@\S+\.\S+/.test(form.email)) return 'A valid email address is required.'
         if (!form.password || form.password.length < 6) return 'Password must be at least 6 characters.'
+        if (mode === 'register') {
+            const strength = getPasswordStrength(form.password)
+            if (strength.text === 'Weak' || strength.text === 'Fair') {
+                return 'Password strength must be at least Good or Strong. Please include uppercase, lowercase, numbers, or special characters.'
+            }
+        }
         if (mode === 'register' && form.password !== form.confirmPassword) return 'Passwords do not match.'
         return null
     }
