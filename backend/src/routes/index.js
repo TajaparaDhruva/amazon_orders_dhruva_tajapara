@@ -1,8 +1,6 @@
 const express = require('express');
 const router = express.Router();
 
-const registerRoutes = require('./auth/register.routes');
-const loginRoutes = require('./auth/login.routes');
 const authRoutes = require('./auth.routes');
 const orderRoutes = require('./order.routes');
 const searchRoutes = require('./search.routes');
@@ -25,8 +23,6 @@ router.get('/', (req, res) => {
 });
 
 // Mount routes
-router.use('/auth', registerRoutes);   // legacy: POST /auth/register
-router.use('/auth', loginRoutes);      // legacy: POST /auth/login
 router.use('/auth', authRoutes);       // consolidated: POST /auth/register, /auth/login, /auth/logout
 router.use('/orders', orderRoutes);
 router.use('/search', searchRoutes);

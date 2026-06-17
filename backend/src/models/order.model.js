@@ -51,6 +51,10 @@ const orderSchema = new mongoose.Schema(
                     'Beauty & Personal Care',
                     'Health & Household',
                     'Automotive',
+                    'Fashion',
+                    'Home & Living',
+                    'Beauty',
+                    'Sports',
                     'Other'
                 ],
                 message: '{VALUE} is not a valid category'
