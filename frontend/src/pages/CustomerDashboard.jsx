@@ -7,152 +7,13 @@ import {
     Clock, Trash2, ArrowRight, Star, Heart, Search, ChevronDown,
     ChevronLeft, ChevronRight, Truck, CreditCard, Headphones, Sparkles, Menu
 } from 'lucide-react'
+import { CATEGORIES, SUBCATEGORIES, ALL_PRODUCTS, RECOMMENDED_PRODUCTS, YOU_MAY_ALSO_LIKE, BRANDS, SLIDES } from '../data/dashboardData'
 
-// --- DATASET DEFINITIONS MATCHING THE REFERENCE PHOTO ---
-
-const CATEGORIES = [
-    { name: 'Electronics', count: 256, image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&q=80' },
-    { name: 'Fashion', count: 192, image: 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&q=80' },
-    { name: 'Home & Living', count: 128, image: 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300&q=80' },
-    { name: 'Beauty', count: 96, image: 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=300&q=80' },
-    { name: 'Sports', count: 76, image: 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=300&q=80' },
-    { name: 'Automotive', count: 54, image: 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=300&q=80' }
-]
-
-const RECOMMENDED_PRODUCTS = [
-    {
-        id: 'rec-1',
-        name: 'Fire-Boltt Ninja 3 Smartwatch',
-        category: 'Electronics',
-        price: 1799,
-        originalPrice: 2299,
-        discount: '-20%',
-        rating: 5,
-        reviews: 120,
-        image: 'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?w=400&q=80'
-    },
-    {
-        id: 'rec-2',
-        name: 'boAt Rockerz 450',
-        category: 'Electronics',
-        price: 1499,
-        originalPrice: 1799,
-        discount: '-18%',
-        rating: 5,
-        reviews: 96,
-        image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80'
-    },
-    {
-        id: 'rec-3',
-        name: 'Puma Unisex Sneakers',
-        category: 'Fashion',
-        price: 1499,
-        originalPrice: 1999,
-        discount: '-25%',
-        rating: 5,
-        reviews: 78,
-        image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80'
-    },
-    {
-        id: 'rec-4',
-        name: 'Safari Laptop Backpack',
-        category: 'Bags & Luggage',
-        price: 2199,
-        originalPrice: 2499,
-        discount: '-10%',
-        rating: 5,
-        reviews: 64,
-        image: 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80'
-    },
-    {
-        id: 'rec-5',
-        name: 'Samsung Galaxy S23',
-        category: 'Electronics',
-        price: 74999,
-        originalPrice: 84999,
-        discount: '-12%',
-        rating: 5,
-        reviews: 207,
-        image: 'https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80'
-    }
-]
-
-const YOU_MAY_ALSO_LIKE = [
-    {
-        id: 'like-1',
-        name: 'Zebronics Keyboard',
-        category: 'Electronics',
-        price: 499,
-        image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=300&q=80'
-    },
-    {
-        id: 'like-2',
-        name: 'Philips LED Bulb',
-        category: 'Home & Living',
-        price: 249,
-        image: 'https://images.unsplash.com/photo-1550985543-f47f38aeee65?w=300&q=80'
-    },
-    {
-        id: 'like-3',
-        name: 'Nike Air Max 270',
-        category: 'Fashion',
-        price: 5499,
-        image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=300&q=80'
-    },
-    {
-        id: 'like-4',
-        name: 'Levi\'s Men\'s T-Shirt',
-        category: 'Fashion',
-        price: 999,
-        image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=300&q=80'
-    },
-    {
-        id: 'like-5',
-        name: 'Sony WH-1000XM5',
-        category: 'Electronics',
-        price: 29990,
-        image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=300&q=80'
-    },
-    {
-        id: 'like-6',
-        name: 'boAt Airdopes 141',
-        category: 'Electronics',
-        price: 1299,
-        image: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=300&q=80'
-    }
-]
-
-const BRANDS = ['boAt', 'Puma', 'Samsung', 'Nike', 'Adidas', 'Sony']
-
-const SLIDES = [
-    {
-        badge: 'MEGA SALE',
-        title: 'Big Savings on Smart Shopping',
-        subtitle: 'Up to 60% off on electronics, fashion, home & more. Get additional first order discounts instantly.',
-        image: 'https://images.unsplash.com/photo-1498049794561-7780e7231661?w=1200&q=80',
-        btnText: 'Shop Now'
-    },
-    {
-        badge: 'FASHION SALE',
-        title: 'Elevate Your Style & Fashion',
-        subtitle: 'Min. 50% Off on latest styles, footwear, clothing and trend accessories.',
-        image: 'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1200&q=80',
-        btnText: 'Shop Now'
-    },
-    {
-        badge: 'HOME ESSENTIALS',
-        title: 'Modern Living & Comfort Decor',
-        subtitle: 'Up to 45% off on aesthetic furniture, organizers, and home sanctuary decor.',
-        image: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80',
-        btnText: 'Explore Now'
-    }
-]
-
-function CategoryItem({ cat }) {
+function CategoryItem({ cat, onClick }) {
     const [isFailed, setIsFailed] = useState(false)
 
     return (
-        <div className="flex-shrink-0 w-[170px] bg-[var(--card-bg)] border border-[var(--card-border)] p-6 rounded-3xl flex flex-col items-center text-center shadow-[0_4px_20px_-4px_rgba(141,90,43,0.05)] hover:shadow-[0_10px_30px_-5px_rgba(141,90,43,0.15)] hover:border-[var(--gold-accent)]/30 hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer">
+        <div onClick={onClick} className="flex-shrink-0 w-[170px] bg-[var(--card-bg)] border border-[var(--card-border)] p-6 rounded-3xl flex flex-col items-center text-center shadow-[0_4px_20px_-4px_rgba(141,90,43,0.05)] hover:shadow-[0_10px_30px_-5px_rgba(141,90,43,0.15)] hover:border-[var(--gold-accent)]/30 hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer">
             <div className="h-24 w-24 rounded-full overflow-hidden border border-[var(--card-border)] bg-[var(--bg-right-panel)] flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:border-[var(--gold-accent)]/30 transition-all duration-500 relative">
                 {!isFailed ? (
                     <img
@@ -190,6 +51,52 @@ export default function CustomerDashboard() {
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [activeHeroDot, setActiveHeroDot] = useState(0)
+
+    // Filter & Sort States
+    const [selectedCategory, setSelectedCategory] = useState(null)
+    const [selectedSubcategory, setSelectedSubcategory] = useState(null)
+    const [selectedBrands, setSelectedBrands] = useState([])
+    const [brandSearchQuery, setBrandSearchQuery] = useState('')
+    const [maxPrice, setMaxPrice] = useState(150000)
+    const [selectedRating, setSelectedRating] = useState(null)
+    const [sortBy, setSortBy] = useState('popularity')
+
+    // Reset filters when changing category
+    useEffect(() => {
+        setSelectedSubcategory(null)
+        setSelectedBrands([])
+        setBrandSearchQuery('')
+        setMaxPrice(150000)
+        setSelectedRating(null)
+    }, [selectedCategory])
+
+    const clearAllFilters = () => {
+        setSelectedSubcategory(null)
+        setSelectedBrands([])
+        setBrandSearchQuery('')
+        setMaxPrice(150000)
+        setSelectedRating(null)
+    }
+
+    // Get active brands for selected category
+    const activeProductsForCategory = ALL_PRODUCTS.filter(p => p.category === selectedCategory)
+    const availableBrands = [...new Set(activeProductsForCategory.map(p => p.brand))]
+
+    // Filtered products list
+    const filteredProducts = activeProductsForCategory
+        .filter(p => {
+            if (selectedSubcategory && p.subcategory !== selectedSubcategory) return false
+            if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false
+            if (p.price > maxPrice) return false
+            if (selectedRating && p.rating < selectedRating) return false
+            return true
+        })
+        .sort((a, b) => {
+            if (sortBy === 'price-low') return a.price - b.price
+            if (sortBy === 'price-high') return b.price - a.price
+            if (sortBy === 'rating') return b.rating - a.rating
+            return b.reviews - a.reviews
+        })
 
     // Stats calculated from customer's orders
     const [customerStats, setCustomerStats] = useState({
@@ -381,11 +288,11 @@ export default function CustomerDashboard() {
 
     return (
         <div className={`min-h-screen font-['Inter'] relative transition-colors duration-300 ${isDark ? 'theme-dark' : ''} bg-[var(--bg-right-panel)] text-[var(--text-primary)]`}>
-            
+
             {/* Header / Navbar (Clean, borderless transition to category nav) */}
             <header className="bg-[var(--card-bg)] sticky top-0 z-40 transition-colors">
                 <div className="max-w-7xl mx-auto px-4 lg:px-6 h-20 flex items-center justify-between gap-4">
-                    
+
                     {/* Logo Section */}
                     <div className="flex items-center gap-2 lg:gap-3 shrink-0">
                         <div className="h-10 w-10 rounded-xl flex items-center justify-center bg-[var(--gold-accent)] border border-[var(--gold-accent)]/20 shadow-md">
@@ -425,7 +332,7 @@ export default function CustomerDashboard() {
 
                     {/* Right Action Icons & User Info */}
                     <div className="flex items-center gap-3 lg:gap-5">
-                        
+
                         {/* Wishlist */}
                         <button className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--gold-accent)] font-semibold text-xs transition-colors shrink-0">
                             <Heart className="h-4.5 w-4.5 text-[var(--text-muted)]" />
@@ -504,394 +411,682 @@ export default function CustomerDashboard() {
 
 
             <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-10">
-                
-                {/* 1. Hero Promo Section / Image Slider Banner */}
-                <section className="relative h-[280px] sm:h-[350px] md:h-[400px] rounded-[2.5rem] overflow-hidden shadow-sm transition-all duration-500">
-                    
-                    {/* Slider Background Image */}
-                    <div 
-                        className="absolute inset-0 bg-cover bg-center transition-all duration-700 transform"
-                        style={{ 
-                            backgroundImage: `url(${SLIDES[activeHeroDot].image})`
-                        }}
-                    />
-                    
-                    {/* Theme-aligned gradient overlay for readability */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
 
-                    {/* Slide Content details */}
-                    <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-16 space-y-4 max-w-xl text-white z-10 text-left">
-                        <span className="w-fit bg-[var(--gold-accent)] text-white text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-md">
-                            {SLIDES[activeHeroDot].badge}
-                        </span>
-                        <h1 className="font-['Outfit'] text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] text-white">
-                            {SLIDES[activeHeroDot].title}
-                        </h1>
-                        <p className="text-[10px] sm:text-xs md:text-sm font-medium text-white/90 leading-relaxed">
-                            {SLIDES[activeHeroDot].subtitle}
-                        </p>
-                        <button
-                            onClick={() => {
-                                const el = document.getElementById('recommended-section')
-                                if (el) el.scrollIntoView({ behavior: 'smooth' })
-                            }}
-                            className="w-fit bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs font-extrabold shadow-lg shadow-[var(--gold-accent)]/20 hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2"
-                        >
-                            {SLIDES[activeHeroDot].btnText} <ArrowRight className="h-4 w-4" />
-                        </button>
-                    </div>
-
-                    {/* Dots indicators (Auto sliding loop) */}
-                    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
-                        {SLIDES.map((_, dot) => (
-                            <button
-                                key={dot}
-                                onClick={() => setActiveHeroDot(dot)}
-                                className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
-                                    activeHeroDot === dot
-                                        ? 'bg-[var(--gold-accent)] w-6.5'
-                                        : 'bg-white/50 hover:bg-white'
-                                }`}
-                            />
-                        ))}
-                    </div>
-                </section>
-
-                {/* 2. Shop by Categories Section */}
-                <section className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                            Shop by Categories
-                        </h2>
-                        <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
-                            View All
-                        </span>
-                    </div>
-
-                    <div className="relative">
-                        {/* Carousel Wrapper */}
-                        <div ref={categoriesRef} className="flex items-center gap-5 xl:justify-between overflow-x-auto no-scrollbar py-2.5 scroll-smooth">
-                            {CATEGORIES.map((cat, idx) => (
-                                <CategoryItem key={idx} cat={cat} />
-                            ))}
+                {selectedCategory ? (
+                    <div className="space-y-6">
+                        {/* Breadcrumb */}
+                        <div className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1.5 opacity-80">
+                            <span className="cursor-pointer hover:text-[var(--gold-accent)] transition-colors" onClick={() => setSelectedCategory(null)}>Home</span>
+                            <span>&gt;</span>
+                            <span className="text-[var(--text-primary)] font-bold">{selectedCategory}</span>
                         </div>
 
-                        {/* Navigation Chevrons */}
-                        <button
-                            onClick={() => scroll(categoriesRef, 'left')}
-                            className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
-                        >
-                            <ChevronLeft className="h-4.5 w-4.5" />
-                        </button>
-                        <button
-                            onClick={() => scroll(categoriesRef, 'right')}
-                            className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
-                        >
-                            <ChevronRight className="h-4.5 w-4.5" />
-                        </button>
-                    </div>
-                </section>
+                        {/* Title & Stats */}
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div>
+                                <h1 className="font-['Outfit'] text-2xl lg:text-3xl font-black text-[var(--text-primary)] tracking-tight">
+                                    {selectedCategory}
+                                </h1>
+                                <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">
+                                    Showing 1-{Math.min(filteredProducts.length, 12)} of {filteredProducts.length} products
+                                </p>
+                            </div>
 
-                {/* 3. Features highlight ribbon */}
-                <section className="bg-[var(--card-bg)] border border-[var(--card-border)] p-5 rounded-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 shadow-sm">
-                    <div className="flex items-center gap-3.5 px-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
-                            <Truck className="h-5.5 w-5.5" />
-                        </div>
-                        <div>
-                            <h4 className="text-xs font-black tracking-tight">Free Delivery</h4>
-                            <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">On orders above ₹499</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3.5 px-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
-                            <CreditCard className="h-5.5 w-5.5" />
-                        </div>
-                        <div>
-                            <h4 className="text-xs font-black tracking-tight">Secure Payment</h4>
-                            <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">100% secure payments</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3.5 px-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
-                            <RefreshCw className="h-5.5 w-5.5" />
-                        </div>
-                        <div>
-                            <h4 className="text-xs font-black tracking-tight">Easy Returns</h4>
-                            <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">30-day return policy</p>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3.5 px-3">
-                        <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
-                            <Headphones className="h-5.5 w-5.5" />
-                        </div>
-                        <div>
-                            <h4 className="text-xs font-black tracking-tight">24/7 Support</h4>
-                            <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">We're here to help</p>
-                        </div>
-                    </div>
-                </section>
-
-                {/* 4. Recommended for You Section */}
-                <section id="recommended-section" className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                            Recommended for you
-                        </h2>
-                        <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
-                            View All
-                        </span>
-                    </div>
-
-                    <div className="relative">
-                        <div ref={recommendedRef} className="flex items-center gap-5 xl:justify-between overflow-x-auto no-scrollbar py-2 scroll-smooth">
-                            {RECOMMENDED_PRODUCTS.map((prod) => (
-                                <div
-                                    key={prod.id}
-                                    className="flex-shrink-0 w-[220px] bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                            {/* Sort & Grid/List view */}
+                            <div className="flex items-center gap-3 self-end sm:self-center">
+                                <span className="text-xs font-bold text-[var(--text-secondary)] whitespace-nowrap">Sort by:</span>
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl py-2 px-3 text-xs font-semibold outline-none cursor-pointer focus:border-[var(--gold-accent)] text-[var(--text-primary)]"
                                 >
-                                    {/* Product Top Image & Tags */}
-                                    <div className="relative bg-[var(--bg-right-panel)] h-44 w-full flex items-center justify-center overflow-hidden border-b border-[var(--card-border)]">
-                                        <img
-                                            src={prod.image}
-                                            alt={prod.name}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                    <option value="popularity">Popularity</option>
+                                    <option value="price-low">Price: Low to High</option>
+                                    <option value="price-high">Price: High to Low</option>
+                                    <option value="rating">Customer Rating</option>
+                                </select>
+
+                                {/* Grid icons */}
+                                <div className="flex items-center border border-[var(--card-border)] rounded-xl p-1 bg-[var(--card-bg)] gap-0.5">
+                                    <button className="p-1.5 rounded-lg bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]">
+                                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
+                                    </button>
+                                    <button className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        {/* Main Grid: Filter panel + Products grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                            {/* Left Filter Panel (Col 3) */}
+                            <div className="lg:col-span-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 space-y-6 shadow-sm">
+                                <div className="flex items-center justify-between border-b pb-4 border-[var(--card-border)]/70">
+                                    <span className="font-['Outfit'] font-black text-sm text-[var(--text-primary)] tracking-tight">Filters</span>
+                                    <button
+                                        onClick={clearAllFilters}
+                                        className="text-[10px] font-black uppercase text-[var(--gold-accent)] hover:underline tracking-wider"
+                                    >
+                                        Clear All
+                                    </button>
+                                </div>
+
+                                {/* Subcategories filter list */}
+                                <div className="space-y-3">
+                                    <div className="font-extrabold text-[11px] text-[var(--text-primary)] uppercase tracking-wider flex items-center justify-between cursor-pointer">
+                                        <span>Subcategories</span>
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        {SUBCATEGORIES[selectedCategory]?.map((sub) => {
+                                            const isChecked = selectedSubcategory === sub.name;
+                                            return (
+                                                <label key={sub.name} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={() => setSelectedSubcategory(isChecked ? null : sub.name)}
+                                                        className="rounded border-[var(--card-border)] text-[var(--gold-accent)] focus:ring-[var(--gold-accent)] h-3.5 w-3.5 cursor-pointer"
+                                                    />
+                                                    <span>{sub.name}</span>
+                                                </label>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+
+                                {/* Brands filter list */}
+                                <div className="space-y-3 pt-4 border-t border-[var(--card-border)]/40">
+                                    <div className="font-extrabold text-[11px] text-[var(--text-primary)] uppercase tracking-wider flex items-center justify-between">
+                                        <span>Brand</span>
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                                    </div>
+                                    {/* Brand Search */}
+                                    <div className="relative flex items-center border border-[var(--card-border)] rounded-lg overflow-hidden bg-[var(--bg-right-panel)]">
+                                        <div className="pl-2.5 text-[var(--text-muted)]">
+                                            <Search className="h-3.5 w-3.5" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            placeholder="Search Brand"
+                                            value={brandSearchQuery}
+                                            onChange={(e) => setBrandSearchQuery(e.target.value)}
+                                            className="w-full py-1.5 px-2 bg-transparent text-[11px] font-medium outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)]"
                                         />
-                                        
-                                        {/* Sale Badge */}
-                                        <span className="absolute top-2.5 left-2.5 bg-[#FFEAEB] text-[#D84242] text-[9px] font-black uppercase px-2 py-0.5 rounded-md shadow-sm">
-                                            {prod.discount}
-                                        </span>
-
-                                        {/* Wishlist toggle icon */}
-                                        <button className="absolute top-2.5 right-2.5 h-7 w-7 rounded-full bg-[var(--card-bg)]/80 dark:bg-black/50 hover:bg-[var(--card-bg)] text-[var(--text-muted)] hover:text-rose-500 border border-[var(--card-border)] flex items-center justify-center transition-all">
-                                            <Heart className="h-3.5 w-3.5" />
-                                        </button>
                                     </div>
+                                    <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1 no-scrollbar">
+                                        {availableBrands
+                                            .filter(b => b.toLowerCase().includes(brandSearchQuery.toLowerCase()))
+                                            .map((brand) => {
+                                                const isChecked = selectedBrands.includes(brand);
+                                                return (
+                                                    <label key={brand} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isChecked}
+                                                            onChange={() => {
+                                                                if (isChecked) {
+                                                                    setSelectedBrands(selectedBrands.filter(b => b !== brand));
+                                                                } else {
+                                                                    setSelectedBrands([...selectedBrands, brand]);
+                                                                }
+                                                            }}
+                                                            className="rounded border-[var(--card-border)] text-[var(--gold-accent)] focus:ring-[var(--gold-accent)] h-3.5 w-3.5 cursor-pointer"
+                                                        />
+                                                        <span>{brand}</span>
+                                                    </label>
+                                                );
+                                            })}
+                                    </div>
+                                </div>
 
-                                    {/* Product Details */}
-                                    <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
-                                        <div>
-                                            <span className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider uppercase">
-                                                {prod.category}
-                                            </span>
-                                            <h3 className="font-bold text-xs mt-1 text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[32px]">
-                                                {prod.name}
-                                            </h3>
-
-                                            {/* Stars Rating */}
-                                            <div className="flex items-center gap-1 mt-2">
-                                                <div className="flex items-center text-amber-400">
-                                                    {[...Array(5)].map((_, s) => (
-                                                        <Star key={s} className="h-3 w-3 fill-current" />
-                                                    ))}
-                                                </div>
-                                                <span className="text-[9.5px] font-bold text-[var(--text-muted)]">
-                                                    ({prod.reviews})
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        {/* Prices & Actions Button */}
-                                        <div>
-                                            <div className="flex items-baseline gap-2">
-                                                <span className="text-sm font-black text-[var(--text-primary)]">
-                                                    {formatCurrency(prod.price)}
-                                                </span>
-                                                <span className="text-[10px] font-semibold text-[var(--text-muted)] line-through">
-                                                    {formatCurrency(prod.originalPrice)}
-                                                </span>
-                                            </div>
-
-                                            <button
-                                                onClick={() => triggerCheckout(prod)}
-                                                className="w-full mt-3.5 py-2 rounded-xl bg-transparent hover:bg-[var(--gold-accent)] text-[var(--gold-accent)] hover:text-white border border-[var(--gold-accent)]/35 hover:border-transparent text-[10.5px] font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
-                                            >
-                                                <ShoppingBag className="h-3.5 w-3.5" /> Add to Cart
-                                            </button>
+                                {/* Price range filter */}
+                                <div className="space-y-3 pt-4 border-t border-[var(--card-border)]/40">
+                                    <div className="font-extrabold text-[11px] text-[var(--text-primary)] uppercase tracking-wider flex items-center justify-between">
+                                        <span>Price Range</span>
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                                    </div>
+                                    <div className="space-y-2.5">
+                                        <input
+                                            type="range"
+                                            min="499"
+                                            max="150000"
+                                            step="500"
+                                            value={maxPrice}
+                                            onChange={(e) => setMaxPrice(Number(e.target.value))}
+                                            className="w-full accent-[var(--gold-accent)] h-1.5 bg-neutral-200 dark:bg-neutral-800 rounded-lg appearance-none cursor-pointer"
+                                        />
+                                        <div className="flex items-center justify-between text-[10.5px] font-extrabold text-[var(--text-secondary)]">
+                                            <span>₹499</span>
+                                            <span>{formatCurrency(maxPrice)}</span>
                                         </div>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
 
-                        {/* Carousel navigators */}
-                        <button
-                            onClick={() => scroll(recommendedRef, 'left')}
-                            className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
-                        >
-                            <ChevronLeft className="h-4.5 w-4.5" />
-                        </button>
-                        <button
-                            onClick={() => scroll(recommendedRef, 'right')}
-                            className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
-                        >
-                            <ChevronRight className="h-4.5 w-4.5" />
-                        </button>
-                    </div>
-                </section>
-
-                {/* 5. Two Banner Promo Grid */}
-                <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {/* Purple Smartphone banner */}
-                    <div className="bg-gradient-to-br from-[#7B66FF] to-[#5944DB] text-white rounded-3xl p-6 lg:p-10 flex items-center justify-between overflow-hidden relative shadow-sm group">
-                        <div className="space-y-4 max-w-[60%] relative z-10">
-                            <h3 className="font-['Outfit'] text-2xl lg:text-3xl font-black leading-tight">
-                                Smartphones <br /> Starting at ₹8,999
-                            </h3>
-                            <p className="text-[11px] font-medium text-white/80">Latest deals on top brands</p>
-                            <button
-                                onClick={() => {
-                                    const el = document.getElementById('recommended-section')
-                                    if (el) el.scrollIntoView({ behavior: 'smooth' })
-                                }}
-                                className="bg-white text-[#7B66FF] px-4 py-2.5 rounded-lg text-[10.5px] font-black uppercase hover:-translate-y-0.5 transition-all shadow-md shrink-0"
-                            >
-                                Shop Now
-                            </button>
-                        </div>
-                        <img
-                            src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80"
-                            alt="Phones"
-                            className="w-[180px] h-[180px] object-contain shrink-0 group-hover:scale-105 transition-transform duration-500 drop-shadow-2xl translate-x-2"
-                        />
-                    </div>
-
-                    {/* Peach Fashion Banner */}
-                    <div className="bg-[#FFF0EB] text-[#1F1F1F] rounded-3xl p-6 lg:p-10 flex items-center justify-between overflow-hidden relative shadow-sm group border border-[#FFDFD4]/30">
-                        <div className="space-y-4 max-w-[60%] relative z-10">
-                            <h3 className="font-['Outfit'] text-2xl lg:text-3xl font-black text-neutral-900 leading-tight">
-                                Fashion Sale <br /> Min. 50% Off
-                            </h3>
-                            <p className="text-[11px] font-bold text-neutral-500">On latest styles & brands</p>
-                            <button
-                                onClick={() => {
-                                    const el = document.getElementById('recommended-section')
-                                    if (el) el.scrollIntoView({ behavior: 'smooth' })
-                                }}
-                                className="bg-[var(--gold-accent)] text-white px-4 py-2.5 rounded-lg text-[10.5px] font-black uppercase hover:-translate-y-0.5 transition-all shadow-md shrink-0"
-                            >
-                                Shop Now
-                            </button>
-                        </div>
-                        <img
-                            src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80"
-                            alt="Fashion display rack"
-                            className="w-[180px] h-[180px] object-contain shrink-0 group-hover:scale-105 transition-transform duration-500 drop-shadow-lg translate-x-2 rounded-2xl"
-                        />
-                    </div>
-                </section>
-
-                {/* 6. Top Brands Section */}
-                <section className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                            Top Brands
-                        </h2>
-                        <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
-                            View All
-                        </span>
-                    </div>
-
-                    <div className="relative">
-                        <div ref={brandsRef} className="flex items-center gap-5 lg:justify-between overflow-x-auto no-scrollbar py-2">
-                            {BRANDS.map((brand, idx) => (
-                                <div
-                                    key={idx}
-                                    className="flex-shrink-0 w-[140px] bg-[var(--card-bg)] border border-[var(--card-border)] py-5 rounded-2xl text-center shadow-sm hover:shadow-md hover:border-[var(--gold-accent)]/45 transition-all cursor-pointer font-['Outfit'] text-base font-black tracking-widest text-[var(--gold-accent)] uppercase"
-                                >
-                                    {brand}
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Navigation chevron floating */}
-                        <button
-                            onClick={() => scroll(brandsRef, 'left')}
-                            className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
-                        >
-                            <ChevronLeft className="h-4.5 w-4.5" />
-                        </button>
-                        <button
-                            onClick={() => scroll(brandsRef, 'right')}
-                            className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
-                        >
-                            <ChevronRight className="h-4.5 w-4.5" />
-                        </button>
-                    </div>
-                </section>
-
-                {/* 7. You May Also Like Section */}
-                <section className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
-                            You may also like
-                        </h2>
-                        <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
-                            View All
-                        </span>
-                    </div>
-
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
-                        {YOU_MAY_ALSO_LIKE.map((prod) => (
-                            <div
-                                key={prod.id}
-                                className="bg-[var(--card-bg)] border border-[var(--card-border)] p-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
-                            >
-                                <div className="bg-[var(--bg-right-panel)] h-28 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)] shadow-inner">
-                                    <img
-                                        src={prod.image}
-                                        alt={prod.name}
-                                        className="w-full h-full object-cover hover:scale-105 transition-transform"
-                                    />
-                                </div>
-                                <div className="mt-3.5 space-y-2">
-                                    <div>
-                                        <span className="text-[8.5px] font-bold text-[var(--text-muted)] uppercase">{prod.category}</span>
-                                        <h3 className="font-bold text-[11px] text-[var(--text-primary)] line-clamp-1 leading-snug mt-0.5">{prod.name}</h3>
+                                {/* Ratings Filter */}
+                                <div className="space-y-3 pt-4 border-t border-[var(--card-border)]/40">
+                                    <div className="font-extrabold text-[11px] text-[var(--text-primary)] uppercase tracking-wider flex items-center justify-between">
+                                        <span>Ratings</span>
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-60" />
                                     </div>
-                                    <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--card-border)] opacity-95">
-                                        <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
-                                        <button
-                                            onClick={() => triggerCheckout(prod)}
-                                            className="px-2.5 py-1.5 bg-[var(--gold-accent)]/10 hover:bg-[var(--gold-accent)] text-[var(--gold-accent)] hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors shrink-0"
-                                        >
-                                            Add
-                                        </button>
+                                    <div className="space-y-2">
+                                        {[5, 4, 3].map((stars) => {
+                                            const isChecked = selectedRating === stars;
+                                            return (
+                                                <label key={stars} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={isChecked}
+                                                        onChange={() => setSelectedRating(isChecked ? null : stars)}
+                                                        className="rounded border-[var(--card-border)] text-[var(--gold-accent)] focus:ring-[var(--gold-accent)] h-3.5 w-3.5 cursor-pointer"
+                                                    />
+                                                    <span className="flex items-center gap-1 text-amber-500">
+                                                        {[...Array(5)].map((_, s) => (
+                                                            <Star key={s} className={`h-3.5 w-3.5 ${s < stars ? 'fill-current' : 'opacity-20'}`} />
+                                                        ))}
+                                                        <span className="text-[10px] text-[var(--text-muted)] font-bold ml-1">{stars} &amp; Up</span>
+                                                    </span>
+                                                </label>
+                                            );
+                                        })}
                                     </div>
                                 </div>
                             </div>
-                        ))}
-                    </div>
-                </section>
 
-                {/* 8. Coupon/Footer Promo Banner */}
-                <section className="bg-[var(--card-bg)] border border-[var(--card-border)] p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm relative">
-                    <div className="flex items-center gap-4 text-center sm:text-left">
-                        <div className="h-14 w-14 rounded-2xl bg-[var(--badge-bg)] border border-[var(--badge-border)] flex items-center justify-center text-[var(--gold-accent)] shrink-0">
-                            <Sparkles className="h-7 w-7" />
-                        </div>
-                        <div>
-                            <h3 className="text-sm lg:text-base font-black text-[var(--text-primary)] tracking-tight">Extra 10% Off on your first order 🎉</h3>
-                            <p className="text-xs font-semibold text-[var(--text-secondary)] mt-0.5">
-                                Use code: <span className="font-extrabold text-[var(--gold-accent)] tracking-wider font-mono">WELCOME10</span>
-                            </p>
+                            {/* Right side: Product Grid (Col 9) */}
+                            <div className="lg:col-span-9 space-y-8">
+                                {filteredProducts.length > 0 ? (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                                        {filteredProducts.map((prod) => (
+                                            <div
+                                                key={prod.id}
+                                                className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                                            >
+                                                {/* Top Image area */}
+                                                <div className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner">
+                                                    <img
+                                                        src={prod.image}
+                                                        alt={prod.name}
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    />
+                                                    {/* Discount sticker */}
+                                                    {prod.discount && (
+                                                        <span className="absolute top-2 left-2 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
+                                                            {prod.discount}
+                                                        </span>
+                                                    )}
+                                                </div>
+
+                                                {/* Details info */}
+                                                <div className="mt-3 space-y-2 flex-1 flex flex-col justify-between">
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center justify-between text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                                                            <span>{prod.brand}</span>
+                                                            <span className="flex items-center text-amber-500 gap-0.5">
+                                                                <Star className="h-2.5 w-2.5 fill-current" />
+                                                                {prod.rating}
+                                                            </span>
+                                                        </div>
+                                                        <h3 className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px]">
+                                                            {prod.name}
+                                                        </h3>
+                                                    </div>
+
+                                                    {/* Action button price and wishlist */}
+                                                    <div className="space-y-2.5 pt-2 border-t border-[var(--card-border)]/50">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
+                                                            {prod.originalPrice && (
+                                                                <span className="text-[9px] font-semibold text-[var(--text-muted)] line-through leading-none mt-0.5">{formatCurrency(prod.originalPrice)}</span>
+                                                            )}
+                                                        </div>
+
+                                                        <div className="flex items-center gap-1.5">
+                                                            <button
+                                                                onClick={() => triggerCheckout(prod)}
+                                                                className="flex-1 py-1.5 rounded-lg bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                                                            >
+                                                                <ShoppingBag className="h-3 w-3" /> Add
+                                                            </button>
+                                                            <button className="h-7 w-7 rounded-lg border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] hover:text-rose-500 flex items-center justify-center transition-all bg-[var(--card-bg)]">
+                                                                <Heart className="h-3.5 w-3.5" />
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-16 text-center shadow-sm space-y-4">
+                                        <div className="h-16 w-16 rounded-full bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] flex items-center justify-center mx-auto text-xl font-bold">
+                                            🔍
+                                        </div>
+                                        <h3 className="font-['Outfit'] font-black text-lg text-[var(--text-primary)]">No products found</h3>
+                                        <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto">
+                                            No products match your current filters. Try resetting the filters or modifying the price range.
+                                        </p>
+                                        <button
+                                            onClick={clearAllFilters}
+                                            className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white px-5 py-2.5 rounded-xl text-xs font-bold transition-colors"
+                                        >
+                                            Reset Filters
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Pagination */}
+                                {filteredProducts.length > 0 && (
+                                    <div className="flex items-center justify-center gap-2 pt-6 border-t border-[var(--card-border)]/50">
+                                        <button className="h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                            <ChevronLeft className="h-4.5 w-4.5" />
+                                        </button>
+                                        {[1, 2, 3].map((p) => (
+                                            <button key={p} className={`h-8.5 w-8.5 rounded-lg border flex items-center justify-center text-xs font-black transition-all ${p === 1 ? 'bg-[var(--gold-accent)] text-white border-transparent shadow-md shadow-[var(--gold-accent)]/15' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                                                {p}
+                                            </button>
+                                        ))}
+                                        <span className="text-xs font-bold text-[var(--text-muted)] px-1">...</span>
+                                        <button className={`h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center text-xs font-black transition-all`}>
+                                            65
+                                        </button>
+                                        <button className="h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                            <ChevronRight className="h-4.5 w-4.5" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                    <button
-                        onClick={() => {
-                            const el = document.getElementById('recommended-section')
-                            if (el) el.scrollIntoView({ behavior: 'smooth' })
-                        }}
-                        className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white px-6 py-2.5 rounded-xl text-xs font-extrabold transition-colors shadow-md shrink-0 cursor-pointer"
-                    >
-                        Shop Now
-                    </button>
-                </section>
+                ) : (
+                    <>
+                        {/* 1. Hero Promo Section / Image Slider Banner */}
+                        <section className="relative h-[280px] sm:h-[350px] md:h-[400px] rounded-[2.5rem] overflow-hidden shadow-sm transition-all duration-500">
 
+                            {/* Slider Background Image */}
+                            <div
+                                className="absolute inset-0 bg-cover bg-center transition-all duration-700 transform"
+                                style={{
+                                    backgroundImage: `url(${SLIDES[activeHeroDot].image})`
+                                }}
+                            />
+
+                            {/* Theme-aligned gradient overlay for readability */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent" />
+
+                            {/* Slide Content details */}
+                            <div className="absolute inset-0 flex flex-col justify-center px-6 sm:px-12 md:px-16 space-y-4 max-w-xl text-white z-10 text-left">
+                                <span className="w-fit bg-[var(--gold-accent)] text-white text-[9px] font-black tracking-wider uppercase px-3 py-1 rounded-full shadow-md">
+                                    {SLIDES[activeHeroDot].badge}
+                                </span>
+                                <h1 className="font-['Outfit'] text-2xl sm:text-4xl md:text-5xl font-black tracking-tight leading-[1.1] text-white">
+                                    {SLIDES[activeHeroDot].title}
+                                </h1>
+                                <p className="text-[10px] sm:text-xs md:text-sm font-medium text-white/90 leading-relaxed">
+                                    {SLIDES[activeHeroDot].subtitle}
+                                </p>
+                                <button
+                                    onClick={() => {
+                                        const el = document.getElementById('recommended-section')
+                                        if (el) el.scrollIntoView({ behavior: 'smooth' })
+                                    }}
+                                    className="w-fit bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white px-5 py-2.5 sm:px-6 sm:py-3 rounded-xl text-xs font-extrabold shadow-lg shadow-[var(--gold-accent)]/20 hover:-translate-y-0.5 transition-all duration-300 inline-flex items-center gap-2"
+                                >
+                                    {SLIDES[activeHeroDot].btnText} <ArrowRight className="h-4 w-4" />
+                                </button>
+                            </div>
+
+                            {/* Dots indicators (Auto sliding loop) */}
+                            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20">
+                                {SLIDES.map((_, dot) => (
+                                    <button
+                                        key={dot}
+                                        onClick={() => setActiveHeroDot(dot)}
+                                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${activeHeroDot === dot
+                                                ? 'bg-[var(--gold-accent)] w-6.5'
+                                                : 'bg-white/50 hover:bg-white'
+                                            }`}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 2. Shop by Categories Section */}
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
+                                    Shop by Categories
+                                </h2>
+                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                    View All
+                                </span>
+                            </div>
+
+                            <div className="relative">
+                                {/* Carousel Wrapper */}
+                                <div ref={categoriesRef} className="flex items-center gap-5 xl:justify-between overflow-x-auto no-scrollbar py-2.5 scroll-smooth">
+                                    {CATEGORIES.map((cat, idx) => (
+                                        <CategoryItem
+                                            key={idx}
+                                            cat={cat}
+                                            onClick={() => setSelectedCategory(cat.name)}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Navigation Chevrons */}
+                                <button
+                                    onClick={() => scroll(categoriesRef, 'left')}
+                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                >
+                                    <ChevronLeft className="h-4.5 w-4.5" />
+                                </button>
+                                <button
+                                    onClick={() => scroll(categoriesRef, 'right')}
+                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                >
+                                    <ChevronRight className="h-4.5 w-4.5" />
+                                </button>
+                            </div>
+                        </section>
+
+                        {/* 3. Features highlight ribbon */}
+                        <section className="bg-[var(--card-bg)] border border-[var(--card-border)] p-5 rounded-2xl grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 shadow-sm">
+                            <div className="flex items-center gap-3.5 px-3">
+                                <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
+                                    <Truck className="h-5.5 w-5.5" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black tracking-tight">Free Delivery</h4>
+                                    <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">On orders above ₹499</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3.5 px-3">
+                                <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
+                                    <CreditCard className="h-5.5 w-5.5" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black tracking-tight">Secure Payment</h4>
+                                    <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">100% secure payments</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3.5 px-3">
+                                <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
+                                    <RefreshCw className="h-5.5 w-5.5" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black tracking-tight">Easy Returns</h4>
+                                    <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">30-day return policy</p>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-3.5 px-3">
+                                <div className="p-2.5 rounded-xl bg-[var(--badge-bg)] text-[var(--gold-accent)] shrink-0 border border-[var(--badge-border)]">
+                                    <Headphones className="h-5.5 w-5.5" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black tracking-tight">24/7 Support</h4>
+                                    <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">We're here to help</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        {/* 4. Recommended for You Section */}
+                        <section id="recommended-section" className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
+                                    Recommended for you
+                                </h2>
+                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                    View All
+                                </span>
+                            </div>
+
+                            <div className="relative">
+                                <div ref={recommendedRef} className="flex items-center gap-5 xl:justify-between overflow-x-auto no-scrollbar py-2 scroll-smooth">
+                                    {RECOMMENDED_PRODUCTS.map((prod) => (
+                                        <div
+                                            key={prod.id}
+                                            className="flex-shrink-0 w-[220px] bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                                        >
+                                            {/* Product Top Image & Tags */}
+                                            <div className="relative bg-[var(--bg-right-panel)] h-44 w-full flex items-center justify-center overflow-hidden border-b border-[var(--card-border)]">
+                                                <img
+                                                    src={prod.image}
+                                                    alt={prod.name}
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                />
+
+                                                {/* Sale Badge */}
+                                                <span className="absolute top-2.5 left-2.5 bg-[#FFEAEB] text-[#D84242] text-[9px] font-black uppercase px-2 py-0.5 rounded-md shadow-sm">
+                                                    {prod.discount}
+                                                </span>
+
+                                                {/* Wishlist toggle icon */}
+                                                <button className="absolute top-2.5 right-2.5 h-7 w-7 rounded-full bg-[var(--card-bg)]/80 dark:bg-black/50 hover:bg-[var(--card-bg)] text-[var(--text-muted)] hover:text-rose-500 border border-[var(--card-border)] flex items-center justify-center transition-all">
+                                                    <Heart className="h-3.5 w-3.5" />
+                                                </button>
+                                            </div>
+
+                                            {/* Product Details */}
+                                            <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
+                                                <div>
+                                                    <span className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider uppercase">
+                                                        {prod.category}
+                                                    </span>
+                                                    <h3 className="font-bold text-xs mt-1 text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[32px]">
+                                                        {prod.name}
+                                                    </h3>
+
+                                                    {/* Stars Rating */}
+                                                    <div className="flex items-center gap-1 mt-2">
+                                                        <div className="flex items-center text-amber-400">
+                                                            {[...Array(5)].map((_, s) => (
+                                                                <Star key={s} className="h-3 w-3 fill-current" />
+                                                            ))}
+                                                        </div>
+                                                        <span className="text-[9.5px] font-bold text-[var(--text-muted)]">
+                                                            ({prod.reviews})
+                                                        </span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Prices & Actions Button */}
+                                                <div>
+                                                    <div className="flex items-baseline gap-2">
+                                                        <span className="text-sm font-black text-[var(--text-primary)]">
+                                                            {formatCurrency(prod.price)}
+                                                        </span>
+                                                        <span className="text-[10px] font-semibold text-[var(--text-muted)] line-through">
+                                                            {formatCurrency(prod.originalPrice)}
+                                                        </span>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => triggerCheckout(prod)}
+                                                        className="w-full mt-3.5 py-2 rounded-xl bg-transparent hover:bg-[var(--gold-accent)] text-[var(--gold-accent)] hover:text-white border border-[var(--gold-accent)]/35 hover:border-transparent text-[10.5px] font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
+                                                    >
+                                                        <ShoppingBag className="h-3.5 w-3.5" /> Add to Cart
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Carousel navigators */}
+                                <button
+                                    onClick={() => scroll(recommendedRef, 'left')}
+                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                >
+                                    <ChevronLeft className="h-4.5 w-4.5" />
+                                </button>
+                                <button
+                                    onClick={() => scroll(recommendedRef, 'right')}
+                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                >
+                                    <ChevronRight className="h-4.5 w-4.5" />
+                                </button>
+                            </div>
+                        </section>
+
+                        {/* 5. Two Banner Promo Grid */}
+                        <section className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* Purple Smartphone banner */}
+                            <div className="bg-gradient-to-br from-[#7B66FF] to-[#5944DB] text-white rounded-3xl p-6 lg:p-10 flex items-center justify-between overflow-hidden relative shadow-sm group">
+                                <div className="space-y-4 max-w-[60%] relative z-10">
+                                    <h3 className="font-['Outfit'] text-2xl lg:text-3xl font-black leading-tight">
+                                        Smartphones <br /> Starting at ₹8,999
+                                    </h3>
+                                    <p className="text-[11px] font-medium text-white/80">Latest deals on top brands</p>
+                                    <button
+                                        onClick={() => setSelectedCategory('Electronics')}
+                                        className="bg-white text-[#7B66FF] px-4 py-2.5 rounded-lg text-[10.5px] font-black uppercase hover:-translate-y-0.5 transition-all shadow-md shrink-0"
+                                    >
+                                        Shop Now
+                                    </button>
+                                </div>
+                                <img
+                                    src="https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&q=80"
+                                    alt="Phones"
+                                    className="w-[180px] h-[180px] object-contain shrink-0 group-hover:scale-105 transition-transform duration-500 drop-shadow-2xl translate-x-2"
+                                />
+                            </div>
+
+                            {/* Peach Fashion Banner */}
+                            <div className="bg-[#FFF0EB] text-[#1F1F1F] rounded-3xl p-6 lg:p-10 flex items-center justify-between overflow-hidden relative shadow-sm group border border-[#FFDFD4]/30">
+                                <div className="space-y-4 max-w-[60%] relative z-10">
+                                    <h3 className="font-['Outfit'] text-2xl lg:text-3xl font-black text-neutral-900 leading-tight">
+                                        Fashion Sale <br /> Min. 50% Off
+                                    </h3>
+                                    <p className="text-[11px] font-bold text-neutral-500">On latest styles & brands</p>
+                                    <button
+                                        onClick={() => setSelectedCategory('Fashion')}
+                                        className="bg-[var(--gold-accent)] text-white px-4 py-2.5 rounded-lg text-[10.5px] font-black uppercase hover:-translate-y-0.5 transition-all shadow-md shrink-0"
+                                    >
+                                        Shop Now
+                                    </button>
+                                </div>
+                                <img
+                                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?w=400&q=80"
+                                    alt="Fashion display rack"
+                                    className="w-[180px] h-[180px] object-contain shrink-0 group-hover:scale-105 transition-transform duration-500 drop-shadow-lg translate-x-2 rounded-2xl"
+                                />
+                            </div>
+                        </section>
+
+                        {/* 6. Top Brands Section */}
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
+                                    Top Brands
+                                </h2>
+                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                    View All
+                                </span>
+                            </div>
+
+                            <div className="relative">
+                                <div ref={brandsRef} className="flex items-center gap-5 lg:justify-between overflow-x-auto no-scrollbar py-2">
+                                    {BRANDS.map((brand, idx) => (
+                                        <div
+                                            key={idx}
+                                            className="flex-shrink-0 w-[140px] bg-[var(--card-bg)] border border-[var(--card-border)] py-5 rounded-2xl text-center shadow-sm hover:shadow-md hover:border-[var(--gold-accent)]/45 transition-all cursor-pointer font-['Outfit'] text-base font-black tracking-widest text-[var(--gold-accent)] uppercase"
+                                        >
+                                            {brand}
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Navigation chevron floating */}
+                                <button
+                                    onClick={() => scroll(brandsRef, 'left')}
+                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
+                                >
+                                    <ChevronLeft className="h-4.5 w-4.5" />
+                                </button>
+                                <button
+                                    onClick={() => scroll(brandsRef, 'right')}
+                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
+                                >
+                                    <ChevronRight className="h-4.5 w-4.5" />
+                                </button>
+                            </div>
+                        </section>
+
+                        {/* 7. You May Also Like Section */}
+                        <section className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
+                                    You may also like
+                                </h2>
+                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                    View All
+                                </span>
+                            </div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
+                                {YOU_MAY_ALSO_LIKE.map((prod) => (
+                                    <div
+                                        key={prod.id}
+                                        className="bg-[var(--card-bg)] border border-[var(--card-border)] p-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
+                                    >
+                                        <div className="bg-[var(--bg-right-panel)] h-28 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)] shadow-inner">
+                                            <img
+                                                src={prod.image}
+                                                alt={prod.name}
+                                                className="w-full h-full object-cover hover:scale-105 transition-transform"
+                                            />
+                                        </div>
+                                        <div className="mt-3.5 space-y-2">
+                                            <div>
+                                                <span className="text-[8.5px] font-bold text-[var(--text-muted)] uppercase">{prod.category}</span>
+                                                <h3 className="font-bold text-[11px] text-[var(--text-primary)] line-clamp-1 leading-snug mt-0.5">{prod.name}</h3>
+                                            </div>
+                                            <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--card-border)] opacity-95">
+                                                <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
+                                                <button
+                                                    onClick={() => triggerCheckout(prod)}
+                                                    className="px-2.5 py-1.5 bg-[var(--gold-accent)]/10 hover:bg-[var(--gold-accent)] text-[var(--gold-accent)] hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors shrink-0"
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+
+                        {/* 8. Coupon/Footer Promo Banner */}
+                        <section className="bg-[var(--card-bg)] border border-[var(--card-border)] p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm relative">
+                            <div className="flex items-center gap-4 text-center sm:text-left">
+                                <div className="h-14 w-14 rounded-2xl bg-[var(--badge-bg)] border border-[var(--badge-border)] flex items-center justify-center text-[var(--gold-accent)] shrink-0">
+                                    <Sparkles className="h-7 w-7" />
+                                </div>
+                                <div>
+                                    <h3 className="text-sm lg:text-base font-black text-[var(--text-primary)] tracking-tight">Extra 10% Off on your first order 🎉</h3>
+                                    <p className="text-xs font-semibold text-[var(--text-secondary)] mt-0.5">
+                                        Use code: <span className="font-extrabold text-[var(--gold-accent)] tracking-wider font-mono">WELCOME10</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => {
+                                    const el = document.getElementById('recommended-section')
+                                    if (el) el.scrollIntoView({ behavior: 'smooth' })
+                                }}
+                                className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white px-6 py-2.5 rounded-xl text-xs font-extrabold transition-colors shadow-md shrink-0 cursor-pointer"
+                            >
+                                Shop Now
+                            </button>
+                        </section>
+                    </>
+                )}
             </main>
 
             {/* SLIDE-OVER DRAWER FOR MY ORDERS */}
@@ -906,7 +1101,7 @@ export default function CustomerDashboard() {
 
                         <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
                             <div className="pointer-events-auto w-screen max-w-md transform bg-[var(--bg-right-panel)] border-l border-[var(--card-border)] shadow-2xl transition-all duration-500 ease-in-out flex flex-col h-full">
-                                
+
                                 {/* Drawer Header */}
                                 <div className="px-6 py-5 border-b border-[var(--card-border)] bg-[var(--card-bg)] flex items-center justify-between">
                                     <div className="flex items-center gap-2">
@@ -927,7 +1122,7 @@ export default function CustomerDashboard() {
 
                                 {/* Drawer Body with Customer metrics and list of orders */}
                                 <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-6">
-                                    
+
                                     {/* Metrics section */}
                                     <div className="grid grid-cols-3 gap-3">
                                         <div className="bg-[var(--card-bg)] border border-[var(--card-border)] p-3.5 rounded-xl text-center">
@@ -1080,7 +1275,7 @@ export default function CustomerDashboard() {
             {isBuyModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
                     <div className="w-full max-w-md rounded-2xl border border-[var(--card-border)] p-6 shadow-2xl relative overflow-hidden transition-all bg-[var(--bg-right-panel)] text-[var(--text-primary)] max-h-[90vh] overflow-y-auto no-scrollbar">
-                        
+
                         <div className="flex items-center justify-between mb-4 pb-3 border-b border-[var(--card-border)]">
                             <h3 className="font-['Outfit'] text-lg font-black flex items-center gap-2 text-[var(--text-primary)]">
                                 <ShoppingBag className="h-5 w-5 text-[var(--gold-accent)]" /> Confirm Purchase Checkout
@@ -1094,7 +1289,7 @@ export default function CustomerDashboard() {
                         </div>
 
                         <form onSubmit={handleBuySubmit} className="space-y-4 text-xs font-semibold">
-                            
+
                             <div>
                                 <label className="block mb-1 text-[var(--text-muted)] uppercase tracking-wider text-[8.5px]">Product Name</label>
                                 <input
