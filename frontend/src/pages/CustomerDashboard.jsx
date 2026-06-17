@@ -48,6 +48,23 @@ export default function CustomerDashboard() {
     const [actionLoading, setActionLoading] = useState(false)
     const [orders, setOrders] = useState([])
     const [isOrdersDrawerOpen, setIsOrdersDrawerOpen] = useState(false)
+    const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false)
+    const [wishlist, setWishlist] = useState(() => {
+        const saved = localStorage.getItem(`vf_wishlist_${user?._id || 'temp'}`);
+        return saved ? JSON.parse(saved) : [];
+    })
+
+    useEffect(() => {
+        localStorage.setItem(`vf_wishlist_${user?._id || 'temp'}`, JSON.stringify(wishlist));
+    }, [wishlist, user?._id])
+
+    const toggleWishlist = (productId) => {
+        if (wishlist.includes(productId)) {
+            setWishlist(wishlist.filter(id => id !== productId));
+        } else {
+            setWishlist([...wishlist, productId]);
+        }
+    }
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [activeHeroDot, setActiveHeroDot] = useState(0)
@@ -60,6 +77,8 @@ export default function CustomerDashboard() {
     const [maxPrice, setMaxPrice] = useState(150000)
     const [selectedRating, setSelectedRating] = useState(null)
     const [sortBy, setSortBy] = useState('popularity')
+    const [viewMode, setViewMode] = useState('grid')
+    const [currentPage, setCurrentPage] = useState(1)
 
     // Reset filters when changing category
     useEffect(() => {
@@ -68,6 +87,7 @@ export default function CustomerDashboard() {
         setBrandSearchQuery('')
         setMaxPrice(150000)
         setSelectedRating(null)
+        setCurrentPage(1)
     }, [selectedCategory])
 
     const clearAllFilters = () => {
@@ -76,6 +96,7 @@ export default function CustomerDashboard() {
         setBrandSearchQuery('')
         setMaxPrice(150000)
         setSelectedRating(null)
+        setCurrentPage(1)
     }
 
     // Get active brands for selected category
@@ -97,6 +118,11 @@ export default function CustomerDashboard() {
             if (sortBy === 'rating') return b.rating - a.rating
             return b.reviews - a.reviews
         })
+
+    const itemsPerPage = 12
+    const totalPages = Math.ceil(filteredProducts.length / itemsPerPage)
+    const startIndex = (currentPage - 1) * itemsPerPage
+    const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage)
 
     // Stats calculated from customer's orders
     const [customerStats, setCustomerStats] = useState({
@@ -212,20 +238,43 @@ export default function CustomerDashboard() {
         }
     }, [api, fetchCustomerOrders])
 
-    // Trigger purchase confirmation modal with prefilled data
-    const triggerCheckout = (product) => {
-        setBuyForm({
-            ProductName: product.name,
-            Category: product.category,
-            Brand: product.brand || product.name.split(' ')[0] || 'Generic',
-            Quantity: 1,
-            UnitPrice: product.price,
-            PaymentMethod: 'UPI',
-            City: 'Mumbai',
-            State: 'MH',
-            Country: 'India'
-        })
-        setIsBuyModalOpen(true)
+    // Trigger direct background purchase without showing the checkout modal
+    const triggerCheckout = async (product) => {
+        setActionLoading(true)
+        try {
+            const brandName = product.brand || product.name.split(' ')[0] || 'Generic'
+            let categoryName = product.category || 'Other'
+            
+            const orderPayload = {
+                OrderID: 'ORD' + Math.floor(1000000 + Math.random() * 9000000),
+                CustomerID: user?._id || 'CUST_TEMP',
+                CustomerName: user?.name || 'Dhruva Tajapara',
+                ProductID: product.id || 'P' + Math.floor(10000 + Math.random() * 90000),
+                ProductName: product.name,
+                Category: categoryName,
+                Brand: brandName,
+                Quantity: 1,
+                UnitPrice: product.price,
+                TotalAmount: product.price,
+                PaymentMethod: 'UPI',
+                OrderDate: new Date(),
+                OrderStatus: 'Pending',
+                City: 'Mumbai',
+                State: 'MH',
+                Country: 'India',
+                SellerID: 'SELL' + Math.floor(10000 + Math.random() * 90000)
+            }
+
+            const { data } = await api.post('/orders', orderPayload)
+            if (data.success) {
+                fetchCustomerOrders()
+                setIsOrdersDrawerOpen(true) // Open orders drawer automatically to show success
+            }
+        } catch (err) {
+            alert('Failed to place order: ' + (err.response?.data?.message || err.message))
+        } finally {
+            setActionLoading(false)
+        }
     }
 
     // Submit purchase simulation
@@ -334,8 +383,18 @@ export default function CustomerDashboard() {
                     <div className="flex items-center gap-3 lg:gap-5">
 
                         {/* Wishlist */}
-                        <button className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--gold-accent)] font-semibold text-xs transition-colors shrink-0">
-                            <Heart className="h-4.5 w-4.5 text-[var(--text-muted)]" />
+                        <button 
+                            onClick={() => setIsWishlistDrawerOpen(true)}
+                            className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--gold-accent)] font-semibold text-xs transition-colors shrink-0 relative cursor-pointer"
+                        >
+                            <div className="relative">
+                                <Heart className={`h-4.5 w-4.5 ${wishlist.length > 0 ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)]'}`} />
+                                {wishlist.length > 0 && (
+                                    <span className="absolute -top-1.5 -right-1.5 bg-rose-500 text-white text-[8px] font-black h-4 w-4 rounded-full flex items-center justify-center border border-[var(--card-bg)]">
+                                        {wishlist.length}
+                                    </span>
+                                )}
+                            </div>
                             <span className="hidden sm:inline">Wishlist</span>
                         </button>
 
@@ -358,7 +417,7 @@ export default function CustomerDashboard() {
                         {/* Theme Toggle */}
                         <button
                             onClick={toggleTheme}
-                            className="h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] flex items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors shrink-0"
+                            className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors shrink-0"
                             title="Toggle Light/Dark Theme"
                         >
                             {isDark ? <Sun className="h-4 w-4 text-amber-500" /> : <Moon className="h-4 w-4 text-[var(--text-secondary)]" />}
@@ -428,7 +487,7 @@ export default function CustomerDashboard() {
                                     {selectedCategory}
                                 </h1>
                                 <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">
-                                    Showing 1-{Math.min(filteredProducts.length, 12)} of {filteredProducts.length} products
+                                    Showing {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredProducts.length)} of {filteredProducts.length} products
                                 </p>
                             </div>
 
@@ -448,10 +507,18 @@ export default function CustomerDashboard() {
 
                                 {/* Grid icons */}
                                 <div className="flex items-center border border-[var(--card-border)] rounded-xl p-1 bg-[var(--card-bg)] gap-0.5">
-                                    <button className="p-1.5 rounded-lg bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]">
+                                    <button 
+                                        onClick={() => setViewMode('grid')}
+                                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+                                        title="Grid View"
+                                    >
                                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
                                     </button>
-                                    <button className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)]">
+                                    <button 
+                                        onClick={() => setViewMode('list')}
+                                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
+                                        title="List View"
+                                    >
                                         <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
                                     </button>
                                 </div>
@@ -598,67 +665,143 @@ export default function CustomerDashboard() {
                             {/* Right side: Product Grid (Col 9) */}
                             <div className="lg:col-span-9 space-y-8">
                                 {filteredProducts.length > 0 ? (
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
-                                        {filteredProducts.map((prod) => (
-                                            <div
-                                                key={prod.id}
-                                                className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
-                                            >
-                                                {/* Top Image area */}
-                                                <div className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner">
-                                                    <img
-                                                        src={prod.image}
-                                                        alt={prod.name}
-                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                    />
-                                                    {/* Discount sticker */}
-                                                    {prod.discount && (
-                                                        <span className="absolute top-2 left-2 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
-                                                            {prod.discount}
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {/* Details info */}
-                                                <div className="mt-3 space-y-2 flex-1 flex flex-col justify-between">
-                                                    <div className="space-y-1">
-                                                        <div className="flex items-center justify-between text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                                                            <span>{prod.brand}</span>
-                                                            <span className="flex items-center text-amber-500 gap-0.5">
-                                                                <Star className="h-2.5 w-2.5 fill-current" />
-                                                                {prod.rating}
+                                    viewMode === 'grid' ? (
+                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in">
+                                            {paginatedProducts.map((prod) => (
+                                                <div
+                                                    key={prod.id}
+                                                    className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                                                >
+                                                    {/* Top Image area */}
+                                                    <div className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner">
+                                                        <img
+                                                            src={prod.image}
+                                                            alt={prod.name}
+                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        />
+                                                        {/* Discount sticker */}
+                                                        {prod.discount && (
+                                                            <span className="absolute top-2 left-2 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
+                                                                {prod.discount}
                                                             </span>
-                                                        </div>
-                                                        <h3 className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px]">
-                                                            {prod.name}
-                                                        </h3>
+                                                        )}
                                                     </div>
 
-                                                    {/* Action button price and wishlist */}
-                                                    <div className="space-y-2.5 pt-2 border-t border-[var(--card-border)]/50">
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
+                                                    {/* Details info */}
+                                                    <div className="mt-3 space-y-2 flex-1 flex flex-col justify-between">
+                                                        <div className="space-y-1">
+                                                            <div className="flex items-center justify-between text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                                                                <span>{prod.brand}</span>
+                                                                <span className="flex items-center text-amber-500 gap-0.5">
+                                                                    <Star className="h-2.5 w-2.5 fill-current" />
+                                                                    {prod.rating}
+                                                                </span>
+                                                            </div>
+                                                            <h3 className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px]">
+                                                                {prod.name}
+                                                            </h3>
+                                                        </div>
+
+                                                        {/* Action button price and wishlist */}
+                                                        <div className="space-y-2.5 pt-2 border-t border-[var(--card-border)]/50">
+                                                            <div className="flex flex-col">
+                                                                <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
+                                                                {prod.originalPrice && (
+                                                                    <span className="text-[9px] font-semibold text-[var(--text-muted)] line-through leading-none mt-0.5">{formatCurrency(prod.originalPrice)}</span>
+                                                                )}
+                                                            </div>
+
+                                                            <div className="flex items-center gap-1.5">
+                                                                <button
+                                                                    onClick={() => triggerCheckout(prod)}
+                                                                    className="flex-1 py-1.5 rounded-lg bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                                                                >
+                                                                    <ShoppingBag className="h-3 w-3" /> Add
+                                                                </button>
+                                                                <button 
+                                                                    onClick={() => toggleWishlist(prod.id)}
+                                                                    className="h-7 w-7 rounded-lg border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] flex items-center justify-center transition-all bg-[var(--card-bg)] cursor-pointer"
+                                                                >
+                                                                    <Heart className={`h-3.5 w-3.5 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="flex flex-col gap-4 animate-fade-in">
+                                                {paginatedProducts.map((prod) => (
+                                                <div
+                                                    key={prod.id}
+                                                    className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col sm:flex-row gap-5 items-center justify-between"
+                                                >
+                                                    {/* Left Image area */}
+                                                    <div className="relative bg-[var(--bg-right-panel)] h-36 w-full sm:w-48 rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner shrink-0">
+                                                        <img
+                                                            src={prod.image}
+                                                            alt={prod.name}
+                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                        />
+                                                        {/* Discount sticker */}
+                                                        {prod.discount && (
+                                                            <span className="absolute top-2.5 left-2.5 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
+                                                                {prod.discount}
+                                                            </span>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Details info (Center) */}
+                                                    <div className="flex-1 min-w-0 py-1 space-y-2">
+                                                        <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold tracking-wider uppercase">
+                                                            <span className="text-[var(--text-muted)]">{prod.brand}</span>
+                                                            <span className="text-[var(--card-border)] opacity-40">|</span>
+                                                            <span className="text-[var(--text-muted)]">{prod.subcategory}</span>
+                                                            <span className="text-[var(--card-border)] opacity-40">|</span>
+                                                            <span className="flex items-center text-amber-500 gap-0.5">
+                                                                <Star className="h-3 w-3 fill-current" />
+                                                                {prod.rating} ({prod.reviews} reviews)
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <h3 className="font-['Outfit'] font-black text-sm lg:text-base text-[var(--text-primary)] leading-tight group-hover:text-[var(--gold-accent)] transition-colors">
+                                                            {prod.name}
+                                                        </h3>
+
+                                                        <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed line-clamp-2 max-w-2xl">
+                                                            Experience premium quality with this {prod.brand} {prod.subcategory} item. Engineered for style, durability, and ultimate performance, making it a perfect addition to your luxury marketplace order.
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Price & Actions (Right) */}
+                                                    <div className="w-full sm:w-auto sm:border-l sm:border-[var(--card-border)]/50 sm:pl-6 flex flex-row sm:flex-col sm:justify-center items-center sm:items-end gap-4 shrink-0 justify-between">
+                                                        <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
+                                                            <span className="text-base font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
                                                             {prod.originalPrice && (
-                                                                <span className="text-[9px] font-semibold text-[var(--text-muted)] line-through leading-none mt-0.5">{formatCurrency(prod.originalPrice)}</span>
+                                                                <span className="text-[10px] font-semibold text-[var(--text-muted)] line-through leading-none mt-1">{formatCurrency(prod.originalPrice)}</span>
                                                             )}
                                                         </div>
 
-                                                        <div className="flex items-center gap-1.5">
+                                                        <div className="flex items-center gap-2">
                                                             <button
                                                                 onClick={() => triggerCheckout(prod)}
-                                                                className="flex-1 py-1.5 rounded-lg bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-colors cursor-pointer"
+                                                                className="px-4 py-2 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                                                             >
-                                                                <ShoppingBag className="h-3 w-3" /> Add
+                                                                <ShoppingBag className="h-3.5 w-3.5" /> Add
                                                             </button>
-                                                            <button className="h-7 w-7 rounded-lg border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] hover:text-rose-500 flex items-center justify-center transition-all bg-[var(--card-bg)]">
-                                                                <Heart className="h-3.5 w-3.5" />
+                                                            <button 
+                                                                onClick={() => toggleWishlist(prod.id)}
+                                                                className="h-9 w-9 rounded-xl border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] flex items-center justify-center transition-all bg-[var(--card-bg)] cursor-pointer"
+                                                            >
+                                                                <Heart className={`h-4 w-4 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                        ))}
-                                    </div>
+                                            ))}
+                                        </div>
+                                    )
                                 ) : (
                                     <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-16 text-center shadow-sm space-y-4">
                                         <div className="h-16 w-16 rounded-full bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] flex items-center justify-center mx-auto text-xl font-bold">
@@ -680,20 +823,20 @@ export default function CustomerDashboard() {
                                 {/* Pagination */}
                                 {filteredProducts.length > 0 && (
                                     <div className="flex items-center justify-center gap-2 pt-6 border-t border-[var(--card-border)]/50">
-                                        <button className="h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                                            <ChevronLeft className="h-4.5 w-4.5" />
+                                        <button className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                            <ChevronLeft className="h-4 w-4" />
                                         </button>
                                         {[1, 2, 3].map((p) => (
-                                            <button key={p} className={`h-8.5 w-8.5 rounded-lg border flex items-center justify-center text-xs font-black transition-all ${p === 1 ? 'bg-[var(--gold-accent)] text-white border-transparent shadow-md shadow-[var(--gold-accent)]/15' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5'}`}>
+                                            <button key={p} className={`h-9 w-9 rounded-lg border flex items-center justify-center text-xs font-black transition-all ${p === 1 ? 'bg-[var(--gold-accent)] text-white border-transparent shadow-md shadow-[var(--gold-accent)]/15' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5'}`}>
                                                 {p}
                                             </button>
                                         ))}
                                         <span className="text-xs font-bold text-[var(--text-muted)] px-1">...</span>
-                                        <button className={`h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center text-xs font-black transition-all`}>
+                                        <button className="h-9 w-9 rounded-lg border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center text-xs font-black transition-all">
                                             65
                                         </button>
-                                        <button className="h-8.5 w-8.5 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                                            <ChevronRight className="h-4.5 w-4.5" />
+                                        <button className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                            <ChevronRight className="h-4 w-4" />
                                         </button>
                                     </div>
                                 )}
@@ -779,15 +922,15 @@ export default function CustomerDashboard() {
                                 {/* Navigation Chevrons */}
                                 <button
                                     onClick={() => scroll(categoriesRef, 'left')}
-                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-9 w-9 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
                                 >
-                                    <ChevronLeft className="h-4.5 w-4.5" />
+                                    <ChevronLeft className="h-4 w-4" />
                                 </button>
                                 <button
                                     onClick={() => scroll(categoriesRef, 'right')}
-                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-9 w-9 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
                                 >
-                                    <ChevronRight className="h-4.5 w-4.5" />
+                                    <ChevronRight className="h-4 w-4" />
                                 </button>
                             </div>
                         </section>
@@ -867,8 +1010,11 @@ export default function CustomerDashboard() {
                                                 </span>
 
                                                 {/* Wishlist toggle icon */}
-                                                <button className="absolute top-2.5 right-2.5 h-7 w-7 rounded-full bg-[var(--card-bg)]/80 dark:bg-black/50 hover:bg-[var(--card-bg)] text-[var(--text-muted)] hover:text-rose-500 border border-[var(--card-border)] flex items-center justify-center transition-all">
-                                                    <Heart className="h-3.5 w-3.5" />
+                                                <button 
+                                                    onClick={() => toggleWishlist(prod.id)}
+                                                    className="absolute top-2.5 right-2.5 h-7 w-7 rounded-full bg-[var(--card-bg)]/80 dark:bg-black/50 hover:bg-[var(--card-bg)] text-[var(--text-muted)] border border-[var(--card-border)] flex items-center justify-center transition-all cursor-pointer"
+                                                >
+                                                    <Heart className={`h-3.5 w-3.5 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
                                                 </button>
                                             </div>
 
@@ -921,15 +1067,15 @@ export default function CustomerDashboard() {
                                 {/* Carousel navigators */}
                                 <button
                                     onClick={() => scroll(recommendedRef, 'left')}
-                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-9 w-9 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
                                 >
-                                    <ChevronLeft className="h-4.5 w-4.5" />
+                                    <ChevronLeft className="h-4 w-4" />
                                 </button>
                                 <button
                                     onClick={() => scroll(recommendedRef, 'right')}
-                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
+                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-9 w-9 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all xl:hidden"
                                 >
-                                    <ChevronRight className="h-4.5 w-4.5" />
+                                    <ChevronRight className="h-4 w-4" />
                                 </button>
                             </div>
                         </section>
@@ -1005,15 +1151,15 @@ export default function CustomerDashboard() {
                                 {/* Navigation chevron floating */}
                                 <button
                                     onClick={() => scroll(brandsRef, 'left')}
-                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
+                                    className="absolute -left-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-9 w-9 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
                                 >
-                                    <ChevronLeft className="h-4.5 w-4.5" />
+                                    <ChevronLeft className="h-4 w-4" />
                                 </button>
                                 <button
                                     onClick={() => scroll(brandsRef, 'right')}
-                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-8.5 w-8.5 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
+                                    className="absolute -right-3 top-1/2 -translate-y-1/2 bg-[var(--card-bg)] hover:bg-neutral-50 dark:hover:bg-white/5 border border-[var(--card-border)] h-9 w-9 rounded-full flex items-center justify-center shadow-md text-[var(--text-secondary)] transition-all lg:hidden"
                                 >
-                                    <ChevronRight className="h-4.5 w-4.5" />
+                                    <ChevronRight className="h-4 w-4" />
                                 </button>
                             </div>
                         </section>
@@ -1265,6 +1411,103 @@ export default function CustomerDashboard() {
                                     </button>
                                 </div>
 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* SLIDE-OVER DRAWER FOR WISHLIST */}
+            {isWishlistDrawerOpen && (
+                <div className="fixed inset-0 z-50 overflow-hidden" aria-labelledby="wishlist-title" role="dialog" aria-modal="true">
+                    <div className="absolute inset-0 overflow-hidden">
+                        <div
+                            onClick={() => setIsWishlistDrawerOpen(false)}
+                            className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity animate-fade-in"
+                        />
+                        <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10">
+                            <div className="pointer-events-auto w-screen max-w-md transform bg-[var(--bg-right-panel)] border-l border-[var(--card-border)] shadow-2xl transition-all duration-500 ease-in-out flex flex-col h-full">
+                                <div className="px-6 py-5 border-b border-[var(--card-border)] bg-[var(--card-bg)] flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-2 bg-[var(--badge-bg)] text-rose-500 rounded-lg">
+                                            <Heart className="h-4.5 w-4.5 fill-current" />
+                                        </div>
+                                        <h2 className="font-['Outfit'] text-lg font-black text-[var(--text-primary)]" id="wishlist-title">
+                                            My Wishlist
+                                        </h2>
+                                    </div>
+                                    <button
+                                        onClick={() => setIsWishlistDrawerOpen(false)}
+                                        className="h-8 w-8 rounded-lg hover:bg-neutral-100 dark:hover:bg-white/5 border border-transparent hover:border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] transition-all"
+                                    >
+                                        <X className="h-4.5 w-4.5" />
+                                    </button>
+                                </div>
+                                <div className="flex-1 overflow-y-auto no-scrollbar p-6 space-y-4">
+                                    {wishlist.length === 0 ? (
+                                        <div className="py-16 text-center border border-dashed border-[var(--card-border)] rounded-2xl flex flex-col items-center justify-center p-6 gap-3 bg-[var(--card-bg)]">
+                                            <div className="h-10 w-10 bg-rose-500/10 rounded-full flex items-center justify-center text-rose-500">
+                                                <Heart className="h-5.5 w-5.5 animate-pulse" />
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-black text-[var(--text-primary)]">Your Wishlist is Empty</h4>
+                                                <p className="text-[10px] text-[var(--text-muted)] mt-1 max-w-[200px] mx-auto leading-normal">
+                                                    Tap the heart icon on any product to save it here!
+                                                </p>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-3.5">
+                                            {ALL_PRODUCTS.filter(p => wishlist.includes(p.id)).map((o) => (
+                                                <div
+                                                    key={o.id}
+                                                    className="bg-[var(--card-bg)] border border-[var(--card-border)] p-4 rounded-xl space-y-3 hover:border-[var(--gold-accent)]/30 transition-colors shadow-sm flex items-center gap-4"
+                                                >
+                                                    <div className="h-16 w-16 bg-[var(--bg-right-panel)] rounded-lg overflow-hidden border border-[var(--card-border)] flex-shrink-0">
+                                                        <img src={o.image} alt={o.name} className="w-full h-full object-cover" />
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                                                            {o.brand}
+                                                        </div>
+                                                        <h4 className="text-xs font-bold text-[var(--text-primary)] mt-0.5 truncate">
+                                                            {o.name}
+                                                        </h4>
+                                                        <div className="text-xs font-black text-[var(--gold-accent)] mt-1">
+                                                            {formatCurrency(o.price)}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col gap-1.5">
+                                                        <button
+                                                            onClick={() => {
+                                                                setIsWishlistDrawerOpen(false);
+                                                                triggerCheckout(o);
+                                                            }}
+                                                            className="px-2.5 py-1.5 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9px] font-black uppercase tracking-wider rounded-lg transition-colors cursor-pointer"
+                                                        >
+                                                            Buy
+                                                        </button>
+                                                        <button
+                                                            onClick={() => toggleWishlist(o.id)}
+                                                            className="p-1.5 border border-rose-500/25 hover:bg-rose-500/5 text-rose-500 rounded-lg transition-colors flex items-center justify-center cursor-pointer"
+                                                            title="Remove from wishlist"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="px-6 py-4.5 border-t border-[var(--card-border)] bg-[var(--card-bg)] flex items-center justify-between gap-3 shrink-0">
+                                    <button
+                                        onClick={() => setIsWishlistDrawerOpen(false)}
+                                        className="w-full py-2.5 border border-[var(--card-border)] hover:bg-neutral-100 dark:hover:bg-white/5 rounded-xl text-xs font-black text-[var(--text-secondary)] transition-colors uppercase tracking-wider"
+                                    >
+                                        Close Wishlist
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
