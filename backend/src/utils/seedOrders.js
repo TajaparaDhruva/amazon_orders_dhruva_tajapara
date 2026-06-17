@@ -7,11 +7,22 @@ const Order = require('../models/order.model');
 // Connect to Database
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
+        await mongoose.connect(process.env.MONGODB_URI, {
+            serverSelectionTimeoutMS: 4000
+        });
         console.log('MongoDB Connected for Seeding...');
     } catch (err) {
-        console.error('Database connection error:', err);
-        process.exit(1);
+        console.warn(`Could not connect to primary MONGODB_URI for seeding: ${err.message}`);
+        console.log('Attempting connection to local MongoDB fallback for seeding...');
+        try {
+            await mongoose.connect('mongodb://127.0.0.1:27017/amazon_orders', {
+                serverSelectionTimeoutMS: 4000
+            });
+            console.log('MongoDB Connected to Local Fallback for Seeding...');
+        } catch (localError) {
+            console.error('Database connection error: Both primary and local MongoDB failed:', localError);
+            process.exit(1);
+        }
     }
 };
 
