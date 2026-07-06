@@ -419,6 +419,7 @@ export default function CustomerDashboard() {
 
     // Filter & Sort States
     const [selectedCategory, setSelectedCategory] = useState(null)
+    const [selectedRecommendedCategory, setSelectedRecommendedCategory] = useState(null)
     const [selectedSubcategory, setSelectedSubcategory] = useState(null)
     const [selectedBrands, setSelectedBrands] = useState([])
     const [brandSearchQuery, setBrandSearchQuery] = useState('')
@@ -440,6 +441,7 @@ export default function CustomerDashboard() {
         } else {
             setSelectedCategory(null)
         }
+        setSelectedRecommendedCategory(null)
     }, [categoryParam])
 
     // Reset filters on category change
@@ -462,7 +464,7 @@ export default function CustomerDashboard() {
     }
 
     // Get active brands for selected category
-    const activeProductsForCategory = (selectedCategory === 'All Products' || !selectedCategory)
+    const activeProductsForCategory = (selectedCategory === 'All Products' || selectedCategory === 'Recommended' || !selectedCategory)
         ? products
         : products.filter(p => p.category === selectedCategory)
     const availableBrands = [...new Set(activeProductsForCategory.map(p => p.brand))]
@@ -967,6 +969,25 @@ export default function CustomerDashboard() {
                                         <ChevronDown className="h-3.5 w-3.5 opacity-60" />
                                     </div>
                                     <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 no-scrollbar text-left">
+                                        {/* All Categories Item */}
+                                        <div
+                                            onClick={() => {
+                                                setSearchParams({});
+                                            }}
+                                            className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all ${(selectedCategory === 'Recommended' || (!selectedCategory && selectedCategory !== 'All Products')) ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]' : 'text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-primary)]'}`}
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <svg className="h-4 w-4 text-[var(--text-muted)]" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                                                    <rect x="3" y="3" width="7" height="7" />
+                                                    <rect x="14" y="3" width="7" height="7" />
+                                                    <rect x="14" y="14" width="7" height="7" />
+                                                    <rect x="3" y="14" width="7" height="7" />
+                                                </svg>
+                                                <span>All Categories</span>
+                                            </div>
+                                            <span className="text-[10px] opacity-70">({products.length})</span>
+                                        </div>
+
                                         {categories.map((cat) => {
                                             const isSelected = selectedCategory === cat.name;
                                             const CategoryIcon = getCategoryIcon(cat.name);
@@ -1378,7 +1399,10 @@ export default function CustomerDashboard() {
                                 <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
                                     Recommended for you
                                 </h2>
-                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                <span 
+                                    onClick={() => setSearchParams({ category: 'Recommended' })}
+                                    className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline"
+                                >
                                     View All
                                 </span>
                             </div>
