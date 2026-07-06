@@ -1,4 +1,5 @@
 const Order = require('../models/order.model');
+const { enrichProduct } = require('./product/product.service');
 
 /**
  * Recommend products for a customer based on their purchase history categories.
@@ -21,17 +22,30 @@ const getCustomerRecommendationsService = async (customerName) => {
     if (!customerHistory || customerHistory.length === 0 || customerHistory[0].categories.length === 0) {
         const fallbackProducts = await Order.aggregate([
             { $match: { isArchived: { $ne: true } } },
-            { $group: { _id: '$ProductName', category: { $first: '$Category' }, salesCount: { $sum: '$Quantity' }, totalRevenue: { $sum: '$TotalAmount' } } },
+            {
+                $group: {
+                    _id: '$ProductID',
+                    ProductID: { $first: '$ProductID' },
+                    ProductName: { $first: '$ProductName' },
+                    Category: { $first: '$Category' },
+                    Brand: { $first: '$Brand' },
+                    UnitPrice: { $first: '$UnitPrice' },
+                    salesCount: { $sum: '$Quantity' }
+                }
+            },
             { $sort: { salesCount: -1 } },
             { $limit: 5 }
         ]);
 
         return {
             recommendationType: 'Fallback (Top Sellers)',
-            recommendations: fallbackProducts.map(p => ({
-                productName: p._id,
-                category: p.category,
-                salesCount: p.salesCount
+            recommendations: fallbackProducts.map(p => enrichProduct({
+                ProductID: p.ProductID,
+                ProductName: p.ProductName,
+                Category: p.Category,
+                Brand: p.Brand,
+                UnitPrice: p.UnitPrice,
+                OrderCount: p.salesCount
             }))
         };
     }
@@ -49,10 +63,13 @@ const getCustomerRecommendationsService = async (customerName) => {
         },
         {
             $group: {
-                _id: '$ProductName',
-                category: { $first: '$Category' },
-                popularityScore: { $sum: '$Quantity' },
-                averagePrice: { $avg: '$UnitPrice' }
+                _id: '$ProductID',
+                ProductID: { $first: '$ProductID' },
+                ProductName: { $first: '$ProductName' },
+                Category: { $first: '$Category' },
+                Brand: { $first: '$Brand' },
+                UnitPrice: { $first: '$UnitPrice' },
+                popularityScore: { $sum: '$Quantity' }
             }
         },
         { $sort: { popularityScore: -1 } },
@@ -62,11 +79,13 @@ const getCustomerRecommendationsService = async (customerName) => {
     return {
         recommendationType: 'Personalized (Based on Category Preferences)',
         preferredCategories: categories,
-        recommendations: recommendations.map(r => ({
-            productName: r._id,
-            category: r.category,
-            popularityScore: r.popularityScore,
-            estimatedPrice: Number(r.averagePrice.toFixed(2))
+        recommendations: recommendations.map(r => enrichProduct({
+            ProductID: r.ProductID,
+            ProductName: r.ProductName,
+            Category: r.Category,
+            Brand: r.Brand,
+            UnitPrice: r.UnitPrice,
+            OrderCount: r.popularityScore
         }))
     };
 };
@@ -93,9 +112,13 @@ const getOrderRecommendationsService = async (orderId) => {
         },
         {
             $group: {
-                _id: '$ProductName',
-                popularityScore: { $sum: '$Quantity' },
-                averagePrice: { $avg: '$UnitPrice' }
+                _id: '$ProductID',
+                ProductID: { $first: '$ProductID' },
+                ProductName: { $first: '$ProductName' },
+                Category: { $first: '$Category' },
+                Brand: { $first: '$Brand' },
+                UnitPrice: { $first: '$UnitPrice' },
+                popularityScore: { $sum: '$Quantity' }
             }
         },
         { $sort: { popularityScore: -1 } },
@@ -106,11 +129,13 @@ const getOrderRecommendationsService = async (orderId) => {
         orderId,
         sourceProduct,
         sourceCategory,
-        recommendations: recommendations.map(r => ({
-            productName: r._id,
-            category: sourceCategory,
-            popularityScore: r.popularityScore,
-            estimatedPrice: Number(r.averagePrice.toFixed(2))
+        recommendations: recommendations.map(r => enrichProduct({
+            ProductID: r.ProductID,
+            ProductName: r.ProductName,
+            Category: r.Category,
+            Brand: r.Brand,
+            UnitPrice: r.UnitPrice,
+            OrderCount: r.popularityScore
         }))
     };
 };
@@ -131,21 +156,26 @@ const getTrendingProductsService = async () => {
         },
         {
             $group: {
-                _id: '$ProductName',
-                category: { $first: '$Category' },
-                salesVolume: { $sum: '$Quantity' },
-                revenue: { $sum: '$TotalAmount' }
+                _id: '$ProductID',
+                ProductID: { $first: '$ProductID' },
+                ProductName: { $first: '$ProductName' },
+                Category: { $first: '$Category' },
+                Brand: { $first: '$Brand' },
+                UnitPrice: { $first: '$UnitPrice' },
+                salesVolume: { $sum: '$Quantity' }
             }
         },
         { $sort: { salesVolume: -1 } },
         { $limit: 10 }
     ]);
 
-    return trendingProducts.map(p => ({
-        productName: p._id,
-        category: p.category,
-        salesVolume: p.salesVolume,
-        revenue: p.revenue
+    return trendingProducts.map(p => enrichProduct({
+        ProductID: p.ProductID,
+        ProductName: p.ProductName,
+        Category: p.Category,
+        Brand: p.Brand,
+        UnitPrice: p.UnitPrice,
+        OrderCount: p.salesVolume
     }));
 };
 
