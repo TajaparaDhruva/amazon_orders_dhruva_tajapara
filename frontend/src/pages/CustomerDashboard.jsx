@@ -1594,13 +1594,16 @@ export default function CustomerDashboard() {
                                 <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
                                     You may also like
                                 </h2>
-                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                <span 
+                                    onClick={() => setSearchParams({ category: 'All' })}
+                                    className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline"
+                                >
                                     View All
                                 </span>
                             </div>
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
-                                {youMayAlsoLike.map((prod) => (
+                                {youMayAlsoLike.slice(0, 6).map((prod) => (
                                     <div
                                         key={prod.id}
                                         className="bg-[var(--card-bg)] border border-[var(--card-border)] p-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
