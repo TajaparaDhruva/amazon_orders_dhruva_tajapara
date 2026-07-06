@@ -4,6 +4,8 @@ import Login from './pages/Login'
 import Landing from './pages/Landing'
 import SellerDashboard from './pages/SellerDashboard'
 import CustomerDashboard from './pages/CustomerDashboard'
+import ProductDetail from './pages/ProductDetail'
+import ShoppingCart from './pages/ShoppingCart'
 
 // Protected Route Component with Role Validation
 function ProtectedRoute({ children, requiredRole }) {
@@ -53,6 +55,26 @@ function App() {
                         element={
                             <ProtectedRoute requiredRole="user">
                                 <CustomerDashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Protected Product Detail */}
+                    <Route
+                        path="/product/:id"
+                        element={
+                            <ProtectedRoute requiredRole="user">
+                                <ProductDetail />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Protected Shopping Cart */}
+                    <Route
+                        path="/cart"
+                        element={
+                            <ProtectedRoute requiredRole="user">
+                                <ShoppingCart />
                             </ProtectedRoute>
                         }
                     />

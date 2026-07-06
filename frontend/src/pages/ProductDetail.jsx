@@ -386,14 +386,11 @@ export default function ProductDetail() {
                     <div onClick={() => navigate('/dashboard/customer')} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white rounded-lg cursor-pointer transition-colors shadow-[0_2px_8px_-2px_rgba(160,90,44,0.3)] shrink-0">
                         <Plus className="h-3.5 w-3.5" /> All Categories
                     </div>
-                    {['Today\'s Deals', 'Top Sellers', 'New Arrivals', 'Electronics', 'Fashion', 'Home & Living', 'Beauty', 'Sports', 'Automotive'].map((link) => (
+                    {['Today\'s Deals', 'Top Sellers', 'New Arrivals', ...[...new Set(products.map(p => p.category))]].map((link) => (
                         <span 
                             key={link} 
                             onClick={() => {
-                                if (['Electronics', 'Fashion', 'Home & Living', 'Beauty', 'Sports', 'Automotive'].includes(link)) {
-                                    navigate('/dashboard/customer');
-                                    // Normally we would pass state, but this handles navigation nicely.
-                                }
+                                navigate('/dashboard/customer');
                             }}
                             className="hover:text-[var(--gold-accent)] transition-colors cursor-pointer shrink-0"
                         >

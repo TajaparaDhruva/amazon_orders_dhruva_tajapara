@@ -384,7 +384,7 @@ export default function ShoppingCart() {
                     <div onClick={() => navigate('/dashboard/customer')} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white rounded-lg cursor-pointer transition-colors shadow-sm shrink-0">
                         <Plus className="h-3.5 w-3.5" /> All Categories
                     </div>
-                    {['Today\'s Deals', 'Top Sellers', 'New Arrivals', 'Electronics', 'Fashion', 'Home & Living', 'Beauty', 'Sports', 'Automotive'].map((link) => (
+                    {['Today\'s Deals', 'Top Sellers', 'New Arrivals', ...[...new Set(products.map(p => p.category))]].map((link) => (
                         <span key={link} onClick={() => navigate('/dashboard/customer')} className="hover:text-[var(--gold-accent)] transition-colors cursor-pointer shrink-0">{link}</span>
                     ))}
                 </div>

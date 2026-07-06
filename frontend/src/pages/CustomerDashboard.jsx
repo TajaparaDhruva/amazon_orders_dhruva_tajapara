@@ -94,10 +94,31 @@ export default function CustomerDashboard() {
 
     useEffect(() => {
         if (products.length > 0) {
-            setCategories(prev => prev.map(cat => {
-                const count = products.filter(p => p.category === cat.name).length;
-                return { ...cat, count: count > 0 ? count : cat.count };
-            }));
+            const uniqueCatNames = [...new Set(products.map(p => p.category))];
+            const dynamicCategories = uniqueCatNames.map(name => {
+                const count = products.filter(p => p.category === name).length;
+                let image = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80';
+                const lowerName = name.toLowerCase();
+                if (lowerName.includes('elect')) {
+                    image = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=300&q=80';
+                } else if (lowerName.includes('fash') || lowerName.includes('cloth')) {
+                    image = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&q=80';
+                } else if (lowerName.includes('home') || lowerName.includes('kitchen') || lowerName.includes('living')) {
+                    image = 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300&q=80';
+                } else if (lowerName.includes('beauty') || lowerName.includes('care')) {
+                    image = 'https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=400&q=80';
+                } else if (lowerName.includes('sport') || lowerName.includes('outdoors')) {
+                    image = 'https://images.unsplash.com/photo-1461896836934-ffe607ba8211?w=300&q=80';
+                } else if (lowerName.includes('auto')) {
+                    image = 'https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=300&q=80';
+                } else if (lowerName.includes('book')) {
+                    image = 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=400&q=80';
+                } else if (lowerName.includes('toy') || lowerName.includes('game')) {
+                    image = 'https://images.unsplash.com/photo-1539627831859-a911cf04b3cd?w=400&q=80';
+                }
+                return { name, count, image };
+            });
+            setCategories(dynamicCategories);
         }
     }, [products])
     const [isOrdersDrawerOpen, setIsOrdersDrawerOpen] = useState(false)
@@ -183,6 +204,7 @@ export default function CustomerDashboard() {
     // Get active brands for selected category
     const activeProductsForCategory = products.filter(p => p.category === selectedCategory)
     const availableBrands = [...new Set(activeProductsForCategory.map(p => p.brand))]
+    const availableSubcategories = [...new Set(activeProductsForCategory.map(p => p.subcategory || 'Standard'))]
 
     // Filtered products list
     const filteredProducts = activeProductsForCategory
@@ -628,17 +650,17 @@ export default function CustomerDashboard() {
                                         <ChevronDown className="h-3.5 w-3.5 opacity-60" />
                                     </div>
                                     <div className="space-y-2">
-                                        {SUBCATEGORIES[selectedCategory]?.map((sub) => {
-                                            const isChecked = selectedSubcategory === sub.name;
+                                        {availableSubcategories.map((subName) => {
+                                            const isChecked = selectedSubcategory === subName;
                                             return (
-                                                <label key={sub.name} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none">
+                                                <label key={subName} className="flex items-center gap-2.5 text-xs font-semibold text-[var(--text-secondary)] cursor-pointer select-none">
                                                     <input
                                                         type="checkbox"
                                                         checked={isChecked}
-                                                        onChange={() => setSelectedSubcategory(isChecked ? null : sub.name)}
+                                                        onChange={() => setSelectedSubcategory(isChecked ? null : subName)}
                                                         className="rounded border-[var(--card-border)] text-[var(--gold-accent)] focus:ring-[var(--gold-accent)] h-3.5 w-3.5 cursor-pointer"
                                                     />
-                                                    <span>{sub.name}</span>
+                                                    <span>{subName}</span>
                                                 </label>
                                             );
                                         })}
