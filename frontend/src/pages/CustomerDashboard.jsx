@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     ShoppingBag, DollarSign, Calendar, Tag, ShieldCheck,
@@ -11,29 +11,66 @@ import { CATEGORIES, SUBCATEGORIES, ALL_PRODUCTS, RECOMMENDED_PRODUCTS, YOU_MAY_
 
 function CategoryItem({ cat, onClick }) {
     const [isFailed, setIsFailed] = useState(false)
+    const [isHovered, setIsHovered] = useState(false)
 
     return (
-        <div onClick={onClick} className="flex-shrink-0 w-[170px] bg-[var(--card-bg)] border border-[var(--card-border)] p-6 rounded-3xl flex flex-col items-center text-center shadow-[0_4px_20px_-4px_rgba(141,90,43,0.05)] hover:shadow-[0_10px_30px_-5px_rgba(141,90,43,0.15)] hover:border-[var(--gold-accent)]/30 hover:-translate-y-1.5 transition-all duration-300 group cursor-pointer">
-            <div className="h-24 w-24 rounded-full overflow-hidden border border-[var(--card-border)] bg-[var(--bg-right-panel)] flex items-center justify-center shadow-inner group-hover:scale-105 group-hover:border-[var(--gold-accent)]/30 transition-all duration-500 relative">
-                {!isFailed ? (
-                    <img
-                        src={cat.image}
-                        alt=""
-                        onError={() => setIsFailed(true)}
-                        className="w-full h-full object-cover"
+        <div 
+            onClick={onClick} 
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            className="flex-shrink-0 w-[150px] flex flex-col items-center text-center group cursor-pointer"
+        >
+            {/* Circular image frame with premium animated gold/accent ring */}
+            <div className="h-28 w-28 rounded-full p-1 bg-transparent flex items-center justify-center transition-all duration-500 shadow-sm relative overflow-hidden">
+                
+                {/* SVG circular drawing border overlay */}
+                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none z-10" viewBox="0 0 100 100">
+                    <circle
+                        cx="50"
+                        cy="50"
+                        r="47"
+                        fill="none"
+                        stroke="var(--gold-accent)"
+                        strokeWidth="2.5"
+                        strokeDasharray="295.3"
+                        style={{
+                            strokeDashoffset: isHovered ? 0 : 295.3,
+                            transition: 'stroke-dashoffset 0.7s ease-in-out'
+                        }}
+                        strokeLinecap="round"
                     />
-                ) : (
-                    <div className="w-full h-full bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] flex items-center justify-center font-black text-xs uppercase p-2">
-                        {cat.name}
-                    </div>
-                )}
+                </svg>
+
+                <div className="w-full h-full rounded-full overflow-hidden bg-[var(--bg-right-panel)] flex items-center justify-center relative border border-[var(--card-border)] shadow-inner">
+                    {!isFailed ? (
+                        <img
+                            src={cat.image}
+                            alt={cat.name}
+                            onError={() => setIsFailed(true)}
+                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] flex items-center justify-center font-black text-[10px] uppercase p-2">
+                            {cat.name}
+                        </div>
+                    )}
+                    
+                    {/* Micro overlay ring on hover */}
+                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </div>
             </div>
-            <h3 className="font-bold text-xs mt-4 text-[var(--text-primary)] tracking-tight group-hover:text-[var(--gold-accent)] transition-colors">
-                {cat.name}
-            </h3>
-            <span className="text-[10px] font-bold text-[var(--text-muted)] mt-1">
-                {cat.count} Products
-            </span>
+            
+            {/* Details Section */}
+            <div className="mt-3.5 space-y-1 z-10">
+                <h3 className="font-['Outfit'] font-extrabold text-xs text-[var(--text-primary)] tracking-tight group-hover:text-[var(--gold-accent)] transition-colors duration-300">
+                    {cat.name}
+                </h3>
+                
+                {/* Clean inline text for products count */}
+                <span className="text-[10px] font-bold text-[var(--text-muted)] group-hover:text-[var(--gold-accent)]/80 transition-colors duration-300">
+                    {cat.count} Products
+                </span>
+            </div>
         </div>
     )
 }
@@ -41,6 +78,8 @@ function CategoryItem({ cat, onClick }) {
 export default function CustomerDashboard() {
     const { user, logout, api } = useAuth()
     const navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
+    const categoryParam = searchParams.get('category')
 
     // UI State
     const [isDark, setIsDark] = useState(false)
@@ -178,11 +217,18 @@ export default function CustomerDashboard() {
     const [brandSearchQuery, setBrandSearchQuery] = useState('')
     const [maxPrice, setMaxPrice] = useState(150000)
     const [selectedRating, setSelectedRating] = useState(null)
-    const [sortBy, setSortBy] = useState('popularity')
-    const [viewMode, setViewMode] = useState('grid')
     const [currentPage, setCurrentPage] = useState(1)
+    const [sortBy, setSortBy] = useState('popularity')
 
-    // Reset filters when changing category
+    useEffect(() => {
+        if (categoryParam) {
+            setSelectedCategory(categoryParam === 'All' ? 'All Products' : categoryParam)
+        } else {
+            setSelectedCategory(null)
+        }
+    }, [categoryParam])
+
+    // Reset filters on category change
     useEffect(() => {
         setSelectedSubcategory(null)
         setSelectedBrands([])
@@ -202,7 +248,9 @@ export default function CustomerDashboard() {
     }
 
     // Get active brands for selected category
-    const activeProductsForCategory = products.filter(p => p.category === selectedCategory)
+    const activeProductsForCategory = (selectedCategory === 'All Products' || !selectedCategory)
+        ? products
+        : products.filter(p => p.category === selectedCategory)
     const availableBrands = [...new Set(activeProductsForCategory.map(p => p.brand))]
     const availableSubcategories = [...new Set(activeProductsForCategory.map(p => p.subcategory || 'Standard'))]
 
@@ -578,7 +626,7 @@ export default function CustomerDashboard() {
                     <div className="space-y-6">
                         {/* Breadcrumb */}
                         <div className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1.5 opacity-80">
-                            <span className="cursor-pointer hover:text-[var(--gold-accent)] transition-colors" onClick={() => setSelectedCategory(null)}>Home</span>
+                            <span className="cursor-pointer hover:text-[var(--gold-accent)] transition-colors" onClick={() => setSearchParams({})}>Home</span>
                             <span>&gt;</span>
                             <span className="text-[var(--text-primary)] font-bold">{selectedCategory}</span>
                         </div>
@@ -607,24 +655,6 @@ export default function CustomerDashboard() {
                                     <option value="price-high">Price: High to Low</option>
                                     <option value="rating">Customer Rating</option>
                                 </select>
-
-                                {/* Grid icons */}
-                                <div className="flex items-center border border-[var(--card-border)] rounded-xl p-1 bg-[var(--card-bg)] gap-0.5">
-                                    <button 
-                                        onClick={() => setViewMode('grid')}
-                                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
-                                        title="Grid View"
-                                    >
-                                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
-                                    </button>
-                                    <button 
-                                        onClick={() => setViewMode('list')}
-                                        className={`p-1.5 rounded-lg transition-all ${viewMode === 'list' ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]' : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'}`}
-                                        title="List View"
-                                    >
-                                        <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-                                    </button>
-                                </div>
                             </div>
                         </div>
 
@@ -768,155 +798,76 @@ export default function CustomerDashboard() {
                             {/* Right side: Product Grid (Col 9) */}
                             <div className="lg:col-span-9 space-y-8">
                                 {filteredProducts.length > 0 ? (
-                                    viewMode === 'grid' ? (
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in">
-                                            {paginatedProducts.map((prod) => (
-                                                <div
-                                                    key={prod.id}
-                                                    className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in">
+                                        {paginatedProducts.map((prod) => (
+                                            <div
+                                                key={prod.id}
+                                                className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                                            >
+                                                {/* Top Image area */}
+                                                <div 
+                                                    onClick={() => navigate(`/product/${prod.id}`)}
+                                                    className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner cursor-pointer"
                                                 >
-                                                    {/* Top Image area */}
-                                                    <div 
-                                                        onClick={() => navigate(`/product/${prod.id}`)}
-                                                        className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner cursor-pointer"
-                                                    >
-                                                        <img
-                                                            src={prod.image}
-                                                            alt={prod.name}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                        />
-                                                        {/* Discount sticker */}
-                                                        {prod.discount && (
-                                                            <span className="absolute top-2 left-2 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
-                                                                {prod.discount}
-                                                            </span>
-                                                        )}
-                                                    </div>
-
-                                                    {/* Details info */}
-                                                    <div className="mt-3 space-y-2 flex-1 flex flex-col justify-between">
-                                                        <div className="space-y-1">
-                                                            <div className="flex items-center justify-between text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
-                                                                <span>{prod.brand}</span>
-                                                                <span className="flex items-center text-amber-500 gap-0.5">
-                                                                    <Star className="h-2.5 w-2.5 fill-current" />
-                                                                    {prod.rating}
-                                                                </span>
-                                                            </div>
-                                                            <h3 
-                                                                onClick={() => navigate(`/product/${prod.id}`)}
-                                                                className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px] cursor-pointer"
-                                                            >
-                                                                {prod.name}
-                                                            </h3>
-                                                        </div>
-
-                                                        {/* Action button price and wishlist */}
-                                                        <div className="space-y-2.5 pt-2 border-t border-[var(--card-border)]/50">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
-                                                                {prod.originalPrice && (
-                                                                    <span className="text-[9px] font-semibold text-[var(--text-muted)] line-through leading-none mt-0.5">{formatCurrency(prod.originalPrice)}</span>
-                                                                )}
-                                                            </div>
-
-                                                            <div className="flex items-center gap-1.5">
-                                                                <button
-                                                                    onClick={() => addToCart(prod)}
-                                                                    className="flex-1 py-1.5 rounded-lg bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                                                                >
-                                                                    <ShoppingBag className="h-3 w-3" /> Add
-                                                                </button>
-                                                                <button 
-                                                                    onClick={() => toggleWishlist(prod.id)}
-                                                                    className="h-7 w-7 rounded-lg border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] flex items-center justify-center transition-all bg-[var(--card-bg)] cursor-pointer"
-                                                                >
-                                                                    <Heart className={`h-3.5 w-3.5 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+                                                    <img
+                                                        src={prod.image}
+                                                        alt={prod.name}
+                                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                                                    />
+                                                    {/* Discount sticker */}
+                                                    {prod.discount && (
+                                                        <span className="absolute top-2 left-2 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
+                                                            {prod.discount}
+                                                        </span>
+                                                    )}
                                                 </div>
-                                            ))}
-                                        </div>
-                                    ) : (
-                                        <div className="flex flex-col gap-4 animate-fade-in">
-                                                {paginatedProducts.map((prod) => (
-                                                <div
-                                                    key={prod.id}
-                                                    className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col sm:flex-row gap-5 items-center justify-between"
-                                                >
-                                                    {/* Left Image area */}
-                                                    <div 
-                                                        onClick={() => navigate(`/product/${prod.id}`)}
-                                                        className="relative bg-[var(--bg-right-panel)] h-36 w-full sm:w-48 rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner shrink-0 cursor-pointer"
-                                                    >
-                                                        <img
-                                                            src={prod.image}
-                                                            alt={prod.name}
-                                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                        />
-                                                        {/* Discount sticker */}
-                                                        {prod.discount && (
-                                                            <span className="absolute top-2.5 left-2.5 bg-[#FFEAEB] text-[#D84242] text-[8px] font-black uppercase px-1.5 py-0.5 rounded shadow-sm">
-                                                                {prod.discount}
-                                                            </span>
-                                                        )}
-                                                    </div>
 
-                                                    {/* Details info (Center) */}
-                                                    <div className="flex-1 min-w-0 py-1 space-y-2">
-                                                        <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold tracking-wider uppercase">
-                                                            <span className="text-[var(--text-muted)]">{prod.brand}</span>
-                                                            <span className="text-[var(--card-border)] opacity-40">|</span>
-                                                            <span className="text-[var(--text-muted)]">{prod.subcategory}</span>
-                                                            <span className="text-[var(--card-border)] opacity-40">|</span>
+                                                {/* Details info */}
+                                                <div className="mt-3 space-y-2 flex-1 flex flex-col justify-between">
+                                                    <div className="space-y-1">
+                                                        <div className="flex items-center justify-between text-[9px] font-bold text-[var(--text-muted)] uppercase tracking-wider">
+                                                            <span>{prod.brand}</span>
                                                             <span className="flex items-center text-amber-500 gap-0.5">
-                                                                <Star className="h-3 w-3 fill-current" />
-                                                                {prod.rating} ({prod.reviews} reviews)
+                                                                <Star className="h-2.5 w-2.5 fill-current" />
+                                                                {prod.rating}
                                                             </span>
                                                         </div>
-                                                        
                                                         <h3 
                                                             onClick={() => navigate(`/product/${prod.id}`)}
-                                                            className="font-['Outfit'] font-black text-sm lg:text-base text-[var(--text-primary)] leading-tight group-hover:text-[var(--gold-accent)] transition-colors cursor-pointer"
+                                                            className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px] cursor-pointer"
                                                         >
                                                             {prod.name}
                                                         </h3>
-
-                                                        <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed line-clamp-2 max-w-2xl">
-                                                            Experience premium quality with this {prod.brand} {prod.subcategory} item. Engineered for style, durability, and ultimate performance, making it a perfect addition to your luxury marketplace order.
-                                                        </p>
                                                     </div>
 
-                                                    {/* Price & Actions (Right) */}
-                                                    <div className="w-full sm:w-auto sm:border-l sm:border-[var(--card-border)]/50 sm:pl-6 flex flex-row sm:flex-col sm:justify-center items-center sm:items-end gap-4 shrink-0 justify-between">
-                                                        <div className="text-left sm:text-right flex flex-col items-start sm:items-end">
-                                                            <span className="text-base font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
+                                                    {/* Action button price and wishlist */}
+                                                    <div className="space-y-2.5 pt-2 border-t border-[var(--card-border)]/50">
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
                                                             {prod.originalPrice && (
-                                                                <span className="text-[10px] font-semibold text-[var(--text-muted)] line-through leading-none mt-1">{formatCurrency(prod.originalPrice)}</span>
+                                                                <span className="text-[9px] font-semibold text-[var(--text-muted)] line-through leading-none mt-0.5">{formatCurrency(prod.originalPrice)}</span>
                                                             )}
                                                         </div>
 
-                                                        <div className="flex items-center gap-2">
+                                                        <div className="flex items-center gap-1.5">
                                                             <button
                                                                 onClick={() => addToCart(prod)}
-                                                                className="px-4 py-2 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                                                                className="flex-1 py-1.5 rounded-lg bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-colors cursor-pointer"
                                                             >
-                                                                <ShoppingBag className="h-3.5 w-3.5" /> Add
+                                                                <ShoppingBag className="h-3 w-3" /> Add
                                                             </button>
                                                             <button 
                                                                 onClick={() => toggleWishlist(prod.id)}
-                                                                className="h-9 w-9 rounded-xl border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] flex items-center justify-center transition-all bg-[var(--card-bg)] cursor-pointer"
+                                                                className="h-7 w-7 rounded-lg border border-[var(--card-border)] hover:border-rose-500 text-[var(--text-muted)] flex items-center justify-center transition-all bg-[var(--card-bg)] cursor-pointer"
                                                             >
-                                                                <Heart className={`h-4 w-4 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
+                                                                <Heart className={`h-3.5 w-3.5 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
                                                             </button>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                ))}
-                                        </div>
-                                    )
+                                            </div>
+                                        ))}
+                                    </div>
                                 ) : (
                                     <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-16 text-center shadow-sm space-y-4">
                                         <div className="h-16 w-16 rounded-full bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] flex items-center justify-center mx-auto text-xl font-bold">
@@ -1040,7 +991,7 @@ export default function CustomerDashboard() {
                                         <CategoryItem
                                             key={idx}
                                             cat={cat}
-                                            onClick={() => setSelectedCategory(cat.name)}
+                                            onClick={() => setSearchParams({ category: cat.name })}
                                         />
                                     ))}
                                 </div>
@@ -1222,7 +1173,7 @@ export default function CustomerDashboard() {
                                     </h3>
                                     <p className="text-[11px] font-medium text-white/80">Latest deals on top brands</p>
                                     <button
-                                        onClick={() => setSelectedCategory('Electronics')}
+                                        onClick={() => setSearchParams({ category: 'Electronics' })}
                                         className="bg-white text-[#7B66FF] px-4 py-2.5 rounded-lg text-[10.5px] font-black uppercase hover:-translate-y-0.5 transition-all shadow-md shrink-0"
                                     >
                                         Shop Now
@@ -1243,7 +1194,7 @@ export default function CustomerDashboard() {
                                     </h3>
                                     <p className="text-[11px] font-bold text-neutral-500">On latest styles & brands</p>
                                     <button
-                                        onClick={() => setSelectedCategory('Fashion')}
+                                        onClick={() => setSearchParams({ category: 'Fashion' })}
                                         className="bg-[var(--gold-accent)] text-white px-4 py-2.5 rounded-lg text-[10.5px] font-black uppercase hover:-translate-y-0.5 transition-all shadow-md shrink-0"
                                     >
                                         Shop Now
