@@ -1,12 +1,44 @@
 const Order = require('../../models/order.model');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * Maps categories to beautiful Unsplash images.
  */
+const CUSTOM_PRODUCT_IMAGES = {
+    'yoga mat': 'https://images.unsplash.com/photo-1718862403436-616232ec6005?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    'premium cork yoga block': 'https://m.media-amazon.com/images/I/71mRxZogT5L._AC_UF894,1000_QL80_.jpg'
+};
+
 const getCategoryImage = (category, subcategory, name = '') => {
     const cleanCategory = (category || '').trim().toLowerCase();
     const cleanSub = (subcategory || '').trim().toLowerCase();
     const cleanName = name.trim().toLowerCase();
+
+    // Dynamically check frontend JSON file overrides to support updates by name
+    try {
+        const filePath = path.join(__dirname, '../../../../frontend/src/data/extracted_products.json');
+        if (fs.existsSync(filePath)) {
+            const rawData = fs.readFileSync(filePath, 'utf8');
+            const items = JSON.parse(rawData);
+            if (Array.isArray(items)) {
+                const found = items.find(item => item.name && item.name.trim().toLowerCase() === cleanName);
+                if (found && found.image) {
+                    return found.image;
+                }
+            }
+        }
+    } catch (err) {
+        // Fallback silently
+    }
+
+    // Check custom overrides first
+    if (CUSTOM_PRODUCT_IMAGES[cleanName]) {
+        return CUSTOM_PRODUCT_IMAGES[cleanName];
+    }
+    if (cleanName.includes('yoga mat')) {
+        return 'https://images.unsplash.com/photo-1718862403436-616232ec6005?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
+    }
 
     if (cleanCategory.includes('elect') || cleanCategory.includes('tech')) {
         if (cleanSub.includes('mobile') || cleanName.includes('phone') || cleanName.includes('iphone')) {
@@ -113,7 +145,7 @@ const getSubcategory = (category, name) => {
  */
 const correctProductMapping = (productName) => {
     const name = (productName || '').trim().toLowerCase();
-    
+
     // Electronics
     if (
         name.includes('4k monitor') ||
@@ -150,10 +182,10 @@ const correctProductMapping = (productName) => {
         else if (name.includes('watch') || name.includes('band') || name.includes('smartwatch')) sub = 'Smart Watches';
         else if (name.includes('headphone') || name.includes('earbud') || name.includes('speaker')) sub = 'Audio';
         else if (name.includes('camera')) sub = 'Cameras';
-        
+
         return { category: 'Electronics', subcategory: sub };
     }
-    
+
     // Fashion / Clothing
     if (
         name.includes('backpack') ||
@@ -172,7 +204,7 @@ const correctProductMapping = (productName) => {
         else sub = "Men's Wear";
         return { category: 'Fashion', subcategory: sub };
     }
-    
+
     // Home & Living
     if (
         name.includes('air fryer') ||
@@ -193,7 +225,7 @@ const correctProductMapping = (productName) => {
         else if (name.includes('lamp') || name.includes('bulb') || name.includes('light')) sub = 'Lighting';
         return { category: 'Home & Living', subcategory: sub };
     }
-    
+
     // Books
     if (
         name.includes('book') ||
@@ -202,7 +234,7 @@ const correctProductMapping = (productName) => {
     ) {
         return { category: 'Books', subcategory: 'Literature' };
     }
-    
+
     // Sports & Outdoors
     if (
         name.includes('water bottle') ||
@@ -212,7 +244,7 @@ const correctProductMapping = (productName) => {
         if (name.includes('yoga')) sub = 'Fitness';
         return { category: 'Sports & Outdoors', subcategory: sub };
     }
-    
+
     // Toys & Games
     if (
         name.includes('game') ||
@@ -222,7 +254,7 @@ const correctProductMapping = (productName) => {
     ) {
         return { category: 'Toys & Games', subcategory: 'Games' };
     }
-    
+
     // Default fallback
     return { category: 'Electronics', subcategory: 'Accessories' };
 };
@@ -293,9 +325,9 @@ const getUniqueProductsService = async (queryParams = {}) => {
     }
     if (search) {
         const cleanSearch = search.toLowerCase();
-        enriched = enriched.filter(p => 
-            p.name.toLowerCase().includes(cleanSearch) || 
-            p.id.toLowerCase().includes(cleanSearch) || 
+        enriched = enriched.filter(p =>
+            p.name.toLowerCase().includes(cleanSearch) ||
+            p.id.toLowerCase().includes(cleanSearch) ||
             p.brand.toLowerCase().includes(cleanSearch)
         );
     }
