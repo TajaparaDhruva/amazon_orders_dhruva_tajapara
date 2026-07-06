@@ -408,8 +408,14 @@ export default function CustomerDashboard() {
         }
     }
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
-    const [searchQuery, setSearchQuery] = useState('')
+    const searchParam = searchParams.get('search')
+    const [searchQuery, setSearchQuery] = useState(searchParam || '')
+    const [isSearchCatDropdownOpen, setIsSearchCatDropdownOpen] = useState(false)
     const [activeHeroDot, setActiveHeroDot] = useState(0)
+
+    useEffect(() => {
+        setSearchQuery(searchParam || '')
+    }, [searchParam])
 
     // Filter & Sort States
     const [selectedCategory, setSelectedCategory] = useState(null)
@@ -420,6 +426,13 @@ export default function CustomerDashboard() {
     const [selectedRating, setSelectedRating] = useState(null)
     const [currentPage, setCurrentPage] = useState(1)
     const [sortBy, setSortBy] = useState('popularity')
+
+    const handleSearchSubmit = () => {
+        const params = {}
+        if (searchQuery) params.search = searchQuery
+        if (selectedCategory && selectedCategory !== 'All Products') params.category = selectedCategory
+        setSearchParams(params)
+    }
 
     useEffect(() => {
         if (categoryParam) {
@@ -462,7 +475,17 @@ export default function CustomerDashboard() {
             if (selectedBrands.length > 0 && !selectedBrands.includes(p.brand)) return false
             if (p.price > maxPrice) return false
             if (selectedRating && p.rating < selectedRating) return false
-            return true
+            if (searchParam) {
+                const query = searchParam.toLowerCase().trim();
+                const matchesSearch = 
+                    (p.name && p.name.toLowerCase().includes(query)) || 
+                    (p.brand && p.brand.toLowerCase().includes(query)) ||
+                    (p.category && p.category.toLowerCase().includes(query)) ||
+                    (p.subcategory && p.subcategory.toLowerCase().includes(query)) ||
+                    (p.id && p.id.toLowerCase().includes(query));
+                if (!matchesSearch) return false;
+            }
+            return true;
         })
         .sort((a, b) => {
             if (sortBy === 'price-low') return a.price - b.price
@@ -712,7 +735,7 @@ export default function CustomerDashboard() {
                     </div>
 
                     {/* Middle Search Bar */}
-                    <div className="hidden md:flex flex-1 max-w-xl items-center border border-[var(--card-border)] rounded-xl overflow-hidden bg-[var(--bg-right-panel)]">
+                    <div className="hidden md:flex flex-1 max-w-xl items-center border border-[var(--card-border)] rounded-xl bg-[var(--bg-right-panel)] relative">
                         <div className="pl-3.5 text-[var(--text-muted)]">
                             <Search className="h-4.5 w-4.5" />
                         </div>
@@ -720,13 +743,71 @@ export default function CustomerDashboard() {
                             type="text"
                             placeholder="Search for products, brands and more..."
                             value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                            }}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearchSubmit();
+                                }
+                            }}
                             className="w-full py-2.5 px-3 bg-transparent text-xs font-medium outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)]"
                         />
-                        <div className="flex items-center gap-1 px-3 py-1.5 border-l border-[var(--card-border)] text-[var(--text-secondary)] text-xs font-bold shrink-0 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                            All Categories <ChevronDown className="h-3.5 w-3.5 opacity-70" />
+                        {searchQuery && (
+                            <button 
+                                onClick={() => {
+                                    setSearchQuery('');
+                                    const params = {};
+                                    if (selectedCategory && selectedCategory !== 'All Products') params.category = selectedCategory;
+                                    setSearchParams(params);
+                                }}
+                                className="p-1 mr-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer text-xs font-bold shrink-0"
+                            >
+                                ✕
+                            </button>
+                        )}
+                        <div 
+                            onClick={() => setIsSearchCatDropdownOpen(!isSearchCatDropdownOpen)}
+                            className="flex items-center gap-1 px-3 py-1.5 border-l border-[var(--card-border)] text-[var(--text-secondary)] text-xs font-bold shrink-0 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors h-full select-none"
+                        >
+                            {selectedCategory && selectedCategory !== 'All Products' ? selectedCategory : 'All Categories'} <ChevronDown className="h-3.5 w-3.5 opacity-70" />
                         </div>
-                        <button className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white p-3.5 transition-colors shrink-0 outline-none">
+
+                        {/* Search Category Dropdown */}
+                        {isSearchCatDropdownOpen && (
+                            <div className="absolute right-12 top-full mt-1.5 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl shadow-xl py-1.5 z-50 text-left max-h-60 overflow-y-auto no-scrollbar">
+                                <button
+                                    onClick={() => {
+                                        const params = {};
+                                        if (searchQuery) params.search = searchQuery;
+                                        setSearchParams(params);
+                                        setIsSearchCatDropdownOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold text-[var(--text-secondary)]"
+                                >
+                                    All Categories
+                                </button>
+                                {categories.map((cat) => (
+                                    <button
+                                        key={cat.name}
+                                        onClick={() => {
+                                            const params = { category: cat.name };
+                                            if (searchQuery) params.search = searchQuery;
+                                            setSearchParams(params);
+                                            setIsSearchCatDropdownOpen(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold text-[var(--text-secondary)]"
+                                    >
+                                        {cat.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        <button 
+                            onClick={handleSearchSubmit}
+                            className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white p-3.5 rounded-r-xl transition-colors shrink-0 outline-none cursor-pointer"
+                        >
                             <Search className="h-4 w-4" />
                         </button>
                     </div>
@@ -828,20 +909,20 @@ export default function CustomerDashboard() {
                         categories={categories}
                         setSearchParams={setSearchParams}
                     />
-                ) : selectedCategory ? (
+                ) : (selectedCategory || searchParam) ? (
                     <div className="space-y-6">
                         {/* Breadcrumb */}
                         <div className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1.5 opacity-80">
                             <span className="cursor-pointer hover:text-[var(--gold-accent)] transition-colors" onClick={() => setSearchParams({})}>Home</span>
                             <span>&gt;</span>
-                            <span className="text-[var(--text-primary)] font-bold">{selectedCategory}</span>
+                            <span className="text-[var(--text-primary)] font-bold">{selectedCategory || 'Search Results'}</span>
                         </div>
 
                         {/* Title & Stats */}
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div>
                                 <h1 className="font-['Outfit'] text-2xl lg:text-3xl font-black text-[var(--text-primary)] tracking-tight">
-                                    {selectedCategory}
+                                    {selectedCategory || `Search Results for "${searchParam}"`}
                                 </h1>
                                 <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">
                                     Showing {filteredProducts.length > 0 ? startIndex + 1 : 0}-{Math.min(startIndex + itemsPerPage, filteredProducts.length)} of {filteredProducts.length} products

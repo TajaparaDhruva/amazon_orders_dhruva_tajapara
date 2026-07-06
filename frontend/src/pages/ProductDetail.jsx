@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     ShoppingBag, Heart, Search, ChevronDown, ChevronLeft, ChevronRight,
@@ -61,9 +61,21 @@ export default function ProductDetail() {
     const [isOrdersDrawerOpen, setIsOrdersDrawerOpen] = useState(false)
     const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
+    const [isSearchCatDropdownOpen, setIsSearchCatDropdownOpen] = useState(false)
+    const [selectedCategory, setSelectedCategory] = useState(null)
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(false)
     const [actionLoading, setActionLoading] = useState(false)
+
+    const handleSearchSubmit = () => {
+        let path = '/dashboard/customer'
+        const params = new URLSearchParams()
+        if (searchQuery) params.append('search', searchQuery)
+        if (selectedCategory && selectedCategory !== 'All Products') params.append('category', selectedCategory)
+        const queryString = params.toString()
+        if (queryString) path += `?${queryString}`
+        navigate(path)
+    }
 
     // Local Storage Wishlist Sync
     const [wishlist, setWishlist] = useState(() => {
@@ -288,7 +300,7 @@ export default function ProductDetail() {
                     </div>
 
                     {/* Search Bar */}
-                    <div className="hidden md:flex flex-1 max-w-xl items-center border border-[var(--card-border)] rounded-xl overflow-hidden bg-[var(--bg-right-panel)]">
+                    <div className="hidden md:flex flex-1 max-w-xl items-center border border-[var(--card-border)] rounded-xl bg-[var(--bg-right-panel)] relative">
                         <div className="pl-3.5 text-[var(--text-muted)]">
                             <Search className="h-4 w-4" />
                         </div>
@@ -297,12 +309,59 @@ export default function ProductDetail() {
                             placeholder="Search for products, brands and more..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    handleSearchSubmit();
+                                }
+                            }}
                             className="w-full py-2.5 px-3 bg-transparent text-xs font-medium outline-none text-[var(--text-primary)] placeholder-[var(--text-muted)]"
                         />
-                        <div className="flex items-center gap-1 px-3 py-1.5 border-l border-[var(--card-border)] text-[var(--text-secondary)] text-xs font-bold shrink-0 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                            All Categories <ChevronDown className="h-3 w-3 opacity-70" />
+                        {searchQuery && (
+                            <button 
+                                onClick={() => setSearchQuery('')}
+                                className="p-1 mr-2 text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer text-xs font-bold shrink-0"
+                            >
+                                ✕
+                            </button>
+                        )}
+                        <div 
+                            onClick={() => setIsSearchCatDropdownOpen(!isSearchCatDropdownOpen)}
+                            className="flex items-center gap-1 px-3 py-1.5 border-l border-[var(--card-border)] text-[var(--text-secondary)] text-xs font-bold shrink-0 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors h-full select-none"
+                        >
+                            {selectedCategory && selectedCategory !== 'All Products' ? selectedCategory : 'All Categories'} <ChevronDown className="h-3 w-3 opacity-70" />
                         </div>
-                        <button onClick={() => navigate('/dashboard/customer')} className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white p-3.5 transition-colors shrink-0 outline-none">
+
+                        {/* Search Category Dropdown */}
+                        {isSearchCatDropdownOpen && (
+                            <div className="absolute right-12 top-full mt-1.5 w-48 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl shadow-xl py-1.5 z-50 text-left max-h-60 overflow-y-auto no-scrollbar">
+                                <button
+                                    onClick={() => {
+                                        setSelectedCategory(null);
+                                        setIsSearchCatDropdownOpen(false);
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold text-[var(--text-secondary)]"
+                                >
+                                    All Categories
+                                </button>
+                                {CATEGORIES.map((cat) => (
+                                    <button
+                                        key={cat.name}
+                                        onClick={() => {
+                                            setSelectedCategory(cat.name);
+                                            setIsSearchCatDropdownOpen(false);
+                                        }}
+                                        className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold text-[var(--text-secondary)]"
+                                    >
+                                        {cat.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        <button 
+                            onClick={handleSearchSubmit}
+                            className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white p-3.5 rounded-r-xl transition-colors shrink-0 outline-none cursor-pointer"
+                        >
                             <Search className="h-4 w-4" />
                         </button>
                     </div>
