@@ -5,9 +5,210 @@ import {
     ShoppingBag, DollarSign, Calendar, Tag, ShieldCheck,
     Plus, LogOut, Moon, Sun, RefreshCw, X, CheckCircle2,
     Clock, Trash2, ArrowRight, Star, Heart, Search, ChevronDown,
-    ChevronLeft, ChevronRight, Truck, CreditCard, Headphones, Sparkles, Menu
+    ChevronLeft, ChevronRight, Truck, CreditCard, Headphones, Sparkles, Menu,
+    Smartphone, Shirt, Home, Trophy, Car, Gamepad2, BookOpen
 } from 'lucide-react'
 import { CATEGORIES, SUBCATEGORIES, ALL_PRODUCTS, RECOMMENDED_PRODUCTS, YOU_MAY_ALSO_LIKE, BRANDS, SLIDES } from '../data/dashboardData'
+
+const getCategoryIcon = (categoryName) => {
+    const name = (categoryName || '').toLowerCase();
+    if (name.includes('elect')) return Smartphone;
+    if (name.includes('fash') || name.includes('cloth')) return Shirt;
+    if (name.includes('home') || name.includes('kitchen') || name.includes('living')) return Home;
+    if (name.includes('beauty') || name.includes('care')) return Sparkles;
+    if (name.includes('sport') || name.includes('outdoor')) return Trophy;
+    if (name.includes('auto') || name.includes('car')) return Car;
+    if (name.includes('toy') || name.includes('game')) return Gamepad2;
+    if (name.includes('book')) return BookOpen;
+    return Tag;
+};
+
+function AllCategoriesView({ categories, setSearchParams }) {
+    const [sortBy, setSortBy] = useState('popular')
+
+    // Sort categories list if sorted
+    const sortedCategories = [...categories].sort((a, b) => {
+        if (sortBy === 'name') return a.name.localeCompare(b.name);
+        return b.count - a.count; // Default to popular
+    })
+
+    return (
+        <div className="space-y-6 animate-fade-in text-left">
+            {/* Breadcrumb & Header */}
+            <div className="space-y-2">
+                <div className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1.5 opacity-80">
+                    <span className="cursor-pointer hover:text-[var(--gold-accent)] transition-colors" onClick={() => setSearchParams({})}>Home</span>
+                    <span>&gt;</span>
+                    <span className="text-[var(--text-primary)] font-bold">Categories</span>
+                </div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="font-['Outfit'] text-2xl lg:text-3xl font-black text-[var(--text-primary)] tracking-tight">
+                            All Categories
+                        </h1>
+                        <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">
+                            Browse through all our product categories
+                        </p>
+                    </div>
+
+                    {/* Sort Dropdown */}
+                    <div className="flex items-center gap-2 self-end sm:self-center">
+                        <span className="text-xs font-bold text-[var(--text-secondary)] whitespace-nowrap">Sort by:</span>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl py-2 px-3.5 text-xs font-semibold outline-none cursor-pointer focus:border-[var(--gold-accent)] text-[var(--text-primary)]"
+                        >
+                            <option value="popular">Popularity</option>
+                            <option value="name">Name</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            {/* Layout Grid: Sidebar + Categories Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                {/* Left Sidebar (Col 3) */}
+                <div className="lg:col-span-3 space-y-6">
+                    
+                    {/* Shop by Category Panel */}
+                    <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-5 shadow-sm space-y-4">
+                        <div className="font-['Outfit'] font-black text-sm text-[var(--text-primary)] border-b pb-3 border-[var(--card-border)]/50 tracking-tight">
+                            Shop by Category
+                        </div>
+                        <div className="space-y-1">
+                            {categories.map((cat) => {
+                                const CategoryIcon = getCategoryIcon(cat.name);
+                                return (
+                                    <div
+                                        key={cat.name}
+                                        onClick={() => setSearchParams({ category: cat.name })}
+                                        className="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--gold-accent)]/5 hover:text-[var(--gold-accent)] transition-all cursor-pointer"
+                                    >
+                                        <div className="flex items-center gap-2.5">
+                                            <CategoryIcon className="h-4 w-4 text-[var(--gold-accent)]/80" />
+                                            <span>{cat.name}</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <span className="text-[10px] font-black opacity-60">{cat.count}</span>
+                                            <ChevronRight className="h-3 w-3 opacity-40" />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Why Shop by Category Panel */}
+                    <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-5 shadow-sm space-y-4">
+                        <div className="font-['Outfit'] font-black text-sm text-[var(--text-primary)] border-b pb-3 border-[var(--card-border)]/50 tracking-tight">
+                            Why Shop by Category?
+                        </div>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] rounded-lg shrink-0">
+                                    <Search className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black text-[var(--text-primary)]">Easy to Find</h4>
+                                    <p className="text-[10px] text-[var(--text-muted)] font-semibold mt-0.5">Find products faster</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] rounded-lg shrink-0">
+                                    <Plus className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black text-[var(--text-primary)]">Wide Selection</h4>
+                                    <p className="text-[10px] text-[var(--text-muted)] font-semibold mt-0.5">Explore a wide range of products</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3">
+                                <div className="p-2 bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] rounded-lg shrink-0">
+                                    <Tag className="h-4 w-4" />
+                                </div>
+                                <div>
+                                    <h4 className="text-xs font-black text-[var(--text-primary)]">Best Deals</h4>
+                                    <p className="text-[10px] text-[var(--text-muted)] font-semibold mt-0.5">Discover category-specific offers</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Right Categories Grid (Col 9) */}
+                <div className="lg:col-span-9 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    {sortedCategories.map((cat) => {
+                        const CategoryIcon = getCategoryIcon(cat.name);
+                        return (
+                            <div
+                                key={cat.name}
+                                className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-[1.75rem] overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
+                            >
+                                {/* Top Image */}
+                                <div className="h-32 w-full overflow-hidden bg-[var(--bg-right-panel)] relative">
+                                    <img
+                                        src={cat.image}
+                                        alt={cat.name}
+                                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                    <div className="absolute inset-0 bg-black/10" />
+                                </div>
+
+                                {/* Central Floating Badge */}
+                                <div className="-mt-6 flex justify-center z-10">
+                                    <div className="h-12 w-12 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] shadow-md flex items-center justify-center text-[var(--gold-accent)] transition-transform duration-300 group-hover:scale-110">
+                                        <CategoryIcon className="h-5 w-5" />
+                                    </div>
+                                </div>
+
+                                {/* Detail Content */}
+                                <div className="p-5 text-center flex-1 flex flex-col justify-between">
+                                    <div className="space-y-1">
+                                        <h3 className="font-['Outfit'] font-black text-sm text-[var(--text-primary)] tracking-tight">
+                                            {cat.name}
+                                        </h3>
+                                        <p className="text-[11px] font-semibold text-[var(--text-muted)]">
+                                            {cat.count} Products
+                                        </p>
+                                    </div>
+
+                                    {/* Action button */}
+                                    <button
+                                        onClick={() => setSearchParams({ category: cat.name })}
+                                        className="w-full mt-4 py-2 border border-[var(--gold-accent)] hover:bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] text-[10.5px] font-black uppercase tracking-wider rounded-xl transition-all cursor-pointer"
+                                    >
+                                        Explore Category
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+            </div>
+
+            {/* Bottom Promo Ribbon Banner */}
+            <div className="bg-[#FFF9F6] border border-[#FFEDE5] p-6 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm text-left">
+                <div className="flex items-center gap-4 text-center sm:text-left">
+                    <div className="h-12 w-12 rounded-xl bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] flex items-center justify-center shrink-0">
+                        <Tag className="h-6 w-6" />
+                    </div>
+                    <div>
+                        <h3 className="text-sm font-black text-[var(--text-primary)]">Discover amazing products in every category</h3>
+                        <p className="text-xs font-semibold text-[var(--text-secondary)] mt-0.5">Shop more, save more with the best deals and offers</p>
+                    </div>
+                </div>
+                <button 
+                    onClick={() => setSearchParams({})}
+                    className="bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white px-6 py-2.5 rounded-xl text-xs font-black transition-colors shrink-0 shadow-sm shadow-[var(--gold-accent)]/10"
+                >
+                    Shop Now
+                </button>
+            </div>
+        </div>
+    )
+}
 
 function CategoryItem({ cat, onClick }) {
     const [isFailed, setIsFailed] = useState(false)
@@ -622,7 +823,12 @@ export default function CustomerDashboard() {
 
             <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-10">
 
-                {selectedCategory ? (
+                {selectedCategory === 'All Products' ? (
+                    <AllCategoriesView 
+                        categories={categories}
+                        setSearchParams={setSearchParams}
+                    />
+                ) : selectedCategory ? (
                     <div className="space-y-6">
                         {/* Breadcrumb */}
                         <div className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1.5 opacity-80">
@@ -671,6 +877,33 @@ export default function CustomerDashboard() {
                                     >
                                         Clear All
                                     </button>
+                                </div>
+
+                                {/* Shop by Category Filter */}
+                                <div className="space-y-3 pb-5 border-b border-[var(--card-border)]/40">
+                                    <div className="font-extrabold text-[11px] text-[var(--text-primary)] uppercase tracking-wider flex items-center justify-between cursor-pointer">
+                                        <span>Shop by Category</span>
+                                        <ChevronDown className="h-3.5 w-3.5 opacity-60" />
+                                    </div>
+                                    <div className="space-y-1 max-h-[220px] overflow-y-auto pr-1 no-scrollbar text-left">
+                                        {categories.map((cat) => {
+                                            const isSelected = selectedCategory === cat.name;
+                                            const CategoryIcon = getCategoryIcon(cat.name);
+                                            return (
+                                                <div
+                                                    key={cat.name}
+                                                    onClick={() => setSearchParams({ category: cat.name })}
+                                                    className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold cursor-pointer transition-all ${isSelected ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]' : 'text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 hover:text-[var(--text-primary)]'}`}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <CategoryIcon className={`h-4 w-4 ${isSelected ? 'text-[var(--gold-accent)]' : 'text-[var(--text-muted)]'}`} />
+                                                        <span>{cat.name}</span>
+                                                    </div>
+                                                    <span className="text-[10px] opacity-70">({cat.count})</span>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
 
                                 {/* Subcategories filter list */}
@@ -979,7 +1212,10 @@ export default function CustomerDashboard() {
                                 <h2 className="font-['Outfit'] text-xl font-extrabold tracking-tight text-[var(--text-primary)]">
                                     Shop by Categories
                                 </h2>
-                                <span className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline">
+                                <span 
+                                    onClick={() => setSearchParams({ category: 'All' })}
+                                    className="text-xs font-bold text-[var(--gold-accent)] cursor-pointer hover:underline"
+                                >
                                     View All
                                 </span>
                             </div>
