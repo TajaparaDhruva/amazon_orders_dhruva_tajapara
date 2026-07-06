@@ -52,6 +52,19 @@ export const SUBCATEGORIES = {
 
 export const ALL_PRODUCTS = [
     {
+        id: 'p-iphone15',
+        name: 'Apple iPhone 15 (128GB) - Blue',
+        brand: 'Apple',
+        category: 'Electronics',
+        subcategory: 'Mobiles',
+        price: 64999,
+        originalPrice: 79900,
+        discount: '-18%',
+        rating: 4.6,
+        reviews: 1246,
+        image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=2070&auto=format&fit=crop'
+    },
+    {
         id: 'p-1',
         name: 'Apple iPhone 14 (128GB) - Midnight',
         brand: 'Apple',

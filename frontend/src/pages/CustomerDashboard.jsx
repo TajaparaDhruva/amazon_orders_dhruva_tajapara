@@ -47,6 +47,59 @@ export default function CustomerDashboard() {
     const [loading, setLoading] = useState(true)
     const [actionLoading, setActionLoading] = useState(false)
     const [orders, setOrders] = useState([])
+    const [products, setProducts] = useState(ALL_PRODUCTS)
+    const [recommendedProducts, setRecommendedProducts] = useState(RECOMMENDED_PRODUCTS)
+    const [youMayAlsoLike, setYouMayAlsoLike] = useState(YOU_MAY_ALSO_LIKE)
+    const [categories, setCategories] = useState(CATEGORIES)
+
+    useEffect(() => {
+        const fetchDBProducts = async () => {
+            try {
+                const { data } = await api.get('/products')
+                if (data.success && data.data && data.data.length > 0) {
+                    setProducts(data.data)
+                }
+            } catch (err) {
+                console.error('Error fetching database products:', err)
+            }
+        }
+
+        const fetchDBRecommendations = async () => {
+            if (!user?.name) return
+            try {
+                const { data } = await api.get(`/recommendations/products/${encodeURIComponent(user.name)}`)
+                if (data.success && data.data && data.data.recommendations) {
+                    setRecommendedProducts(data.data.recommendations)
+                }
+            } catch (err) {
+                console.error('Error fetching database recommendations:', err)
+            }
+        }
+
+        const fetchDBTrending = async () => {
+            try {
+                const { data } = await api.get('/trending/products')
+                if (data.success && data.data) {
+                    setYouMayAlsoLike(data.data)
+                }
+            } catch (err) {
+                console.error('Error fetching database trending products:', err)
+            }
+        }
+
+        fetchDBProducts()
+        fetchDBRecommendations()
+        fetchDBTrending()
+    }, [api, user?.name])
+
+    useEffect(() => {
+        if (products.length > 0) {
+            setCategories(prev => prev.map(cat => {
+                const count = products.filter(p => p.category === cat.name).length;
+                return { ...cat, count: count > 0 ? count : cat.count };
+            }));
+        }
+    }, [products])
     const [isOrdersDrawerOpen, setIsOrdersDrawerOpen] = useState(false)
     const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false)
     const [wishlist, setWishlist] = useState(() => {
@@ -63,6 +116,34 @@ export default function CustomerDashboard() {
             setWishlist(wishlist.filter(id => id !== productId));
         } else {
             setWishlist([...wishlist, productId]);
+        }
+    }
+
+    const [cart, setCart] = useState(() => {
+        const saved = localStorage.getItem(`vf_cart_${user?._id || 'temp'}`);
+        return saved ? JSON.parse(saved) : [];
+    })
+
+    useEffect(() => {
+        localStorage.setItem(`vf_cart_${user?._id || 'temp'}`, JSON.stringify(cart));
+    }, [cart, user?._id])
+
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
+
+    const addToCart = (productToAdd) => {
+        const existingIndex = cart.findIndex(item => item.id === productToAdd.id)
+        if (existingIndex > -1) {
+            const updated = [...cart]
+            updated[existingIndex].quantity += 1
+            setCart(updated)
+        } else {
+            setCart([...cart, {
+                ...productToAdd,
+                quantity: 1,
+                color: 'Default',
+                storage: 'Standard',
+                inStock: true
+            }])
         }
     }
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
@@ -100,7 +181,7 @@ export default function CustomerDashboard() {
     }
 
     // Get active brands for selected category
-    const activeProductsForCategory = ALL_PRODUCTS.filter(p => p.category === selectedCategory)
+    const activeProductsForCategory = products.filter(p => p.category === selectedCategory)
     const availableBrands = [...new Set(activeProductsForCategory.map(p => p.brand))]
 
     // Filtered products list
@@ -398,16 +479,16 @@ export default function CustomerDashboard() {
                             <span className="hidden sm:inline">Wishlist</span>
                         </button>
 
-                        {/* Cart (with orders badge) */}
+                        {/* Cart (with cartCount badge) */}
                         <button
-                            onClick={() => setIsOrdersDrawerOpen(true)}
+                            onClick={() => navigate('/cart')}
                             className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--gold-accent)] font-semibold text-xs transition-colors relative shrink-0"
                         >
                             <div className="relative">
                                 <ShoppingBag className="h-4.5 w-4.5 text-[var(--text-muted)]" />
-                                {activeOrderCount > 0 && (
+                                {cartCount > 0 && (
                                     <span className="absolute -top-1.5 -right-1.5 bg-[var(--gold-accent)] text-white text-[8px] font-black h-4 w-4 rounded-full flex items-center justify-center border-2 border-[var(--card-bg)]">
-                                        {activeOrderCount}
+                                        {cartCount}
                                     </span>
                                 )}
                             </div>
@@ -673,7 +754,10 @@ export default function CustomerDashboard() {
                                                     className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-3 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
                                                 >
                                                     {/* Top Image area */}
-                                                    <div className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner">
+                                                    <div 
+                                                        onClick={() => navigate(`/product/${prod.id}`)}
+                                                        className="relative bg-[var(--bg-right-panel)] h-36 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner cursor-pointer"
+                                                    >
                                                         <img
                                                             src={prod.image}
                                                             alt={prod.name}
@@ -697,7 +781,10 @@ export default function CustomerDashboard() {
                                                                     {prod.rating}
                                                                 </span>
                                                             </div>
-                                                            <h3 className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px]">
+                                                            <h3 
+                                                                onClick={() => navigate(`/product/${prod.id}`)}
+                                                                className="font-bold text-[10.5px] text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[28px] cursor-pointer"
+                                                            >
                                                                 {prod.name}
                                                             </h3>
                                                         </div>
@@ -713,7 +800,7 @@ export default function CustomerDashboard() {
 
                                                             <div className="flex items-center gap-1.5">
                                                                 <button
-                                                                    onClick={() => triggerCheckout(prod)}
+                                                                    onClick={() => addToCart(prod)}
                                                                     className="flex-1 py-1.5 rounded-lg bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[9.5px] font-black uppercase tracking-wider flex items-center justify-center gap-1 transition-colors cursor-pointer"
                                                                 >
                                                                     <ShoppingBag className="h-3 w-3" /> Add
@@ -738,7 +825,10 @@ export default function CustomerDashboard() {
                                                     className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col sm:flex-row gap-5 items-center justify-between"
                                                 >
                                                     {/* Left Image area */}
-                                                    <div className="relative bg-[var(--bg-right-panel)] h-36 w-full sm:w-48 rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner shrink-0">
+                                                    <div 
+                                                        onClick={() => navigate(`/product/${prod.id}`)}
+                                                        className="relative bg-[var(--bg-right-panel)] h-36 w-full sm:w-48 rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner shrink-0 cursor-pointer"
+                                                    >
                                                         <img
                                                             src={prod.image}
                                                             alt={prod.name}
@@ -765,7 +855,10 @@ export default function CustomerDashboard() {
                                                             </span>
                                                         </div>
                                                         
-                                                        <h3 className="font-['Outfit'] font-black text-sm lg:text-base text-[var(--text-primary)] leading-tight group-hover:text-[var(--gold-accent)] transition-colors">
+                                                        <h3 
+                                                            onClick={() => navigate(`/product/${prod.id}`)}
+                                                            className="font-['Outfit'] font-black text-sm lg:text-base text-[var(--text-primary)] leading-tight group-hover:text-[var(--gold-accent)] transition-colors cursor-pointer"
+                                                        >
                                                             {prod.name}
                                                         </h3>
 
@@ -785,7 +878,7 @@ export default function CustomerDashboard() {
 
                                                         <div className="flex items-center gap-2">
                                                             <button
-                                                                onClick={() => triggerCheckout(prod)}
+                                                                onClick={() => addToCart(prod)}
                                                                 className="px-4 py-2 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-[10px] font-black uppercase tracking-wider flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                                                             >
                                                                 <ShoppingBag className="h-3.5 w-3.5" /> Add
@@ -799,7 +892,7 @@ export default function CustomerDashboard() {
                                                         </div>
                                                     </div>
                                                 </div>
-                                            ))}
+                                                ))}
                                         </div>
                                     )
                                 ) : (
@@ -821,21 +914,32 @@ export default function CustomerDashboard() {
                                 )}
 
                                 {/* Pagination */}
-                                {filteredProducts.length > 0 && (
+                                {totalPages > 1 && (
                                     <div className="flex items-center justify-center gap-2 pt-6 border-t border-[var(--card-border)]/50">
-                                        <button className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                        <button 
+                                            disabled={currentPage === 1}
+                                            onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                            className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all disabled:opacity-40 disabled:hover:bg-transparent"
+                                        >
                                             <ChevronLeft className="h-4 w-4" />
                                         </button>
-                                        {[1, 2, 3].map((p) => (
-                                            <button key={p} className={`h-9 w-9 rounded-lg border flex items-center justify-center text-xs font-black transition-all ${p === 1 ? 'bg-[var(--gold-accent)] text-white border-transparent shadow-md shadow-[var(--gold-accent)]/15' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5'}`}>
-                                                {p}
-                                            </button>
-                                        ))}
-                                        <span className="text-xs font-bold text-[var(--text-muted)] px-1">...</span>
-                                        <button className="h-9 w-9 rounded-lg border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center text-xs font-black transition-all">
-                                            65
-                                        </button>
-                                        <button className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                                        {Array.from({ length: totalPages }).map((_, idx) => {
+                                            const pageNum = idx + 1;
+                                            return (
+                                                <button 
+                                                    key={pageNum} 
+                                                    onClick={() => setCurrentPage(pageNum)}
+                                                    className={`h-9 w-9 rounded-lg border flex items-center justify-center text-xs font-black transition-all ${pageNum === currentPage ? 'bg-[var(--gold-accent)] text-white border-transparent shadow-md shadow-[var(--gold-accent)]/15' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5'}`}
+                                                >
+                                                    {pageNum}
+                                                </button>
+                                            )
+                                        })}
+                                        <button 
+                                            disabled={currentPage === totalPages}
+                                            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                            className="h-9 w-9 rounded-lg border border-[var(--card-border)] flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all disabled:opacity-40 disabled:hover:bg-transparent"
+                                        >
                                             <ChevronRight className="h-4 w-4" />
                                         </button>
                                     </div>
@@ -910,7 +1014,7 @@ export default function CustomerDashboard() {
                             <div className="relative">
                                 {/* Carousel Wrapper */}
                                 <div ref={categoriesRef} className="flex items-center gap-5 xl:justify-between overflow-x-auto no-scrollbar py-2.5 scroll-smooth">
-                                    {CATEGORIES.map((cat, idx) => (
+                                    {categories.map((cat, idx) => (
                                         <CategoryItem
                                             key={idx}
                                             cat={cat}
@@ -991,13 +1095,16 @@ export default function CustomerDashboard() {
 
                             <div className="relative">
                                 <div ref={recommendedRef} className="flex items-center gap-5 xl:justify-between overflow-x-auto no-scrollbar py-2 scroll-smooth">
-                                    {RECOMMENDED_PRODUCTS.map((prod) => (
+                                    {recommendedProducts.map((prod) => (
                                         <div
                                             key={prod.id}
                                             className="flex-shrink-0 w-[220px] bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 group flex flex-col justify-between"
                                         >
                                             {/* Product Top Image & Tags */}
-                                            <div className="relative bg-[var(--bg-right-panel)] h-44 w-full flex items-center justify-center overflow-hidden border-b border-[var(--card-border)]">
+                                            <div 
+                                                onClick={() => navigate(`/product/${prod.id}`)}
+                                                className="relative bg-[var(--bg-right-panel)] h-44 w-full flex items-center justify-center overflow-hidden border-b border-[var(--card-border)] cursor-pointer"
+                                            >
                                                 <img
                                                     src={prod.image}
                                                     alt={prod.name}
@@ -1011,7 +1118,7 @@ export default function CustomerDashboard() {
 
                                                 {/* Wishlist toggle icon */}
                                                 <button 
-                                                    onClick={() => toggleWishlist(prod.id)}
+                                                    onClick={(e) => { e.stopPropagation(); toggleWishlist(prod.id); }}
                                                     className="absolute top-2.5 right-2.5 h-7 w-7 rounded-full bg-[var(--card-bg)]/80 dark:bg-black/50 hover:bg-[var(--card-bg)] text-[var(--text-muted)] border border-[var(--card-border)] flex items-center justify-center transition-all cursor-pointer"
                                                 >
                                                     <Heart className={`h-3.5 w-3.5 ${wishlist.includes(prod.id) ? 'fill-rose-500 text-rose-500' : 'text-[var(--text-muted)] hover:text-rose-500'}`} />
@@ -1024,7 +1131,10 @@ export default function CustomerDashboard() {
                                                     <span className="text-[10px] font-bold text-[var(--text-muted)] tracking-wider uppercase">
                                                         {prod.category}
                                                     </span>
-                                                    <h3 className="font-bold text-xs mt-1 text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[32px]">
+                                                    <h3 
+                                                        onClick={() => navigate(`/product/${prod.id}`)}
+                                                        className="font-bold text-xs mt-1 text-[var(--text-primary)] line-clamp-2 leading-tight group-hover:text-[var(--gold-accent)] transition-colors min-h-[32px] cursor-pointer"
+                                                    >
                                                         {prod.name}
                                                     </h3>
 
@@ -1053,7 +1163,7 @@ export default function CustomerDashboard() {
                                                     </div>
 
                                                     <button
-                                                        onClick={() => triggerCheckout(prod)}
+                                                        onClick={() => addToCart(prod)}
                                                         className="w-full mt-3.5 py-2 rounded-xl bg-transparent hover:bg-[var(--gold-accent)] text-[var(--gold-accent)] hover:text-white border border-[var(--gold-accent)]/35 hover:border-transparent text-[10.5px] font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-all duration-300 cursor-pointer"
                                                     >
                                                         <ShoppingBag className="h-3.5 w-3.5" /> Add to Cart
@@ -1176,12 +1286,15 @@ export default function CustomerDashboard() {
                             </div>
 
                             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
-                                {YOU_MAY_ALSO_LIKE.map((prod) => (
+                                {youMayAlsoLike.map((prod) => (
                                     <div
                                         key={prod.id}
                                         className="bg-[var(--card-bg)] border border-[var(--card-border)] p-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between"
                                     >
-                                        <div className="bg-[var(--bg-right-panel)] h-28 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)] shadow-inner">
+                                        <div 
+                                            onClick={() => navigate(`/product/${prod.id}`)}
+                                            className="bg-[var(--bg-right-panel)] h-28 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)] shadow-inner cursor-pointer"
+                                        >
                                             <img
                                                 src={prod.image}
                                                 alt={prod.name}
@@ -1191,12 +1304,17 @@ export default function CustomerDashboard() {
                                         <div className="mt-3.5 space-y-2">
                                             <div>
                                                 <span className="text-[8.5px] font-bold text-[var(--text-muted)] uppercase">{prod.category}</span>
-                                                <h3 className="font-bold text-[11px] text-[var(--text-primary)] line-clamp-1 leading-snug mt-0.5">{prod.name}</h3>
+                                                <h3 
+                                                    onClick={() => navigate(`/product/${prod.id}`)}
+                                                    className="font-bold text-[11px] text-[var(--text-primary)] line-clamp-1 leading-snug mt-0.5 cursor-pointer hover:text-[var(--gold-accent)] transition-colors"
+                                                >
+                                                    {prod.name}
+                                                </h3>
                                             </div>
                                             <div className="flex items-center justify-between gap-1.5 pt-1.5 border-t border-[var(--card-border)] opacity-95">
                                                 <span className="text-xs font-black text-[var(--text-primary)]">{formatCurrency(prod.price)}</span>
                                                 <button
-                                                    onClick={() => triggerCheckout(prod)}
+                                                    onClick={() => addToCart(prod)}
                                                     className="px-2.5 py-1.5 bg-[var(--gold-accent)]/10 hover:bg-[var(--gold-accent)] text-[var(--gold-accent)] hover:text-white rounded-lg text-[9px] font-black uppercase tracking-wider transition-colors shrink-0"
                                                 >
                                                     Add
@@ -1458,7 +1576,7 @@ export default function CustomerDashboard() {
                                         </div>
                                     ) : (
                                         <div className="space-y-3.5">
-                                            {ALL_PRODUCTS.filter(p => wishlist.includes(p.id)).map((o) => (
+                                            {products.filter(p => wishlist.includes(p.id)).map((o) => (
                                                 <div
                                                     key={o.id}
                                                     className="bg-[var(--card-bg)] border border-[var(--card-border)] p-4 rounded-xl space-y-3 hover:border-[var(--gold-accent)]/30 transition-colors shadow-sm flex items-center gap-4"
