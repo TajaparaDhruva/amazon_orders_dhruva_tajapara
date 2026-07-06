@@ -205,12 +205,17 @@ const getTrendingCategoriesService = async () => {
         { $limit: 5 }
     ]);
 
-    return trendingCategories.map(c => ({
-        category: c._id || 'Unknown',
-        ordersCount: c.ordersCount,
-        unitsSold: c.unitsSold,
-        revenue: c.revenue
-    }));
+    return trendingCategories.map(c => {
+        let category = c._id || 'Unknown';
+        if (category === 'Clothing') category = 'Fashion';
+        else if (category === 'Home & Kitchen') category = 'Home & Living';
+        return {
+            category,
+            ordersCount: c.ordersCount,
+            unitsSold: c.unitsSold,
+            revenue: c.revenue
+        };
+    });
 };
 
 module.exports = {
