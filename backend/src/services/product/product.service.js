@@ -109,6 +109,125 @@ const getSubcategory = (category, name) => {
 };
 
 /**
+ * Deterministically maps product names to correct categories and subcategories.
+ */
+const correctProductMapping = (productName) => {
+    const name = (productName || '').trim().toLowerCase();
+    
+    // Electronics
+    if (
+        name.includes('4k monitor') ||
+        name.includes('camera') ||
+        name.includes('speaker') ||
+        name.includes('hdd') ||
+        name.includes('ssd') ||
+        name.includes('mouse') ||
+        name.includes('tablet') ||
+        name.includes('cable') ||
+        name.includes('keyboard') ||
+        name.includes('memory') ||
+        name.includes('microphone') ||
+        name.includes('headphone') ||
+        name.includes('earbud') ||
+        name.includes('tripod') ||
+        name.includes('power bank') ||
+        name.includes('projector') ||
+        name.includes('router') ||
+        name.includes('galaxy s23') ||
+        name.includes('phone') ||
+        name.includes('charger') ||
+        name.includes('webcam') ||
+        name.includes('wireless') ||
+        name.includes('iphone') ||
+        name.includes('macbook') ||
+        name.includes('watch') ||
+        name.includes('band') ||
+        name.includes('drone')
+    ) {
+        let sub = 'Accessories';
+        if (name.includes('phone') || name.includes('iphone') || name.includes('galaxy') || name.includes('smartphone')) sub = 'Mobiles';
+        else if (name.includes('laptop') || name.includes('macbook')) sub = 'Laptops';
+        else if (name.includes('watch') || name.includes('band') || name.includes('smartwatch')) sub = 'Smart Watches';
+        else if (name.includes('headphone') || name.includes('earbud') || name.includes('speaker')) sub = 'Audio';
+        else if (name.includes('camera')) sub = 'Cameras';
+        
+        return { category: 'Electronics', subcategory: sub };
+    }
+    
+    // Fashion / Clothing
+    if (
+        name.includes('backpack') ||
+        name.includes('shirt') ||
+        name.includes('jeans') ||
+        name.includes('sunglasses') ||
+        name.includes('t-shirt') ||
+        name.includes('jacket') ||
+        name.includes('shoes') ||
+        name.includes('sneaker') ||
+        name.includes('jordan')
+    ) {
+        let sub = 'Clothing';
+        if (name.includes('shoes') || name.includes('sneaker') || name.includes('jordan')) sub = 'Footwear';
+        else if (name.includes('backpack') || name.includes('sunglasses')) sub = 'Accessories';
+        else sub = "Men's Wear";
+        return { category: 'Fashion', subcategory: sub };
+    }
+    
+    // Home & Living
+    if (
+        name.includes('air fryer') ||
+        name.includes('cookware') ||
+        name.includes('desk organizer') ||
+        name.includes('plant') ||
+        name.includes('kettle') ||
+        name.includes('instant pot') ||
+        name.includes('lamp') ||
+        name.includes('bulb') ||
+        name.includes('light') ||
+        name.includes('chair') ||
+        name.includes('cleaner') ||
+        name.includes('vacuum')
+    ) {
+        let sub = 'Kitchen';
+        if (name.includes('chair') || name.includes('furniture')) sub = 'Furniture';
+        else if (name.includes('lamp') || name.includes('bulb') || name.includes('light')) sub = 'Lighting';
+        return { category: 'Home & Living', subcategory: sub };
+    }
+    
+    // Books
+    if (
+        name.includes('book') ||
+        name.includes('novel') ||
+        name.includes('algorithms')
+    ) {
+        return { category: 'Books', subcategory: 'Literature' };
+    }
+    
+    // Sports & Outdoors
+    if (
+        name.includes('water bottle') ||
+        name.includes('yoga')
+    ) {
+        let sub = 'Gear';
+        if (name.includes('yoga')) sub = 'Fitness';
+        return { category: 'Sports & Outdoors', subcategory: sub };
+    }
+    
+    // Toys & Games
+    if (
+        name.includes('game') ||
+        name.includes('toy') ||
+        name.includes('puzzle') ||
+        name.includes('blaster')
+    ) {
+        return { category: 'Toys & Games', subcategory: 'Games' };
+    }
+    
+    // Default fallback
+    return { category: 'Electronics', subcategory: 'Accessories' };
+};
+
+/**
  * Enriches a raw database grouped product with ratings, images, and discounts.
  */
 const enrichProduct = (p) => {
@@ -117,12 +236,10 @@ const enrichProduct = (p) => {
     const discountVal = (charSum % 4) * 5 + 10; // 10%, 15%, 20%, 25%
     const originalPrice = Math.round(p.UnitPrice * (1 + discountVal / 100));
 
-    // Normalize category for frontend consistency
-    let category = p.Category;
-    if (category === 'Clothing') category = 'Fashion';
-    else if (category === 'Home & Kitchen') category = 'Home & Living';
-
-    const subcategory = getSubcategory(category, p.ProductName);
+    // Correct categories and subcategories deterministically based on name
+    const corrected = correctProductMapping(p.ProductName);
+    const category = corrected.category;
+    const subcategory = corrected.subcategory;
     const image = getCategoryImage(category, subcategory, p.ProductName);
 
     return {
@@ -148,32 +265,6 @@ const getUniqueProductsService = async (queryParams = {}) => {
 
     const matchStage = { isArchived: { $ne: true } };
 
-    if (category) {
-        let categoriesToMatch = [category];
-        if (category === 'Fashion') categoriesToMatch.push('Clothing');
-        if (category === 'Home & Living') categoriesToMatch.push('Home & Kitchen');
-        matchStage.Category = { $in: categoriesToMatch };
-    }
-
-    if (brand) {
-        matchStage.Brand = { $regex: brand, $options: 'i' };
-    }
-
-    if (search) {
-        const escapedSearch = search.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-        matchStage.$or = [
-            { ProductName: { $regex: escapedSearch, $options: 'i' } },
-            { ProductID: { $regex: escapedSearch, $options: 'i' } },
-            { Brand: { $regex: escapedSearch, $options: 'i' } }
-        ];
-    }
-
-    if (minPrice || maxPrice) {
-        matchStage.UnitPrice = {};
-        if (minPrice) matchStage.UnitPrice.$gte = Number(minPrice);
-        if (maxPrice) matchStage.UnitPrice.$lte = Number(maxPrice);
-    }
-
     const products = await Order.aggregate([
         { $match: matchStage },
         {
@@ -190,7 +281,32 @@ const getUniqueProductsService = async (queryParams = {}) => {
         { $sort: { OrderCount: -1 } } // Sort by popularity by default
     ]);
 
-    return products.map(enrichProduct);
+    let enriched = products.map(enrichProduct);
+
+    // Apply filtering in JavaScript to ensure exact match with corrected category/prices
+    if (category) {
+        enriched = enriched.filter(p => p.category === category);
+    }
+    if (brand) {
+        const cleanBrand = brand.toLowerCase();
+        enriched = enriched.filter(p => p.brand.toLowerCase().includes(cleanBrand));
+    }
+    if (search) {
+        const cleanSearch = search.toLowerCase();
+        enriched = enriched.filter(p => 
+            p.name.toLowerCase().includes(cleanSearch) || 
+            p.id.toLowerCase().includes(cleanSearch) || 
+            p.brand.toLowerCase().includes(cleanSearch)
+        );
+    }
+    if (minPrice) {
+        enriched = enriched.filter(p => p.price >= Number(minPrice));
+    }
+    if (maxPrice) {
+        enriched = enriched.filter(p => p.price <= Number(maxPrice));
+    }
+
+    return enriched;
 };
 
 /**
