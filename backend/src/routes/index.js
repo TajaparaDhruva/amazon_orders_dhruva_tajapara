@@ -3,6 +3,7 @@ const router = express.Router();
 
 const authRoutes = require('./auth.routes');
 const orderRoutes = require('./order.routes');
+const productRoutes = require('./product.routes');
 const searchRoutes = require('./search.routes');
 const analyticsRoutes = require('./analytics.routes');
 const statsRoutes = require('./stats.routes');
@@ -25,6 +26,7 @@ router.get('/', (req, res) => {
 // Mount routes
 router.use('/auth', authRoutes);       // consolidated: POST /auth/register, /auth/login, /auth/logout
 router.use('/orders', orderRoutes);
+router.use('/products', productRoutes);
 router.use('/search', searchRoutes);
 router.use('/analytics', analyticsRoutes);
 router.use('/stats', statsRoutes);
