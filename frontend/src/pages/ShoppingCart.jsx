@@ -420,7 +420,7 @@ export default function ShoppingCart() {
                                     <button
                                         onClick={() => {
                                             setIsProfileDropdownOpen(false)
-                                            setIsOrdersDrawerOpen(true)
+                                            navigate('/order-history')
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold flex items-center gap-2 text-[var(--text-secondary)]"
                                     >

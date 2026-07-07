@@ -658,7 +658,7 @@ export default function CustomerDashboard() {
             const { data } = await api.post('/orders', orderPayload)
             if (data.success) {
                 fetchCustomerOrders()
-                setIsOrdersDrawerOpen(true) // Open orders drawer automatically to show success
+                navigate('/order-history')
             }
         } catch (err) {
             alert('Failed to place order: ' + (err.response?.data?.message || err.message))
@@ -700,7 +700,7 @@ export default function CustomerDashboard() {
             if (data.success) {
                 setIsBuyModalOpen(false)
                 fetchCustomerOrders()
-                setIsOrdersDrawerOpen(true) // Open orders drawer automatically to show success
+                navigate('/order-history')
             }
         } catch (err) {
             alert('Failed to place order: ' + (err.response?.data?.message || err.message))
@@ -893,7 +893,7 @@ export default function CustomerDashboard() {
                                     <button
                                         onClick={() => {
                                             setIsProfileDropdownOpen(false)
-                                            setIsOrdersDrawerOpen(true)
+                                            navigate('/order-history')
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold flex items-center gap-2 text-[var(--text-secondary)]"
                                     >

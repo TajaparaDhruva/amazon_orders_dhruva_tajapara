@@ -184,7 +184,7 @@ export default function BuyNow() {
                 const { data } = await api.post('/orders', orderPayload)
                 if (!data.success) throw new Error(data.message || 'Error occurred')
             }
-            navigate('/dashboard/customer?openOrders=true')
+            navigate('/order-history')
         } catch (err) {
             console.error(err)
             alert('Failed to place order: ' + (err.response?.data?.message || err.message))
@@ -286,7 +286,7 @@ export default function BuyNow() {
 
                             {isProfileDropdownOpen && (
                                 <div className="absolute right-0 mt-2.5 w-48 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] shadow-xl py-2 z-50 animate-scale-up">
-                                    <button onClick={() => navigate('/dashboard/customer?openOrders=true')} className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold flex items-center gap-2 text-[var(--text-secondary)]">
+                                    <button onClick={() => { setIsProfileDropdownOpen(false); navigate('/order-history'); }} className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold flex items-center gap-2 text-[var(--text-secondary)]">
                                         <Clock className="h-4 w-4 text-[var(--text-muted)]" /> My Orders History
                                     </button>
                                     <hr className="border-[var(--card-border)] my-1.5 opacity-40" />

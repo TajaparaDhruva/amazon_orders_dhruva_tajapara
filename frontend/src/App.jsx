@@ -8,6 +8,7 @@ import ProductDetail from './pages/ProductDetail'
 import ShoppingCart from './pages/ShoppingCart'
 import Wishlist from './pages/Wishlist'
 import BuyNow from './pages/BuyNow'
+import OrderHistory from './pages/OrderHistory'
 
 // Protected Route Component with Role Validation
 function ProtectedRoute({ children, requiredRole }) {
@@ -97,6 +98,16 @@ function App() {
                         element={
                             <ProtectedRoute requiredRole="user">
                                 <BuyNow />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Protected Order History */}
+                    <Route
+                        path="/order-history"
+                        element={
+                            <ProtectedRoute requiredRole="user">
+                                <OrderHistory />
                             </ProtectedRoute>
                         }
                     />
