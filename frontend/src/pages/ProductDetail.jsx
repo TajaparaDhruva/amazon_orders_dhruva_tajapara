@@ -685,18 +685,25 @@ export default function ProductDetail() {
                         </div>
 
                         {/* CTA Buttons */}
-                        <div className="flex flex-col sm:flex-row items-stretch gap-4 pt-4 border-t border-[var(--card-border)]/50">
+                        <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-[var(--card-border)]/50">
                             <button
                                 onClick={() => addToCart(product, selectedColor, selectedStorage, currentPrice)}
-                                className="flex-1 py-3 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                                className="w-full sm:flex-1 py-3 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                             >
                                 <ShoppingBag className="h-4.5 w-4.5" /> Add to Cart
                             </button>
                             <button
                                 onClick={() => triggerDirectPurchase(product, selectedColor, selectedStorage, currentPrice)}
-                                className="flex-1 py-3 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] hover:bg-[var(--gold-bg-pill)] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                                className="w-full sm:flex-1 py-3 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] hover:bg-[var(--gold-bg-pill)] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                             >
                                 Buy Now
+                            </button>
+                            <button
+                                onClick={() => toggleWishlist(product.id)}
+                                className={`w-full sm:w-auto p-3 rounded-xl border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${wishlist.includes(product.id) ? 'bg-rose-500/10 border-rose-500 text-rose-500 hover:bg-rose-500/20' : 'border-[var(--card-border)] text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/5'}`}
+                                title={wishlist.includes(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                            >
+                                <Heart className={`h-4.5 w-4.5 ${wishlist.includes(product.id) ? 'fill-current' : ''}`} />
                             </button>
                         </div>
                     </div>
@@ -712,14 +719,26 @@ export default function ProductDetail() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-5">
                             {relatedProducts.map((prod) => (
                                 <div key={prod.id} className="bg-[var(--card-bg)] border border-[var(--card-border)] p-3 rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-                                    <div 
-                                        onClick={() => {
-                                            navigate(`/product/${prod.id}`);
-                                            window.scrollTo(0, 0);
-                                        }} 
-                                        className="bg-[var(--bg-right-panel)] h-28 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)] shadow-inner cursor-pointer"
-                                    >
-                                        <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                    <div className="relative bg-[var(--bg-right-panel)] h-28 w-full rounded-xl overflow-hidden flex items-center justify-center border border-[var(--card-border)] shadow-inner">
+                                        <div 
+                                            onClick={() => {
+                                                navigate(`/product/${prod.id}`);
+                                                window.scrollTo(0, 0);
+                                            }}
+                                            className="w-full h-full cursor-pointer"
+                                        >
+                                            <img src={prod.image} alt={prod.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                        </div>
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                toggleWishlist(prod.id);
+                                            }}
+                                            className={`absolute top-2 right-2 p-1.5 rounded-lg border backdrop-blur-md transition-all cursor-pointer z-10 ${wishlist.includes(prod.id) ? 'bg-rose-500 border-rose-500 text-white shadow-sm' : 'bg-white/80 dark:bg-black/50 border-[var(--card-border)] text-[var(--text-muted)] hover:text-rose-500 hover:scale-105'}`}
+                                            title={wishlist.includes(prod.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
+                                        >
+                                            <Heart className={`h-3 w-3 ${wishlist.includes(prod.id) ? 'fill-current' : ''}`} />
+                                        </button>
                                     </div>
                                     <div className="mt-3.5 space-y-2">
                                         <div>
