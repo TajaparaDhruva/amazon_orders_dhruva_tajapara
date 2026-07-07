@@ -6,6 +6,7 @@ import SellerDashboard from './pages/SellerDashboard'
 import CustomerDashboard from './pages/CustomerDashboard'
 import ProductDetail from './pages/ProductDetail'
 import ShoppingCart from './pages/ShoppingCart'
+import Wishlist from './pages/Wishlist'
 
 // Protected Route Component with Role Validation
 function ProtectedRoute({ children, requiredRole }) {
@@ -75,6 +76,16 @@ function App() {
                         element={
                             <ProtectedRoute requiredRole="user">
                                 <ShoppingCart />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Protected Wishlist */}
+                    <Route
+                        path="/wishlist"
+                        element={
+                            <ProtectedRoute requiredRole="user">
+                                <Wishlist />
                             </ProtectedRoute>
                         }
                     />

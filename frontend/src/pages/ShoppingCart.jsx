@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     ShoppingBag, Heart, Search, ChevronDown, Star, LogOut, Moon, Sun, 
-    RefreshCw, X, Trash2, Clock, CheckCircle2, ShieldCheck, Truck, Headphones, Plus
+    RefreshCw, X, Trash2, Clock, CheckCircle2, ShieldCheck, Truck, Headphones, Plus, ArrowLeft
 } from 'lucide-react'
 import { ALL_PRODUCTS, RECOMMENDED_PRODUCTS, YOU_MAY_ALSO_LIKE, BRANDS, CATEGORIES } from '../data/dashboardData'
 
@@ -369,7 +369,7 @@ export default function ShoppingCart() {
                         
                         {/* Wishlist */}
                         <button 
-                            onClick={() => setIsWishlistDrawerOpen(true)}
+                            onClick={() => navigate('/wishlist')}
                             className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--gold-accent)] font-semibold text-xs transition-colors shrink-0 relative cursor-pointer"
                         >
                             <div className="relative">
@@ -437,17 +437,6 @@ export default function ShoppingCart() {
                 </div>
             </header>
 
-            {/* Second Navbar Links */}
-            <div className="border-y border-[var(--card-border)]/60 bg-[var(--card-bg)] py-3">
-                <div className="max-w-7xl mx-auto px-4 lg:px-6 flex items-center justify-between text-xs font-bold text-[var(--text-secondary)] overflow-x-auto no-scrollbar gap-6">
-                    <div onClick={() => navigate('/dashboard/customer')} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white rounded-lg cursor-pointer transition-colors shadow-sm shrink-0">
-                        <Plus className="h-3.5 w-3.5" /> All Categories
-                    </div>
-                    {['Today\'s Deals', 'Top Sellers', 'New Arrivals', ...[...new Set(products.map(p => p.category))]].map((link) => (
-                        <span key={link} onClick={() => navigate('/dashboard/customer')} className="hover:text-[var(--gold-accent)] transition-colors cursor-pointer shrink-0">{link}</span>
-                    ))}
-                </div>
-            </div>
 
             {/* Main Cart Content */}
             <main className="max-w-7xl mx-auto px-4 lg:px-6 py-8 space-y-10">
@@ -457,7 +446,16 @@ export default function ShoppingCart() {
                     {/* Left Section: Cart Items list */}
                     <div className="lg:col-span-8 space-y-6">
                         <div>
-                            <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)]">Shopping Cart ({cart.length} Items)</h1>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => navigate(-1)}
+                                    className="h-9 w-9 rounded-xl border border-[var(--card-border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-black/5 dark:hover:bg-white/5 transition-all cursor-pointer shrink-0"
+                                    title="Go Back"
+                                >
+                                    <ArrowLeft className="h-4 w-4" />
+                                </button>
+                                <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)]">Shopping Cart ({cart.length} Items)</h1>
+                            </div>
                             <p className="text-xs font-medium text-[var(--text-muted)] mt-1">Review your items and proceed to checkout</p>
                         </div>
 
