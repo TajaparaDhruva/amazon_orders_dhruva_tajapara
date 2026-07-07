@@ -587,7 +587,7 @@ export default function ProductDetail() {
                                     <button
                                         onClick={() => {
                                             setIsProfileDropdownOpen(false)
-                                            setIsOrdersDrawerOpen(true)
+                                            navigate('/order-history')
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold flex items-center gap-2 text-[var(--text-secondary)]"
                                     >
@@ -739,7 +739,7 @@ export default function ProductDetail() {
                                 <ShoppingBag className="h-4.5 w-4.5" /> Add to Cart
                             </button>
                             <button
-                                onClick={() => triggerDirectPurchase(product, 'Default', 'Standard', currentPrice)}
+                                onClick={() => navigate(`/buy-now/${product.id}`)}
                                 className="w-full sm:flex-1 py-3 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] hover:bg-[var(--gold-bg-pill)] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                             >
                                 Buy Now

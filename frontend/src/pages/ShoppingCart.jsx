@@ -420,7 +420,7 @@ export default function ShoppingCart() {
                                     <button
                                         onClick={() => {
                                             setIsProfileDropdownOpen(false)
-                                            setIsOrdersDrawerOpen(true)
+                                            navigate('/order-history')
                                         }}
                                         className="w-full text-left px-4 py-2 hover:bg-[var(--bg-right-panel)] text-xs font-semibold flex items-center gap-2 text-[var(--text-secondary)]"
                                     >
@@ -574,19 +574,12 @@ export default function ShoppingCart() {
 
                             <div className="space-y-3 pt-2">
                                 <button
-                                    onClick={handleCheckoutSubmit}
-                                    disabled={actionLoading || cart.length === 0}
+                                    onClick={() => navigate('/buy-now/cart')}
+                                    disabled={cart.length === 0}
                                     className="w-full py-3 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {actionLoading ? <RefreshCw className="h-3.5 w-3.5 animate-spin" /> : <ShoppingBag className="h-4.5 w-4.5" />}
+                                    <ShoppingBag className="h-4.5 w-4.5" />
                                     Proceed to Checkout
-                                </button>
-                                <button
-                                    onClick={handleCheckoutSubmit}
-                                    disabled={actionLoading || cart.length === 0}
-                                    className="w-full py-3 rounded-xl border border-[var(--gold-accent)] hover:bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer disabled:opacity-50"
-                                >
-                                    Buy Now
                                 </button>
                             </div>
                         </div>
