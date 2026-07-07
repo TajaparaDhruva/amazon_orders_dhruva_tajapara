@@ -126,8 +126,6 @@ export default function ProductDetail() {
 
     // UI States
     const [isDark, setIsDark] = useState(() => localStorage.getItem('vf_dark_mode') === 'true')
-    const [selectedColor, setSelectedColor] = useState('Blue')
-    const [selectedStorage, setSelectedStorage] = useState('128GB')
     const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false)
     const [isOrdersDrawerOpen, setIsOrdersDrawerOpen] = useState(false)
     const [isWishlistDrawerOpen, setIsWishlistDrawerOpen] = useState(false)
@@ -137,11 +135,6 @@ export default function ProductDetail() {
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(false)
     const [actionLoading, setActionLoading] = useState(false)
-
-    useEffect(() => {
-        setSelectedColor('Blue')
-        setSelectedStorage('128GB')
-    }, [id])
 
     const handleSearchSubmit = () => {
         let path = '/dashboard/customer'
@@ -198,29 +191,9 @@ export default function ProductDetail() {
         }
     }
 
-    // Dynamic price calculation based on variant selection
-    const getCalculatedPrice = () => {
-        let price = product?.price || 0
-        const showStoragePicker = product?.category === 'Electronics' && (product?.subcategory === 'Mobiles' || product?.subcategory === 'Laptops')
-        if (showStoragePicker) {
-            if (selectedStorage === '256GB') price += 10000
-            else if (selectedStorage === '512GB') price += 20000
-        }
-        return price
-    }
-    const currentPrice = getCalculatedPrice()
-
-    const getCalculatedOriginalPrice = () => {
-        if (!product?.originalPrice) return null
-        let orig = product.originalPrice
-        const showStoragePicker = product?.category === 'Electronics' && (product?.subcategory === 'Mobiles' || product?.subcategory === 'Laptops')
-        if (showStoragePicker) {
-            if (selectedStorage === '256GB') orig += 10000
-            else if (selectedStorage === '512GB') orig += 20000
-        }
-        return orig
-    }
-    const currentOriginalPrice = getCalculatedOriginalPrice()
+    // Price — always use product's own price directly
+    const currentPrice = product?.price || 0
+    const currentOriginalPrice = product?.originalPrice || null
 
     // Fetch customer orders history (used for sidebar drawer component check)
     const fetchCustomerOrders = useCallback(async () => {
@@ -299,18 +272,7 @@ export default function ProductDetail() {
         }
     }
 
-    // Color variant mappings
-    const colors = [
-        { name: 'Blue', hex: '#E2ECF6', image: 'https://images.unsplash.com/photo-1695048133142-1a20484d2569?q=80&w=2070&auto=format&fit=crop' },
-        { name: 'Pink', hex: '#FAE0E4', image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=400&q=80' },
-        { name: 'Green', hex: '#E1EDDF', image: 'https://images.unsplash.com/photo-1574757547511-ad22b2811d08?w=400&q=80' },
-        { name: 'Black', hex: '#343A40', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=400&q=80' }
-    ]
-
-    const showColorPicker = product?.category === 'Electronics' && product?.subcategory === 'Mobiles'
-    const activeColorImg = showColorPicker 
-        ? (colors.find(c => c.name === selectedColor)?.image || product?.image)
-        : product?.image
+    // Always use the product's own image
 
     // Specification highlights (real items specs)
     const highlights = getProductHighlights(product)
@@ -527,9 +489,9 @@ export default function ProductDetail() {
                 <div className="text-xs font-semibold text-[var(--text-secondary)] flex items-center gap-1.5 opacity-80">
                     <span onClick={() => navigate('/dashboard/customer')} className="cursor-pointer hover:text-[var(--gold-accent)]">Home</span>
                     <span>&gt;</span>
-                    <span onClick={() => navigate('/dashboard/customer')} className="cursor-pointer hover:text-[var(--gold-accent)]">{product.category}</span>
+                    <span onClick={() => navigate(`/dashboard/customer?category=${encodeURIComponent(product.category)}`)} className="cursor-pointer hover:text-[var(--gold-accent)]">{product.category}</span>
                     <span>&gt;</span>
-                    <span className="text-[var(--text-muted)] font-bold">{product.subcategory || 'Mobiles'}</span>
+                    <span onClick={() => navigate(`/dashboard/customer?category=${encodeURIComponent(product.category)}`)} className="cursor-pointer hover:text-[var(--gold-accent)] text-[var(--text-muted)] font-bold">{product.subcategory || 'General'}</span>
                     <span>&gt;</span>
                     <span className="text-[var(--text-primary)] font-bold truncate max-w-xs">{product.name}</span>
                 </div>
@@ -540,7 +502,7 @@ export default function ProductDetail() {
                     {/* Left Panel: Image presentation */}
                     <div className="lg:col-span-5 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-[2rem] p-6 space-y-6 shadow-sm">
                         <div className="relative bg-[var(--bg-right-panel)] h-96 w-full rounded-2xl overflow-hidden flex items-center justify-center border border-[var(--card-border)]/50 shadow-inner">
-                            <img src={activeColorImg} alt={product.name} className="w-full h-full object-cover transition-all duration-300" />
+                            <img src={product.image} alt={product.name} className="w-full h-full object-cover transition-all duration-300" />
                             {product.discount && (
                                 <span className="absolute top-4 left-4 bg-[#FFEAEB] text-[#D84242] text-xs font-black uppercase px-2.5 py-1 rounded-md shadow-sm">
                                     {product.discount}
@@ -628,45 +590,7 @@ export default function ProductDetail() {
                             </div>
                         </div>
 
-                        {/* Interactive variant pickers */}
-                        {((product.category === 'Electronics' && product.subcategory === 'Mobiles') || 
-                          (product.category === 'Electronics' && product.subcategory === 'Laptops')) && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                                {/* Color Selector */}
-                                {product.category === 'Electronics' && product.subcategory === 'Mobiles' ? (
-                                    <div className="space-y-2.5">
-                                        <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-muted)] block">Color: <span className="text-[var(--text-primary)] font-bold">{selectedColor}</span></span>
-                                        <div className="flex items-center gap-3">
-                                            {colors.map((c) => (
-                                                <button
-                                                    key={c.name}
-                                                    onClick={() => setSelectedColor(c.name)}
-                                                    className={`h-9 w-9 rounded-full border flex items-center justify-center transition-all ${selectedColor === c.name ? 'border-[var(--gold-accent)] ring-2 ring-[var(--gold-accent)]/20 scale-105' : 'border-[var(--card-border)] hover:scale-105'}`}
-                                                    style={{ backgroundColor: c.hex }}
-                                                    title={c.name}
-                                                />
-                                            ))}
-                                        </div>
-                                    </div>
-                                ) : <div />}
 
-                                {/* Storage Selector */}
-                                <div className="space-y-2.5">
-                                    <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-muted)] block">Storage Variant</span>
-                                    <div className="flex items-center gap-3">
-                                        {['128GB', '256GB', '512GB'].map((st) => (
-                                            <button
-                                                key={st}
-                                                onClick={() => setSelectedStorage(st)}
-                                                className={`px-4 py-2 border rounded-xl text-xs font-bold transition-all ${selectedStorage === st ? 'border-[var(--gold-accent)] bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] shadow-sm' : 'border-[var(--card-border)] hover:border-[var(--gold-accent)]/40 text-[var(--text-secondary)] bg-[var(--card-bg)]'}`}
-                                            >
-                                                {st}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
                         {/* Highlights lists */}
                         <div className="space-y-3 pt-2">
@@ -687,13 +611,13 @@ export default function ProductDetail() {
                         {/* CTA Buttons */}
                         <div className="flex flex-col sm:flex-row items-center gap-4 pt-4 border-t border-[var(--card-border)]/50">
                             <button
-                                onClick={() => addToCart(product, selectedColor, selectedStorage, currentPrice)}
+                                onClick={() => addToCart(product, 'Default', 'Standard', currentPrice)}
                                 className="w-full sm:flex-1 py-3 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                             >
                                 <ShoppingBag className="h-4.5 w-4.5" /> Add to Cart
                             </button>
                             <button
-                                onClick={() => triggerDirectPurchase(product, selectedColor, selectedStorage, currentPrice)}
+                                onClick={() => triggerDirectPurchase(product, 'Default', 'Standard', currentPrice)}
                                 className="w-full sm:flex-1 py-3 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] hover:bg-[var(--gold-bg-pill)] text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 transition-colors cursor-pointer"
                             >
                                 Buy Now
