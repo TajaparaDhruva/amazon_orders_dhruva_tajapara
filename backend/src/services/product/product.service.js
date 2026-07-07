@@ -260,13 +260,93 @@ const correctProductMapping = (productName) => {
 };
 
 /**
+ * Realistic Indian market price lookup by product name keywords.
+ * Returns { price, originalPrice, discount } or null if not matched.
+ */
+const REALISTIC_PRICE_MAP = [
+    // Electronics — large appliances / displays
+    { keywords: ['4k monitor', 'monitor'],          price: 24999, orig: 32999, disc: '-24%' },
+    { keywords: ['projector'],                       price: 7999,  orig: 10999, disc: '-27%' },
+    { keywords: ['drone'],                           price: 9999,  orig: 13999, disc: '-29%' },
+    { keywords: ['action camera'],                   price: 8999,  orig: 12499, disc: '-28%' },
+    { keywords: ['camera'],                          price: 6999,  orig: 9999,  disc: '-30%' },
+    // Electronics — computers & peripherals
+    { keywords: ['laptop', 'macbook', 'pavilion'],  price: 54999, orig: 69999, disc: '-21%' },
+    { keywords: ['graphic tablet'],                  price: 4999,  orig: 6499,  disc: '-23%' },
+    { keywords: ['mechanical keyboard', 'keyboard'], price: 3499,  orig: 4999,  disc: '-30%' },
+    { keywords: ['gaming mouse', 'mouse'],           price: 1299,  orig: 1799,  disc: '-28%' },
+    { keywords: ['webcam'],                          price: 1999,  orig: 2799,  disc: '-29%' },
+    { keywords: ['portable ssd', 'external hdd', 'hard disk', 'hdd', 'ssd'], price: 4999, orig: 6999, disc: '-29%' },
+    { keywords: ['memory card'],                     price: 799,   orig: 999,   disc: '-20%' },
+    // Electronics — audio
+    { keywords: ['noise cancelling headphone', 'headphone', 'over-ear'], price: 5999, orig: 7999, disc: '-25%' },
+    { keywords: ['wireless earbud', 'earbud', 'earphone', 'airpods'],    price: 1999, orig: 2999, disc: '-33%' },
+    { keywords: ['bluetooth speaker', 'speaker'],                         price: 2499, orig: 3499, disc: '-29%' },
+    { keywords: ['microphone'],                      price: 2299,  orig: 3299,  disc: '-30%' },
+    // Electronics — wearables
+    { keywords: ['smartwatch', 'smart watch'],       price: 3499,  orig: 4999,  disc: '-30%' },
+    { keywords: ['fitness band', 'fitness tracker'], price: 1499,  orig: 1999,  disc: '-25%' },
+    // Electronics — mobile & accessories
+    { keywords: ['iphone 15', 'iphone'],             price: 64999, orig: 79999, disc: '-19%' },
+    { keywords: ['galaxy s23', 'galaxy', 'smartphone', 'mobile phone'], price: 44999, orig: 54999, disc: '-18%' },
+    { keywords: ['smartphone case', 'phone case'],   price: 299,   orig: 499,   disc: '-40%' },
+    { keywords: ['power bank'],                      price: 1299,  orig: 1799,  disc: '-28%' },
+    { keywords: ['wireless charger'],                price: 799,   orig: 1199,  disc: '-33%' },
+    { keywords: ['usb-c charger', 'charger', 'car charger'], price: 499, orig: 799, disc: '-38%' },
+    { keywords: ['phone tripod', 'tripod'],          price: 699,   orig: 999,   disc: '-30%' },
+    { keywords: ['hdmi cable', 'cable'],             price: 299,   orig: 499,   disc: '-40%' },
+    { keywords: ['router', 'wi-fi'],                 price: 1999,  orig: 2799,  disc: '-29%' },
+    { keywords: ['smart light bulb', 'smart bulb'],  price: 499,   orig: 699,   disc: '-29%' },
+    // Home & Living
+    { keywords: ['gamer ergonomic chair', 'gaming chair', 'office chair', 'ergonomic chair', 'chair'], price: 7999,  orig: 11999, disc: '-33%' },
+    { keywords: ['air fryer'],                       price: 3999,  orig: 5499,  disc: '-27%' },
+    { keywords: ['instant pot', 'pressure cooker'], price: 5999,  orig: 7999,  disc: '-25%' },
+    { keywords: ['cookware set', 'cookware'],        price: 2999,  orig: 4499,  disc: '-33%' },
+    { keywords: ['vacuum cleaner', 'vacuum'],        price: 4999,  orig: 6999,  disc: '-29%' },
+    { keywords: ['electric kettle', 'kettle'],       price: 799,   orig: 1199,  disc: '-33%' },
+    { keywords: ['led desk lamp', 'desk lamp', 'lamp'], price: 699, orig: 999,  disc: '-30%' },
+    { keywords: ['desk organizer', 'organizer'],     price: 599,   orig: 899,   disc: '-33%' },
+    { keywords: ['desk plant', 'plant'],             price: 249,   orig: 349,   disc: '-29%' },
+    { keywords: ['water bottle'],                    price: 299,   orig: 499,   disc: '-40%' },
+    // Sports
+    { keywords: ['yoga mat', 'yoga'],                price: 499,   orig: 799,   disc: '-38%' },
+    { keywords: ['running shoes'],                   price: 2999,  orig: 4499,  disc: '-33%' },
+    // Fashion
+    { keywords: ['air jordan', 'jordan'],            price: 12999, orig: 14999, disc: '-13%' },
+    { keywords: ['laptop sleeve'],                   price: 699,   orig: 999,   disc: '-30%' },
+    { keywords: ['backpack'],                        price: 1299,  orig: 1999,  disc: '-35%' },
+    { keywords: ['winter jacket', 'jacket'],         price: 2499,  orig: 3999,  disc: '-38%' },
+    { keywords: ['sunglasses'],                      price: 799,   orig: 1199,  disc: '-33%' },
+    { keywords: ['jeans'],                           price: 999,   orig: 1799,  disc: '-44%' },
+    { keywords: ['dress shirt'],                     price: 799,   orig: 1199,  disc: '-33%' },
+    { keywords: ['t-shirt', 'tshirt'],               price: 399,   orig: 599,   disc: '-33%' },
+    // Toys & Games
+    { keywords: ['water blaster', 'nerf', 'blaster'], price: 1499, orig: 1999,  disc: '-25%' },
+    { keywords: ['kids toy car', 'toy car'],          price: 499,   orig: 699,   disc: '-29%' },
+    { keywords: ['board game'],                       price: 699,   orig: 999,   disc: '-30%' },
+    { keywords: ['puzzle'],                           price: 499,   orig: 799,   disc: '-38%' },
+    // Books
+    { keywords: ['introduction to algorithms', 'algorithms'], price: 1999, orig: 2499, disc: '-20%' },
+    { keywords: ["children's book", 'children book'],         price: 199,  orig: 299,  disc: '-33%' },
+    { keywords: ['novel bestseller', 'novel', 'book'],         price: 299,  orig: 499,  disc: '-40%' },
+];
+
+const getRealisticPrice = (productName) => {
+    const nameLower = (productName || '').toLowerCase();
+    for (const entry of REALISTIC_PRICE_MAP) {
+        if (entry.keywords.some(kw => nameLower.includes(kw))) {
+            return { price: entry.price, originalPrice: entry.orig, discount: entry.disc };
+        }
+    }
+    return null;
+};
+
+/**
  * Enriches a raw database grouped product with ratings, images, and discounts.
  */
 const enrichProduct = (p) => {
     const charSum = p.ProductID.split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
     const rating = Number((4.1 + (charSum % 8) / 10).toFixed(1)); // rating between 4.1 and 4.8
-    const discountVal = (charSum % 4) * 5 + 10; // 10%, 15%, 20%, 25%
-    const originalPrice = Math.round(p.UnitPrice * (1 + discountVal / 100));
 
     // Correct categories and subcategories deterministically based on name
     const corrected = correctProductMapping(p.ProductName);
@@ -274,15 +354,21 @@ const enrichProduct = (p) => {
     const subcategory = corrected.subcategory;
     const image = getCategoryImage(category, subcategory, p.ProductName);
 
+    // Use realistic market prices instead of raw order UnitPrice
+    const realistic = getRealisticPrice(p.ProductName);
+    const price = realistic ? realistic.price : Math.round(p.UnitPrice * 10) * 10; // fallback: round to nearest 10
+    const originalPrice = realistic ? realistic.originalPrice : Math.round(price * 1.2);
+    const discount = realistic ? realistic.discount : '-17%';
+
     return {
         id: p.ProductID,
         name: p.ProductName,
         brand: p.Brand,
         category,
         subcategory,
-        price: p.UnitPrice,
+        price,
         originalPrice,
-        discount: `-${discountVal}%`,
+        discount,
         rating,
         reviews: p.OrderCount * 7 + (charSum % 13),
         image
