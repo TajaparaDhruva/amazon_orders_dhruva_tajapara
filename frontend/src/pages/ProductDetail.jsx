@@ -7,13 +7,84 @@ import {
 } from 'lucide-react'
 import { ALL_PRODUCTS, RECOMMENDED_PRODUCTS, YOU_MAY_ALSO_LIKE, CATEGORIES, SLIDES } from '../data/dashboardData'
 
+const getProductHighlights = (product) => {
+    if (!product) return []
+    const cat = (product.category || '').toLowerCase()
+    const subcat = (product.subcategory || '').toLowerCase()
+    const name = (product.name || '').toLowerCase()
+
+    if (cat.includes('elect') && subcat.includes('mobile')) {
+        return [
+            { label: 'Display', value: product.id === 'p-iphone15' ? '15.49 cm (6.1 inch) Super Retina XDR' : 'Full HD+ Fluid AMOLED Display' },
+            { label: 'Camera', value: 'High Definition Dual Rear + Front HDR Camera' },
+            { label: 'Processor', value: 'High Performance Octa-core Fast Chipset' },
+            { label: 'OS', value: 'Secured Mobile OS with latest security patches' },
+            { label: 'Battery', value: 'All-day smart fast-charging battery' },
+            { label: 'Connectivity', value: '5G Dual SIM, High speed Wi-Fi & Bluetooth' }
+        ]
+    }
+
+    if (cat.includes('elect') && subcat.includes('laptop')) {
+        return [
+            { label: 'Processor', value: 'Intel Core i5 / AMD Ryzen High Speed CPU' },
+            { label: 'Memory & Storage', value: 'High Speed RAM & Ultra-fast NVMe SSD' },
+            { label: 'Display', value: '15.6 inch Full HD Anti-glare Screen' },
+            { label: 'Graphics', value: 'Integrated High Definition Graphics' },
+            { label: 'Battery Life', value: 'Up to 8 hours back-up for work & entertainment' },
+            { label: 'Warranty', value: '1 Year Onsite Brand Warranty coverage' }
+        ]
+    }
+
+    if (cat.includes('fash') || name.includes('shirt') || name.includes('shoe') || name.includes('backpack') || name.includes('bag') || name.includes('jordan')) {
+        return [
+            { label: 'Material', value: 'Premium ultra-durable high-quality fabric' },
+            { label: 'Fit & Comfort', value: 'Ergonomic shape designed for all-day comfortable wear' },
+            { label: 'Style Type', value: 'Modern aesthetic design matching active lifestyle trends' },
+            { label: 'Durability', value: 'Reinforced stitching with premium quality threads' },
+            { label: 'Care Instructions', value: 'Machine washable or easy wipe-clean fabric surface' },
+            { label: 'Ideal For', value: 'Versatile use including casual outings & travel wear' }
+        ]
+    }
+
+    if (cat.includes('home') || cat.includes('living') || name.includes('chair') || name.includes('kettle') || name.includes('vase') || name.includes('bottle')) {
+        return [
+            { label: 'Build Quality', value: 'Premium robust material with high durability' },
+            { label: 'Design', value: 'Elegant minimalist aesthetic suitable for modern home interiors' },
+            { label: 'Utility', value: 'Highly practical design aimed at everyday utility' },
+            { label: 'Features', value: 'Eco-friendly, chemical-free non-toxic surface material' },
+            { label: 'Maintenance', value: 'Low maintenance, easy to wash, dust, and clean' },
+            { label: 'Ideal For', value: 'Living room, kitchen, bedroom, workspace, or dining areas' }
+        ]
+    }
+
+    if (name.includes('hard') || name.includes('hdd') || name.includes('ssd') || name.includes('drive') || name.includes('card') || name.includes('charger') || name.includes('cable') || name.includes('power bank')) {
+        return [
+            { label: 'Capacity & Speed', value: name.includes('2tb') ? '2TB Storage Space with superfast data write speeds' : 'High-capacity premium storage flash chips' },
+            { label: 'Compatibility', value: 'Plug-and-play support for Windows, macOS, Android, & Linux' },
+            { label: 'Build Quality', value: 'Shock-resistant rugged protective outer housing shell' },
+            { label: 'Connectivity', value: 'USB 3.2 Gen 1 / Type-C high speed universal port' },
+            { label: 'Safety Protections', value: 'Over-current, over-voltage, and thermal guard protection' },
+            { label: 'Warranty', value: '2 Year Manufacturer replacement cover warranty' }
+        ]
+    }
+
+    return [
+        { label: 'Quality Standard', value: '100% Genuine product crafted with superior materials' },
+        { label: 'Durability', value: 'Rigid quality tested to withstand everyday usage' },
+        { label: 'Aesthetic Design', value: 'Modern sleek visual appeal tailored for comfort' },
+        { label: 'Packaging', value: 'Safely packed in eco-friendly protective brand wrapping' },
+        { label: 'Shipping', value: 'Dispatched via premium delivery partner network' },
+        { label: 'Customer Support', value: 'Backed by 24/7 dedicated customer assistance helpline' }
+    ]
+}
+
 export default function ProductDetail() {
     const { id } = useParams()
     const navigate = useNavigate()
     const { user, logout, api } = useAuth()
 
     const [product, setProduct] = useState(null)
-    const [products, setProducts] = useState([])
+    const [products, setProducts] = useState(ALL_PRODUCTS)
     const [loadingProduct, setLoadingProduct] = useState(true)
 
     useEffect(() => {
@@ -66,6 +137,11 @@ export default function ProductDetail() {
     const [orders, setOrders] = useState([])
     const [loading, setLoading] = useState(false)
     const [actionLoading, setActionLoading] = useState(false)
+
+    useEffect(() => {
+        setSelectedColor('Blue')
+        setSelectedStorage('128GB')
+    }, [id])
 
     const handleSearchSubmit = () => {
         let path = '/dashboard/customer'
@@ -124,18 +200,24 @@ export default function ProductDetail() {
 
     // Dynamic price calculation based on variant selection
     const getCalculatedPrice = () => {
-        let price = product.price
-        if (selectedStorage === '256GB') price += 10000
-        else if (selectedStorage === '512GB') price += 20000
+        let price = product?.price || 0
+        const showStoragePicker = product?.category === 'Electronics' && (product?.subcategory === 'Mobiles' || product?.subcategory === 'Laptops')
+        if (showStoragePicker) {
+            if (selectedStorage === '256GB') price += 10000
+            else if (selectedStorage === '512GB') price += 20000
+        }
         return price
     }
     const currentPrice = getCalculatedPrice()
 
     const getCalculatedOriginalPrice = () => {
-        if (!product.originalPrice) return null
+        if (!product?.originalPrice) return null
         let orig = product.originalPrice
-        if (selectedStorage === '256GB') orig += 10000
-        else if (selectedStorage === '512GB') orig += 20000
+        const showStoragePicker = product?.category === 'Electronics' && (product?.subcategory === 'Mobiles' || product?.subcategory === 'Laptops')
+        if (showStoragePicker) {
+            if (selectedStorage === '256GB') orig += 10000
+            else if (selectedStorage === '512GB') orig += 20000
+        }
         return orig
     }
     const currentOriginalPrice = getCalculatedOriginalPrice()
@@ -225,17 +307,13 @@ export default function ProductDetail() {
         { name: 'Black', hex: '#343A40', image: 'https://images.unsplash.com/photo-1605787020600-b9ebd5df1d07?w=400&q=80' }
     ]
 
-    const activeColorImg = colors.find(c => c.name === selectedColor)?.image || product.image
+    const showColorPicker = product?.category === 'Electronics' && product?.subcategory === 'Mobiles'
+    const activeColorImg = showColorPicker 
+        ? (colors.find(c => c.name === selectedColor)?.image || product?.image)
+        : product?.image
 
     // Specification highlights (real items specs)
-    const highlights = [
-        { label: 'Display', value: product.id === 'p-iphone15' ? '15.49 cm (6.1 inch) Super Retina XDR Display' : 'Ultra HD Cinematic Display Premium' },
-        { label: 'Rear Camera', value: product.id === 'p-iphone15' ? '48MP + 12MP Dual Rear Camera' : 'High definition sensor with HDR' },
-        { label: 'Front Camera', value: product.id === 'p-iphone15' ? '12MP Front Camera' : 'HDR high resolution focus lens' },
-        { label: 'Processor', value: product.id === 'p-iphone15' ? 'A16 Bionic Chip Superfast Performance' : 'Multi-core efficient graphics processing' },
-        { label: 'Operating System', value: product.id === 'p-iphone15' ? 'iOS 17 Latest iOS Version' : 'Secured standard OS preinstalled' },
-        { label: 'Battery Capacity', value: product.id === 'p-iphone15' ? '3349 mAh Battery Capacity' : 'All-day smart fast-charge battery' }
-    ]
+    const highlights = getProductHighlights(product)
 
     const toggleTheme = () => {
         const next = !isDark
@@ -264,7 +342,10 @@ export default function ProductDetail() {
 
     const activeOrderCount = orders.filter(o => o.OrderStatus === 'Pending' || o.OrderStatus === 'Processing' || o.OrderStatus === 'Shipped').length
     const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0)
-    const relatedProducts = products.filter(p => p.category === product?.category && p.id !== product?.id).slice(0, 6)
+    const relatedProducts = [
+        ...products.filter(p => p.subcategory === product?.subcategory && p.id !== product?.id),
+        ...products.filter(p => p.category === product?.category && p.subcategory !== product?.subcategory && p.id !== product?.id)
+    ].slice(0, 6)
 
     if (loadingProduct || !product) {
         return (
@@ -439,26 +520,6 @@ export default function ProductDetail() {
                 </div>
             </header>
 
-            {/* Second Navbar Navigation links */}
-            <div className="border-y border-[var(--card-border)]/60 bg-[var(--card-bg)] py-3">
-                <div className="max-w-7xl mx-auto px-4 lg:px-6 flex items-center justify-between text-xs font-bold text-[var(--text-secondary)] overflow-x-auto no-scrollbar gap-6">
-                    <div onClick={() => navigate('/dashboard/customer')} className="flex items-center gap-1.5 px-3 py-1.5 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white rounded-lg cursor-pointer transition-colors shadow-[0_2px_8px_-2px_rgba(160,90,44,0.3)] shrink-0">
-                        <Plus className="h-3.5 w-3.5" /> All Categories
-                    </div>
-                    {['Today\'s Deals', 'Top Sellers', 'New Arrivals', ...[...new Set(products.map(p => p.category))]].map((link) => (
-                        <span 
-                            key={link} 
-                            onClick={() => {
-                                navigate('/dashboard/customer');
-                            }}
-                            className="hover:text-[var(--gold-accent)] transition-colors cursor-pointer shrink-0"
-                        >
-                            {link}
-                        </span>
-                    ))}
-                </div>
-            </div>
-
             {/* Main Section */}
             <main className="max-w-7xl mx-auto px-4 lg:px-6 py-6 space-y-8">
                 
@@ -558,45 +619,54 @@ export default function ProductDetail() {
                                     <div className="flex items-center gap-1.5 text-[var(--gold-accent)] font-bold text-[10.5px]">
                                         <RefreshCw className="h-3.5 w-3.5" /> Exchange Offer
                                     </div>
-                                    <p className="text-[9.5px] text-[var(--text-secondary)] leading-snug">Up to ₹15,000 off on exchange of your old smartphone</p>
+                                    <p className="text-[9.5px] text-[var(--text-secondary)] leading-snug">
+                                        {product.category === 'Electronics' && product.subcategory === 'Mobiles' 
+                                            ? 'Up to ₹15,000 off on exchange of your old smartphone' 
+                                            : 'Exchange options and trade-in discounts available on checkout'}
+                                    </p>
                                 </div>
                             </div>
                         </div>
 
                         {/* Interactive variant pickers */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                            {/* Color Selector */}
-                            <div className="space-y-2.5">
-                                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-muted)] block">Color: <span className="text-[var(--text-primary)] font-bold">{selectedColor}</span></span>
-                                <div className="flex items-center gap-3">
-                                    {colors.map((c) => (
-                                        <button
-                                            key={c.name}
-                                            onClick={() => setSelectedColor(c.name)}
-                                            className={`h-9 w-9 rounded-full border flex items-center justify-center transition-all ${selectedColor === c.name ? 'border-[var(--gold-accent)] ring-2 ring-[var(--gold-accent)]/20 scale-105' : 'border-[var(--card-border)] hover:scale-105'}`}
-                                            style={{ backgroundColor: c.hex }}
-                                            title={c.name}
-                                        />
-                                    ))}
-                                </div>
-                            </div>
+                        {((product.category === 'Electronics' && product.subcategory === 'Mobiles') || 
+                          (product.category === 'Electronics' && product.subcategory === 'Laptops')) && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                                {/* Color Selector */}
+                                {product.category === 'Electronics' && product.subcategory === 'Mobiles' ? (
+                                    <div className="space-y-2.5">
+                                        <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-muted)] block">Color: <span className="text-[var(--text-primary)] font-bold">{selectedColor}</span></span>
+                                        <div className="flex items-center gap-3">
+                                            {colors.map((c) => (
+                                                <button
+                                                    key={c.name}
+                                                    onClick={() => setSelectedColor(c.name)}
+                                                    className={`h-9 w-9 rounded-full border flex items-center justify-center transition-all ${selectedColor === c.name ? 'border-[var(--gold-accent)] ring-2 ring-[var(--gold-accent)]/20 scale-105' : 'border-[var(--card-border)] hover:scale-105'}`}
+                                                    style={{ backgroundColor: c.hex }}
+                                                    title={c.name}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
+                                ) : <div />}
 
-                            {/* Storage Selector */}
-                            <div className="space-y-2.5">
-                                <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-muted)] block">Storage Variant</span>
-                                <div className="flex items-center gap-3">
-                                    {['128GB', '256GB', '512GB'].map((st) => (
-                                        <button
-                                            key={st}
-                                            onClick={() => setSelectedStorage(st)}
-                                            className={`px-4 py-2 border rounded-xl text-xs font-bold transition-all ${selectedStorage === st ? 'border-[var(--gold-accent)] bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] shadow-sm' : 'border-[var(--card-border)] hover:border-[var(--gold-accent)]/40 text-[var(--text-secondary)] bg-[var(--card-bg)]'}`}
-                                        >
-                                            {st}
-                                        </button>
-                                    ))}
+                                {/* Storage Selector */}
+                                <div className="space-y-2.5">
+                                    <span className="text-[10px] font-black uppercase tracking-wider text-[var(--text-muted)] block">Storage Variant</span>
+                                    <div className="flex items-center gap-3">
+                                        {['128GB', '256GB', '512GB'].map((st) => (
+                                            <button
+                                                key={st}
+                                                onClick={() => setSelectedStorage(st)}
+                                                className={`px-4 py-2 border rounded-xl text-xs font-bold transition-all ${selectedStorage === st ? 'border-[var(--gold-accent)] bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] shadow-sm' : 'border-[var(--card-border)] hover:border-[var(--gold-accent)]/40 text-[var(--text-secondary)] bg-[var(--card-bg)]'}`}
+                                            >
+                                                {st}
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Highlights lists */}
                         <div className="space-y-3 pt-2">
