@@ -369,6 +369,19 @@ export default function CustomerDashboard() {
     })
 
     useEffect(() => {
+        if (searchParams.get('openOrders') === 'true') {
+            setIsOrdersDrawerOpen(true)
+            const newParams = {}
+            searchParams.forEach((val, key) => {
+                if (key !== 'openOrders') {
+                    newParams[key] = val
+                }
+            })
+            setSearchParams(newParams)
+        }
+    }, [searchParams, setSearchParams])
+
+    useEffect(() => {
         localStorage.setItem(`vf_wishlist_${user?._id || 'temp'}`, JSON.stringify(wishlist));
     }, [wishlist, user?._id])
 
