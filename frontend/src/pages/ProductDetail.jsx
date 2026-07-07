@@ -13,6 +13,39 @@ const getProductHighlights = (product) => {
     const subcat = (product.subcategory || '').toLowerCase()
     const name = (product.name || '').toLowerCase()
 
+    if (name.includes('plant') || name.includes('flower') || name.includes('seeds') || name.includes('foliage')) {
+        return [
+            { label: 'Type', value: 'Natural Air Purifying Plant' },
+            { label: 'Care Level', value: 'Low maintenance, perfect for indoor spaces' },
+            { label: 'Watering', value: 'Moderate watering once or twice a week' },
+            { label: 'Placement', value: 'Indoor bright spaces, office desk, study table' },
+            { label: 'Benefits', value: 'Reduces stress, improves focus, purifies indoor air' },
+            { label: 'Pot Included', value: 'Premium self-watering aesthetic container/pot' }
+        ]
+    }
+
+    if (cat.includes('toy') || cat.includes('game') || name.includes('toy') || name.includes('board game') || name.includes('puzzle') || name.includes('blaster') || name.includes('nerf')) {
+        return [
+            { label: 'Material', value: 'Non-toxic, lead-free child-safe high quality materials' },
+            { label: 'Age Group', value: 'Recommended for children aged 3 years and above' },
+            { label: 'Skill Set', value: 'Enhances cognitive development, focus & motor skills' },
+            { label: 'Safety Standard', value: 'EN71 and ASTM certified kid-friendly design' },
+            { label: 'Operations', value: 'Easy to play, hours of screen-free engagement' },
+            { label: 'Ideal For', value: 'Birthday gifts, family games, indoor play' }
+        ]
+    }
+
+    if (cat.includes('book') || name.includes('book') || name.includes('novel') || name.includes('algorithms') || name.includes('literature')) {
+        return [
+            { label: 'Binding', value: 'Premium quality robust paperback / hardcover format' },
+            { label: 'Paper Quality', value: 'Eco-friendly recycled acid-free cream pages' },
+            { label: 'Font Sizing', value: 'Standard comfortable and clear readable size' },
+            { label: 'Edition', value: 'Latest revised and brand-certified print copy' },
+            { label: 'Language', value: 'English (Standard readable print edition)' },
+            { label: 'Ideal For', value: 'Students, avid readers, knowledge seekers' }
+        ]
+    }
+
     if (cat.includes('elect') && subcat.includes('mobile')) {
         return [
             { label: 'Display', value: product.id === 'p-iphone15' ? '15.49 cm (6.1 inch) Super Retina XDR' : 'Full HD+ Fluid AMOLED Display' },
@@ -323,6 +356,29 @@ export default function ProductDetail() {
         ...products.filter(p => p.category === product?.category && p.subcategory !== product?.subcategory && p.id !== product?.id)
     ].slice(0, 6)
 
+    const getThirdBadge = () => {
+        if (!product) return { icon: CheckCircle2, text: '1 Year Warranty' }
+        const cat = (product.category || '').toLowerCase()
+        const name = (product.name || '').toLowerCase()
+
+        if (name.includes('plant') || name.includes('flower') || name.includes('seeds') || name.includes('foliage')) {
+            return { icon: Sparkles, text: 'Fresh & Green' }
+        }
+        if (cat.includes('toy') || cat.includes('game') || name.includes('toy') || name.includes('board game') || name.includes('puzzle') || name.includes('blaster') || name.includes('nerf')) {
+            return { icon: ShieldCheck, text: 'Kids Safe' }
+        }
+        if (cat.includes('book') || name.includes('book') || name.includes('novel') || name.includes('algorithms') || name.includes('literature')) {
+            return { icon: Star, text: 'Top Rated' }
+        }
+        if (cat.includes('fash') || cat.includes('cloth') || name.includes('shirt') || name.includes('shoe') || name.includes('backpack') || name.includes('bag') || name.includes('jordan')) {
+            return { icon: RefreshCw, text: '7 Day Return' }
+        }
+        return { icon: CheckCircle2, text: '1 Year Warranty' }
+    }
+
+    const thirdBadge = getThirdBadge()
+    const ThirdBadgeIcon = thirdBadge.icon
+
     if (loadingProduct || !product) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-[var(--bg-right-panel)] text-[var(--text-primary)]">
@@ -587,8 +643,8 @@ export default function ProductDetail() {
                                 <span className="text-[9px] font-black uppercase block tracking-wider text-[var(--text-primary)]">Free Delivery</span>
                             </div>
                             <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)]/50 rounded-xl p-3 text-center space-y-1 hover:-translate-y-0.5 transition-transform duration-300">
-                                <CheckCircle2 className="h-5 w-5 text-[var(--gold-accent)] mx-auto" />
-                                <span className="text-[9px] font-black uppercase block tracking-wider text-[var(--text-primary)]">1 Year Warranty</span>
+                                <ThirdBadgeIcon className="h-5 w-5 text-[var(--gold-accent)] mx-auto" />
+                                <span className="text-[9px] font-black uppercase block tracking-wider text-[var(--text-primary)]">{thirdBadge.text}</span>
                             </div>
                         </div>
                     </div>
