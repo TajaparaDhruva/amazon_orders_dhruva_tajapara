@@ -452,7 +452,7 @@ export default function ProductDetail() {
                         
                         {/* Wishlist */}
                         <button 
-                            onClick={() => setIsWishlistDrawerOpen(true)}
+                            onClick={() => navigate('/wishlist')}
                             className="flex items-center gap-1.5 text-[var(--text-secondary)] hover:text-[var(--gold-accent)] font-semibold text-xs transition-colors shrink-0 relative cursor-pointer"
                         >
                             <div className="relative">
