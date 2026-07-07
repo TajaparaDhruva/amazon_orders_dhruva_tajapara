@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import {
     ShoppingBag, Heart, Search, ChevronDown, ChevronLeft, ChevronRight,
-    Star, Plus, LogOut, Moon, Sun, RefreshCw, X, Clock, Trash2, Sparkles, CheckCircle2, ShieldCheck, Truck, Headphones, CreditCard
+    Star, Plus, LogOut, Moon, Sun, RefreshCw, X, Clock, Trash2, Sparkles, CheckCircle2, ShieldCheck, Truck, Headphones, CreditCard, PackageCheck, HeartHandshake, HeartOff
 } from 'lucide-react'
 import { ALL_PRODUCTS, RECOMMENDED_PRODUCTS, YOU_MAY_ALSO_LIKE, CATEGORIES, SLIDES } from '../data/dashboardData'
 
@@ -156,11 +156,23 @@ export default function ProductDetail() {
         localStorage.setItem(`vf_wishlist_${user?._id || 'temp'}`, JSON.stringify(wishlist));
     }, [wishlist, user?._id])
 
-    const toggleWishlist = (productId) => {
+    // Toast notification state
+    const [toast, setToast] = useState(null)
+    const toastTimerRef = useRef(null)
+
+    const showToast = (message, type = 'success') => {
+        if (toastTimerRef.current) clearTimeout(toastTimerRef.current)
+        setToast({ message, type })
+        toastTimerRef.current = setTimeout(() => setToast(null), 2500)
+    }
+
+    const toggleWishlist = (productId, productName) => {
         if (wishlist.includes(productId)) {
             setWishlist(wishlist.filter(item => item !== productId));
+            showToast(`Removed from Wishlist`, 'wishlist-remove')
         } else {
             setWishlist([...wishlist, productId]);
+            showToast(`Added to Wishlist ♥`, 'wishlist-add')
         }
     }
 
@@ -180,6 +192,7 @@ export default function ProductDetail() {
             const updated = [...cart]
             updated[existingItemIndex].quantity += 1
             setCart(updated)
+            showToast(`Quantity updated in Cart`, 'cart')
         } else {
             setCart([...cart, {
                 ...productToAdd,
@@ -188,6 +201,7 @@ export default function ProductDetail() {
                 storage,
                 quantity: 1
             }])
+            showToast(`Added to Cart 🛒`, 'cart')
         }
     }
 
@@ -322,6 +336,58 @@ export default function ProductDetail() {
 
     return (
         <div className={`min-h-screen font-['Inter'] relative transition-colors duration-300 ${isDark ? 'theme-dark' : ''} bg-[var(--bg-right-panel)] text-[var(--text-primary)]`}>
+
+            {/* ── Premium Toast Notification ── */}
+            {toast && (() => {
+                const isCart = toast.type === 'cart'
+                const isWishAdd = toast.type === 'wishlist-add'
+                const isWishRemove = toast.type === 'wishlist-remove'
+                const accent = isCart ? '#8D5A2B' : isWishAdd ? '#E11D48' : '#6B7280'
+                const bgAccent = isCart ? 'bg-[#8D5A2B]' : isWishAdd ? 'bg-rose-600' : 'bg-gray-400'
+                const IconEl = isCart ? PackageCheck : isWishAdd ? HeartHandshake : HeartOff
+                const label = isCart ? 'Shopping Cart' : 'Wishlist'
+                const sub = isCart
+                    ? (toast.message.includes('updated') ? 'Item quantity updated' : 'Item added successfully')
+                    : isWishAdd ? 'Saved to your wishlist' : 'Removed from wishlist'
+                return (
+                    <div
+                        className="fixed bottom-6 right-6 z-[9999] animate-slide-in-right"
+                        style={{ minWidth: '300px', maxWidth: '340px' }}
+                    >
+                        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl shadow-2xl overflow-hidden">
+                            {/* Progress bar */}
+                            <div className="h-0.5 bg-[var(--card-border)]">
+                                <div
+                                    className={`h-full ${bgAccent} rounded-full`}
+                                    style={{ animation: 'toastProgress 2.5s linear forwards' }}
+                                />
+                            </div>
+                            <div className="flex items-start gap-4 p-4">
+                                {/* Icon strip */}
+                                <div
+                                    className="h-10 w-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                                    style={{ backgroundColor: accent + '18' }}
+                                >
+                                    <IconEl className="h-5 w-5" style={{ color: accent }} />
+                                </div>
+                                {/* Text */}
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-[13px] font-black text-[var(--text-primary)] leading-tight">{label}</p>
+                                    <p className="text-[11.5px] text-[var(--text-secondary)] font-medium mt-0.5 leading-snug">{sub}</p>
+                                    <p className="text-[10.5px] font-bold mt-1.5 truncate" style={{ color: accent }}>{product?.name}</p>
+                                </div>
+                                {/* Close */}
+                                <button
+                                    onClick={() => setToast(null)}
+                                    className="shrink-0 h-6 w-6 rounded-lg flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-right-panel)] transition-all cursor-pointer mt-0.5"
+                                >
+                                    <X className="h-3.5 w-3.5" />
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })()}
             
             {/* Header / Navbar */}
             <header className="bg-[var(--card-bg)] sticky top-0 z-40 transition-colors">
@@ -623,7 +689,7 @@ export default function ProductDetail() {
                                 Buy Now
                             </button>
                             <button
-                                onClick={() => toggleWishlist(product.id)}
+                                onClick={() => toggleWishlist(product.id, product.name)}
                                 className={`w-full sm:w-auto p-3 rounded-xl border flex items-center justify-center transition-colors cursor-pointer shrink-0 ${wishlist.includes(product.id) ? 'bg-rose-500/10 border-rose-500 text-rose-500 hover:bg-rose-500/20' : 'border-[var(--card-border)] text-[var(--text-muted)] hover:text-rose-500 hover:bg-rose-500/5'}`}
                                 title={wishlist.includes(product.id) ? 'Remove from Wishlist' : 'Add to Wishlist'}
                             >
