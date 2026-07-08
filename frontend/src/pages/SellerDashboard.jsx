@@ -54,6 +54,20 @@ const CHART_DATA = {
     'This Year':  { points: [120000,98000,145000,132000,168000,155000,189000], days: ['Jan','Feb','Mar','Apr','May','Jun','Jul'] },
 }
 
+// ─── Mock Full Orders List ────────────────────────────────────────────────────
+const MOCK_ALL_ORDERS = [
+    { OrderID:'VF10234', customer:'Riya Kapoor',    email:'riy***@gmail.com', phone:'+91 98765 43210', initials:'RK', color:'#f97316', items:[{name:'Electric Kettle',img:'https://images.unsplash.com/photo-1577334716219-3375b050d7a3?w=80&q=80'},{name:'Office Chair',img:'https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=80&q=80'}], itemCount:2, amount:5582, payment:'Online', payBadge:'Paid',   OrderStatus:'Processing', statusNote:'Order is being prepared', OrderDate:new Date('2024-05-25T10:30:00') },
+    { OrderID:'VF10233', customer:'Aman Mehta',    email:'aman***@gmail.com',phone:'+91 87654 32109', initials:'AM', color:'#22c55e', items:[{name:'Leather Backpack',img:'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=80&q=80'}],                                                                                          itemCount:1, amount:1199, payment:'Online', payBadge:'Paid',   OrderStatus:'Pending',    statusNote:'Awaiting confirmation',   OrderDate:new Date('2024-05-25T09:15:00') },
+    { OrderID:'VF10232', customer:'Sneha Patel',   email:'sneh***@gmail.com', phone:'+91 91234 56789', initials:'SP', color:'#a855f7', items:[{name:'Casual Sneakers',img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&q=80'},{name:'Electric Kettle',img:'https://images.unsplash.com/photo-1577334716219-3375b050d7a3?w=80&q=80'},{name:'Puzzle Set',img:'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=80&q=80'}], itemCount:3, amount:2447, payment:'Cash on Delivery', payBadge:'COD', OrderStatus:'Confirmed', statusNote:'Order confirmed', OrderDate:new Date('2024-05-24T18:45:00') },
+    { OrderID:'VF10231', customer:'Vivek Gupta',   email:'vive***@gmail.com', phone:'+91 99887 76655', initials:'VG', color:'#3b82f6', items:[{name:'Office Chair',img:'https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=80&q=80'}],                                                                                                 itemCount:1, amount:5499, payment:'Online', payBadge:'Paid',   OrderStatus:'Delivered', statusNote:'Delivered on 24 May',     OrderDate:new Date('2024-05-24T16:20:00') },
+    { OrderID:'VF10230', customer:'Neha Joshi',    email:'neha***@gmail.com', phone:'+91 78965 43211', initials:'NJ', color:'#ec4899', items:[{name:'Leather Backpack',img:'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=80&q=80'},{name:'Puzzle Set',img:'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=80&q=80'}],  itemCount:2, amount:1648, payment:'Online', payBadge:'Paid',   OrderStatus:'Cancelled',  statusNote:'Cancelled by customer',   OrderDate:new Date('2024-05-23T11:30:00') },
+    { OrderID:'VF10229', customer:'Raj Sharma',    email:'raj***@gmail.com',  phone:'+91 88765 43210', initials:'RS', color:'#14b8a6', items:[{name:'Casual Sneakers',img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&q=80'}],                                                                                                 itemCount:1, amount:849,  payment:'UPI',    payBadge:'Paid',   OrderStatus:'Shipped',   statusNote:'Out for delivery',        OrderDate:new Date('2024-05-23T08:10:00') },
+    { OrderID:'VF10228', customer:'Priya Singh',   email:'pri***@gmail.com',  phone:'+91 77654 32109', initials:'PS', color:'#f59e0b', items:[{name:'Electric Kettle',img:'https://images.unsplash.com/photo-1577334716219-3375b050d7a3?w=80&q=80'},{name:'Leather Backpack',img:'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=80&q=80'}], itemCount:2, amount:2398, payment:'Credit Card', payBadge:'Paid', OrderStatus:'Delivered', statusNote:'Delivered on 22 May',     OrderDate:new Date('2024-05-22T14:55:00') },
+    { OrderID:'VF10227', customer:'Arjun Nair',    email:'arj***@gmail.com',  phone:'+91 66543 21098', initials:'AN', color:'#6366f1', items:[{name:'Office Chair',img:'https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=80&q=80'},{name:'Casual Sneakers',img:'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=80&q=80'}], itemCount:2, amount:6348, payment:'Online', payBadge:'Paid',  OrderStatus:'Processing', statusNote:'Preparing shipment',      OrderDate:new Date('2024-05-22T10:20:00') },
+    { OrderID:'VF10226', customer:'Kavya Reddy',   email:'kav***@gmail.com',  phone:'+91 55432 10987', initials:'KR', color:'#10b981', items:[{name:'Puzzle Set',img:'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=80&q=80'}],                                                                                                 itemCount:1, amount:499,  payment:'UPI',    payBadge:'Paid',   OrderStatus:'Confirmed', statusNote:'Confirmed, preparing',    OrderDate:new Date('2024-05-21T17:35:00') },
+    { OrderID:'VF10225', customer:'Mohit Verma',   email:'moh***@gmail.com',  phone:'+91 44321 09876', initials:'MV', color:'#f43f5e', items:[{name:'Electric Kettle',img:'https://images.unsplash.com/photo-1577334716219-3375b050d7a3?w=80&q=80'}],                                                                                                 itemCount:1, amount:83,   payment:'COD',    payBadge:'COD',    OrderStatus:'Pending',   statusNote:'Awaiting payment',        OrderDate:new Date('2024-05-21T09:05:00') },
+]
+
 // Nav links
 const NAV_LINKS = ['Dashboard', 'Products', 'Orders', 'Customers', 'Analytics']
 
@@ -101,6 +115,15 @@ export default function SellerDashboard() {
     const [viewModal, setViewModal]   = useState(null)      // null | product
     const [moreMenu, setMoreMenu]     = useState(null)      // null | { prodId, x, y }
     const [deleteConfirm, setDeleteConfirm] = useState(null) // null | product object
+
+    // Orders page state
+    const [ordSearch, setOrdSearch]       = useState('')
+    const [ordStatus, setOrdStatus]       = useState('All Status')
+    const [ordPayment, setOrdPayment]     = useState('All Payment Status')
+    const [ordPage, setOrdPage]           = useState(1)
+    const [ordDetail, setOrdDetail]       = useState(null)  // null | order object (side drawer)
+    const [allOrders, setAllOrders]       = useState(MOCK_ALL_ORDERS)
+    const ORD_PER_PAGE = 5
 
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
@@ -775,6 +798,446 @@ export default function SellerDashboard() {
                 )
             })()}
 
+            {/* ══════════════ ORDERS PAGE ══════════════ */}
+            {activeNav === 'Orders' && (() => {
+                const ORD_STATUSES  = ['All Status','Pending','Processing','Confirmed','Shipped','Delivered','Cancelled']
+                const ORD_PAYMENTS  = ['All Payment Status','Paid','COD','Pending']
+
+                const filtered = allOrders.filter(o => {
+                    const q = ordSearch.toLowerCase()
+                    const matchQ = !q || o.OrderID.toLowerCase().includes(q) || o.customer.toLowerCase().includes(q)
+                    const matchS = ordStatus  === 'All Status'         || o.OrderStatus === ordStatus
+                    const matchP = ordPayment === 'All Payment Status'  || o.payBadge   === ordPayment
+                    return matchQ && matchS && matchP
+                })
+
+                const totalPages = Math.max(1, Math.ceil(filtered.length / ORD_PER_PAGE))
+                const safePage   = Math.min(ordPage, totalPages)
+                const paginated  = filtered.slice((safePage - 1) * ORD_PER_PAGE, safePage * ORD_PER_PAGE)
+
+                const ordStatBadge = (s) => {
+                    if (s === 'Delivered')  return 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/25'
+                    if (s === 'Processing') return 'bg-blue-500/10 text-blue-600 border border-blue-500/25'
+                    if (s === 'Shipped')    return 'bg-violet-500/10 text-violet-600 border border-violet-500/25'
+                    if (s === 'Confirmed')  return 'bg-amber-500/10 text-amber-600 border border-amber-500/25'
+                    if (s === 'Cancelled')  return 'bg-rose-500/10 text-rose-600 border border-rose-500/25'
+                    if (s === 'Pending')    return 'bg-orange-500/10 text-orange-600 border border-orange-500/25'
+                    return 'bg-neutral-500/10 text-neutral-500 border border-neutral-500/20'
+                }
+                const payBadgeStyle = (p) => {
+                    if (p === 'Paid') return 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
+                    if (p === 'COD')  return 'bg-blue-500/10 text-blue-600 border border-blue-500/20'
+                    return 'bg-amber-500/10 text-amber-600 border border-amber-500/20'
+                }
+
+                const ORDER_STAT_CARDS = [
+                    { label:'Total Orders',  value: allOrders.length,                                           sub:'All time orders',         icon:<ShoppingBag className="h-5 w-5" />, color:'text-orange-500',  bg:'bg-orange-500/10 border-orange-500/20' },
+                    { label:'Pending',       value: allOrders.filter(o=>o.OrderStatus==='Pending').length,      sub:'Awaiting processing',     icon:<Clock className="h-5 w-5" />,       color:'text-amber-500',   bg:'bg-amber-500/10 border-amber-500/20',  subColor:'text-amber-500' },
+                    { label:'Processing',    value: allOrders.filter(o=>o.OrderStatus==='Processing').length,   sub:'Orders in process',       icon:<RefreshCw className="h-5 w-5" />,   color:'text-blue-500',    bg:'bg-blue-500/10 border-blue-500/20',    subColor:'text-blue-500' },
+                    { label:'Delivered',     value: allOrders.filter(o=>o.OrderStatus==='Delivered').length,    sub:'Successfully delivered',  icon:<Truck className="h-5 w-5" />,       color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20' },
+                    { label:'Cancelled',     value: allOrders.filter(o=>o.OrderStatus==='Cancelled').length,    sub:'Cancelled orders',        icon:<X className="h-5 w-5" />,           color:'text-rose-500',    bg:'bg-rose-500/10 border-rose-500/20',    subColor:'text-rose-500' },
+                ]
+
+                return (
+                    <div className="space-y-6">
+
+                        {/* Page Header */}
+                        <div>
+                            <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)] tracking-tight">Orders</h1>
+                            <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">Track and manage all customer orders.</p>
+                        </div>
+
+                        {/* Stat Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            {ORDER_STAT_CARDS.map((card, i) => (
+                                <div key={i} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 hover:shadow-md transition-all duration-200">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-xl border shrink-0 ${card.color} ${card.bg}`}>{card.icon}</div>
+                                        <div className="min-w-0">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{card.label}</div>
+                                            <div className={`font-['Outfit'] text-2xl font-black ${card.color} leading-tight mt-0.5`}>{card.value}</div>
+                                            <div className={`text-[10px] font-semibold mt-1 ${card.subColor || 'text-[var(--text-muted)]'}`}>{card.sub}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Search & Filters */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div className="relative flex-1 max-w-sm">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                <input
+                                    type="text" placeholder="Search by order ID, customer name..."
+                                    value={ordSearch}
+                                    onChange={e => { setOrdSearch(e.target.value); setOrdPage(1) }}
+                                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--gold-accent)] transition-colors"
+                                />
+                            </div>
+                            <div className="relative">
+                                <select value={ordStatus} onChange={e => { setOrdStatus(e.target.value); setOrdPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors">
+                                    {ORD_STATUSES.map(s => <option key={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <div className="relative">
+                                <select value={ordPayment} onChange={e => { setOrdPayment(e.target.value); setOrdPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors">
+                                    {ORD_PAYMENTS.map(p => <option key={p}>{p}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] bg-[var(--gold-bg-pill)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-colors cursor-pointer">
+                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                            </button>
+                        </div>
+
+                        {/* Orders Table */}
+                        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
+                            {/* Table Header */}
+                            <div className="grid items-center border-b border-[var(--card-border)] px-5 py-3 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider bg-[var(--bg-right-panel)]/40"
+                                style={{ gridTemplateColumns: '28px 1.2fr 1.8fr 1.4fr 0.8fr 0.9fr 1.1fr 1fr 0.6fr' }}>
+                                <div />
+                                <div>Order ID</div>
+                                <div>Customer</div>
+                                <div>Items</div>
+                                <div>Amount</div>
+                                <div>Payment</div>
+                                <div>Status</div>
+                                <div>Date</div>
+                                <div className="text-right">Actions</div>
+                            </div>
+
+                            {/* Rows */}
+                            <div className="divide-y divide-[var(--card-border)]/50">
+                                {paginated.length === 0 ? (
+                                    <div className="py-16 flex flex-col items-center gap-3 text-[var(--text-muted)]">
+                                        <ShoppingBag className="h-8 w-8 opacity-30" />
+                                        <span className="text-xs font-semibold">No orders found</span>
+                                    </div>
+                                ) : paginated.map(order => (
+                                    <div key={order.OrderID}
+                                        className="grid items-center px-5 py-3.5 hover:bg-[var(--bg-right-panel)]/60 transition-colors cursor-pointer"
+                                        style={{ gridTemplateColumns: '28px 1.2fr 1.8fr 1.4fr 0.8fr 0.9fr 1.1fr 1fr 0.6fr' }}
+                                        onClick={() => setOrdDetail(order)}
+                                    >
+                                        {/* Expand arrow */}
+                                        <div className="text-[var(--text-muted)]">
+                                            <ChevronRight className="h-3.5 w-3.5" />
+                                        </div>
+
+                                        {/* Order ID */}
+                                        <div>
+                                            <div className="text-xs font-black text-[var(--text-primary)]"># {order.OrderID}</div>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{order.itemCount} item{order.itemCount > 1 ? 's' : ''}</div>
+                                        </div>
+
+                                        {/* Customer */}
+                                        <div className="flex items-center gap-2.5 min-w-0">
+                                            <div className="h-8 w-8 rounded-full flex items-center justify-center text-white text-[10px] font-black shrink-0"
+                                                style={{ backgroundColor: order.color }}>
+                                                {order.initials}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="text-xs font-bold text-[var(--text-primary)] truncate">{order.customer}</div>
+                                                <div className="text-[10px] font-semibold text-[var(--text-muted)] truncate">{order.email}</div>
+                                                <div className="text-[10px] font-semibold text-[var(--text-muted)]">{order.phone}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Items thumbnails */}
+                                        <div className="flex items-center gap-1.5">
+                                            {order.items.slice(0, 2).map((item, ii) => (
+                                                <div key={ii} className="h-9 w-9 rounded-xl overflow-hidden border border-[var(--card-border)] bg-[var(--bg-right-panel)] shrink-0 flex items-center justify-center p-0.5">
+                                                    <img src={item.img} alt={item.name} className="h-full w-full object-contain rounded-lg"
+                                                        onError={e => e.target.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&q=80'} />
+                                                </div>
+                                            ))}
+                                            {order.items.length > 2 && (
+                                                <div className="h-9 w-9 rounded-xl border border-[var(--card-border)] bg-[var(--bg-right-panel)] flex items-center justify-center text-[9px] font-black text-[var(--text-secondary)]">
+                                                    +{order.items.length - 2}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Amount */}
+                                        <div className="text-xs font-black text-[var(--text-primary)]">₹{order.amount.toLocaleString('en-IN')}</div>
+
+                                        {/* Payment */}
+                                        <div>
+                                            <span className={`inline-block px-2 py-0.5 rounded-[6px] text-[9px] font-black border ${payBadgeStyle(order.payBadge)}`}>
+                                                {order.payBadge}
+                                            </span>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{order.payment}</div>
+                                        </div>
+
+                                        {/* Status */}
+                                        <div>
+                                            <span className={`inline-block px-2.5 py-0.5 rounded-[6px] text-[9px] font-black border ${ordStatBadge(order.OrderStatus)}`}>
+                                                {order.OrderStatus}
+                                            </span>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5 truncate max-w-[110px]">{order.statusNote}</div>
+                                        </div>
+
+                                        {/* Date */}
+                                        <div>
+                                            <div className="text-[10px] font-bold text-[var(--text-primary)]">
+                                                {new Date(order.OrderDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+                                            </div>
+                                            <div className="text-[9px] font-semibold text-[var(--text-muted)] mt-0.5">
+                                                {new Date(order.OrderDate).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})}
+                                            </div>
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex justify-end" onClick={e => e.stopPropagation()}>
+                                            <button
+                                                onClick={() => setOrdDetail(order)}
+                                                className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors"
+                                                title="View Details"
+                                            >
+                                                <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination Footer */}
+                            <div className="flex items-center justify-between px-5 py-3.5 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]/30">
+                                <span className="text-[10px] font-semibold text-[var(--text-muted)]">
+                                    Showing {filtered.length === 0 ? 0 : Math.min((safePage-1)*ORD_PER_PAGE+1, filtered.length)} to {Math.min(safePage*ORD_PER_PAGE, filtered.length)} of {filtered.length} orders
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <button disabled={safePage === 1} onClick={() => setOrdPage(p => Math.max(1, p-1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed transition-colors">
+                                        <ChevronLeft className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                        const page = i + 1
+                                        return (
+                                            <button key={page} onClick={() => setOrdPage(page)}
+                                                className={`h-7 w-7 rounded-lg text-[10px] font-black transition-colors cursor-pointer ${
+                                                    safePage === page
+                                                        ? 'bg-[var(--gold-accent)] text-white border border-[var(--gold-accent)]'
+                                                        : 'border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                }`}>{page}</button>
+                                        )
+                                    })}
+                                    {totalPages > 5 && <span className="text-[var(--text-muted)] text-xs font-bold">...</span>}
+                                    {totalPages > 5 && (
+                                        <button onClick={() => setOrdPage(totalPages)}
+                                            className={`h-7 w-7 rounded-lg text-[10px] font-black border cursor-pointer transition-colors ${
+                                                safePage === totalPages ? 'bg-[var(--gold-accent)] text-white border-[var(--gold-accent)]' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                            }`}>{totalPages}</button>
+                                    )}
+                                    <button disabled={safePage === totalPages} onClick={() => setOrdPage(p => Math.min(totalPages, p+1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed transition-colors">
+                                        <ChevronRight className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── ORDER DETAIL DRAWER ────────────────────────────────── */}
+                        {ordDetail && (() => {
+                            const STATUS_STEPS = ['Pending','Processing','Confirmed','Shipped','Delivered']
+                            const currentStepIdx = STATUS_STEPS.indexOf(ordDetail.OrderStatus)
+                            const isCancelled = ordDetail.OrderStatus === 'Cancelled'
+                            return (
+                            <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setOrdDetail(null)}>
+                                <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+                                <div
+                                    className="relative w-full max-w-[420px] h-full flex flex-col shadow-2xl"
+                                    style={{ background: 'var(--card-bg)', borderLeft: '1px solid var(--card-border)', overflowY: 'auto' }}
+                                    onClick={e => e.stopPropagation()}
+                                >
+                                    {/* ── HERO HEADER ── */}
+                                    {/* Sticky close bar */}
+                                    <div className="sticky top-0 z-20 flex items-center justify-end px-4 pt-4 pb-0 pointer-events-none">
+                                        <button
+                                            onClick={() => setOrdDetail(null)}
+                                            className="pointer-events-auto h-8 w-8 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] shadow-md flex items-center justify-center text-[var(--text-muted)] hover:text-rose-500 cursor-pointer transition-all hover:scale-110"
+                                        >
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+                                    <div className="relative overflow-hidden shrink-0 -mt-8" style={{ background: `linear-gradient(135deg, ${ordDetail.color}22 0%, ${ordDetail.color}08 100%)`, borderBottom: '1px solid var(--card-border)' }}>
+                                        {/* Decorative blobs */}
+                                        <div className="absolute top-0 right-0 h-28 w-28 rounded-full blur-3xl opacity-20" style={{ background: ordDetail.color }} />
+                                        <div className="absolute bottom-0 left-0 h-16 w-16 rounded-full blur-2xl opacity-10" style={{ background: ordDetail.color }} />
+
+                                        <div className="px-6 pt-6 pb-5 relative z-10">
+                                            {/* Customer Avatar + Name */}
+                                            <div className="flex items-center gap-4 mb-5">
+                                                <div className="h-14 w-14 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg shrink-0 ring-4 ring-white/20"
+                                                    style={{ backgroundColor: ordDetail.color }}>
+                                                    {ordDetail.initials}
+                                                </div>
+                                                <div>
+                                                    <div className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">{ordDetail.customer}</div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)]">{ordDetail.email}</div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)]">{ordDetail.phone}</div>
+                                                </div>
+                                            </div>
+
+                                            {/* Order meta row */}
+                                            <div className="flex items-center justify-between">
+                                                <div>
+                                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Order ID</div>
+                                                    <div className="font-['Outfit'] text-base font-black text-[var(--text-primary)] mt-0.5">#{ordDetail.OrderID}</div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Date</div>
+                                                    <div className="text-xs font-bold text-[var(--text-primary)] mt-0.5">
+                                                        {new Date(ordDetail.OrderDate).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+                                                    </div>
+                                                    <div className="text-[10px] font-semibold text-[var(--text-muted)]">
+                                                        {new Date(ordDetail.OrderDate).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true})}
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span className={`inline-flex items-center px-3 py-1.5 rounded-xl text-[10px] font-black border ${ordStatBadge(ordDetail.OrderStatus)}`}>
+                                                        {ordDetail.OrderStatus}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* ── BODY ── */}
+                                    <div className="p-5 space-y-4 flex-1">
+
+                                        {/* Order Progress Timeline */}
+                                        {!isCancelled && (
+                                            <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl p-4">
+                                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-4">Order Progress</div>
+                                                <div className="flex items-center justify-between relative">
+                                                    {/* Progress bar track */}
+                                                    <div className="absolute top-3.5 left-0 right-0 h-0.5 bg-[var(--card-border)] z-0" />
+                                                    <div className="absolute top-3.5 left-0 h-0.5 z-0 transition-all duration-700 rounded-full"
+                                                        style={{
+                                                            width: currentStepIdx >= 0 ? `${(currentStepIdx / (STATUS_STEPS.length - 1)) * 100}%` : '0%',
+                                                            background: 'var(--gold-accent)'
+                                                        }} />
+                                                    {STATUS_STEPS.map((step, idx) => {
+                                                        const done = currentStepIdx >= idx
+                                                        const active = currentStepIdx === idx
+                                                        return (
+                                                            <div key={step} className="flex flex-col items-center gap-1.5 z-10">
+                                                                <div className={`h-7 w-7 rounded-full flex items-center justify-center text-[9px] font-black transition-all duration-300 ${
+                                                                    active ? 'bg-[var(--gold-accent)] text-white ring-4 ring-[var(--gold-accent)]/20 scale-110'
+                                                                    : done ? 'bg-[var(--gold-accent)] text-white'
+                                                                    : 'bg-[var(--card-bg)] border-2 border-[var(--card-border)] text-[var(--text-muted)]'
+                                                                }`}>
+                                                                    {done && !active ? <Check className="h-3 w-3" /> : idx + 1}
+                                                                </div>
+                                                                <span className={`text-[8px] font-black text-center leading-tight ${done ? 'text-[var(--gold-accent)]' : 'text-[var(--text-muted)]'}`}>
+                                                                    {step}
+                                                                </span>
+                                                            </div>
+                                                        )
+                                                    })}
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Cancelled banner */}
+                                        {isCancelled && (
+                                            <div className="flex items-center gap-3 px-4 py-3.5 rounded-2xl bg-rose-500/5 border border-rose-500/20">
+                                                <div className="h-8 w-8 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                                                    <X className="h-4 w-4 text-rose-500" />
+                                                </div>
+                                                <div>
+                                                    <div className="text-xs font-black text-rose-500">Order Cancelled</div>
+                                                    <div className="text-[10px] font-semibold text-rose-400/70 mt-0.5">{ordDetail.statusNote}</div>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Total + Payment — combined premium card */}
+                                        <div className="relative rounded-2xl overflow-hidden border border-[var(--card-border)]"
+                                            style={{ background: `linear-gradient(135deg, var(--gold-accent)14 0%, var(--card-bg) 60%)` }}>
+                                            <div className="p-4 flex items-center justify-between">
+                                                <div>
+                                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Total Amount</div>
+                                                    <div className="font-['Outfit'] text-2xl font-black text-[var(--gold-accent)] mt-1">
+                                                        ₹{ordDetail.amount.toLocaleString('en-IN')}
+                                                    </div>
+                                                    <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">
+                                                        {ordDetail.itemCount} item{ordDetail.itemCount > 1 ? 's' : ''}
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-2">Payment</div>
+                                                    <span className={`inline-block px-2.5 py-1 rounded-xl text-[10px] font-black border ${payBadgeStyle(ordDetail.payBadge)}`}>
+                                                        {ordDetail.payBadge}
+                                                    </span>
+                                                    <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-1">{ordDetail.payment}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Items */}
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                                            <div className="px-4 py-3 border-b border-[var(--card-border)] flex items-center justify-between">
+                                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Items Ordered</div>
+                                                <div className="text-[9px] font-black text-[var(--text-secondary)] bg-[var(--card-bg)] border border-[var(--card-border)] px-2 py-0.5 rounded-full">{ordDetail.itemCount}</div>
+                                            </div>
+                                            <div className="divide-y divide-[var(--card-border)]/50">
+                                                {ordDetail.items.map((item, i) => (
+                                                    <div key={i} className="flex items-center gap-3 px-4 py-3">
+                                                        <div className="h-12 w-12 rounded-xl overflow-hidden border border-[var(--card-border)] bg-[var(--card-bg)] shrink-0 flex items-center justify-center p-1.5 shadow-sm">
+                                                            <img src={item.img} alt={item.name} className="h-full w-full object-contain"
+                                                                onError={e => e.target.src='https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=80&q=80'} />
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <div className="text-xs font-bold text-[var(--text-primary)] truncate">{item.name}</div>
+                                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">Qty: 1</div>
+                                                        </div>
+                                                        <Package className="h-3.5 w-3.5 text-[var(--text-muted)] shrink-0" />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Update Status */}
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl p-4">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest mb-3">Update Order Status</div>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {['Pending','Processing','Confirmed','Shipped','Delivered','Cancelled'].map(s => {
+                                                    const isActive = ordDetail.OrderStatus === s
+                                                    const isCancelBtn = s === 'Cancelled'
+                                                    return (
+                                                        <button key={s}
+                                                            onClick={() => {
+                                                                setAllOrders(prev => prev.map(o => o.OrderID === ordDetail.OrderID ? {...o, OrderStatus: s} : o))
+                                                                setOrdDetail(prev => ({...prev, OrderStatus: s}))
+                                                            }}
+                                                            className={`flex items-center justify-center gap-1.5 px-2 py-2.5 rounded-xl text-[10px] font-black border cursor-pointer transition-all ${
+                                                                isActive
+                                                                    ? isCancelBtn ? 'bg-rose-500/10 text-rose-600 border-rose-500/30 ring-2 ring-rose-500/20'
+                                                                        : 'bg-[var(--gold-accent)]/10 text-[var(--gold-accent)] border-[var(--gold-accent)]/30 ring-2 ring-[var(--gold-accent)]/20'
+                                                                    : isCancelBtn ? 'border-rose-500/20 text-rose-500/60 hover:bg-rose-500/5 hover:text-rose-500 hover:border-rose-500/30'
+                                                                        : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--card-bg)] hover:text-[var(--text-primary)]'
+                                                            }`}>
+                                                            {isActive && <Check className="h-3 w-3 shrink-0" />}
+                                                            {s}
+                                                        </button>
+                                                    )
+                                                })}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        )()}
+                    </div>
+                )
+            })()}
+
             {/* ══════════════ DASHBOARD PAGE ══════════════ */}
             {activeNav === 'Dashboard' && <>
 
@@ -992,7 +1455,7 @@ export default function SellerDashboard() {
                     <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
                         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--card-border)]">
                             <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Recent Orders</h3>
-                            <button className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All Orders</button>
+                            <button onClick={() => setActiveNav('Orders')} className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All Orders</button>
                         </div>
                         <div className="divide-y divide-[var(--card-border)]/50">
                             {loadingOrders ? (
