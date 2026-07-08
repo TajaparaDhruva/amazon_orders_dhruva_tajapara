@@ -1678,6 +1678,285 @@ export default function SellerDashboard() {
                 )
             })()}
 
+            {/* ══════════════ ANALYTICS PAGE ══════════════ */}
+            {activeNav === 'Analytics' && (() => {
+                const totalRevenue = stats.totalRevenue || 54320
+                const totalOrders = stats.totalOrders || 156
+                const totalCustomers = stats.totalCustomers || 128
+                const productViews = stats.productViews || 2350
+                const conversionRate = "3.24%"
+                const avgOrderValue = Math.round(totalRevenue / totalOrders) || 862
+
+                const ANALYTICS_CARDS = [
+                    { label:'Total Sales',     value: formatCurrency(totalRevenue), sub:'12.5% vs last week', icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp:true },
+                    { label:'Total Orders',    value: totalOrders.toLocaleString(),  sub:'8.3% vs last week',  icon:<ShoppingBag className="h-5 w-5" />, color:'text-blue-500', bg:'bg-blue-500/10 border-blue-500/20', isUp:true },
+                    { label:'Total Customers', value: totalCustomers.toLocaleString(), sub:'10.2% vs last week', icon:<Users className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp:true },
+                    { label:'Views',           value: productViews.toLocaleString(),  sub:'15.7% vs last week', icon:<Eye className="h-5 w-5" />, color:'text-violet-500', bg:'bg-violet-500/10 border-violet-500/20', isUp:true },
+                    { label:'Conversion Rate', value: conversionRate,                 sub:'2.1% vs last week',  icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp:true },
+                    { label:'Average Order Value', value: formatCurrency(avgOrderValue), sub:'3.2% vs last week', icon:<Star className="h-5 w-5" />, color:'text-rose-500', bg:'bg-rose-500/10 border-rose-500/20', isUp:false }
+                ]
+
+                const catSegments = [
+                    { label: 'Home Appliances', value: 18620, color: '#10b981', pct: '34.3' },
+                    { label: 'Furniture',       value: 12450, color: '#3b82f6', pct: '22.9' },
+                    { label: 'Footwear',        value: 8830,  color: '#f59e0b', pct: '16.3' },
+                    { label: 'Bags',            value: 7560,  color: '#a855f7', pct: '13.9' },
+                    { label: 'Toys & Games',    value: 6860,  color: '#f43f5e', pct: '12.6' },
+                ]
+                const CAT_DONUT_R = 70, CAT_DONUT_CX = 90, CAT_DONUT_CY = 90, CAT_STROKE_W = 22
+                let catCumAngle = -90
+                const catDonutArcs = catSegments.map(seg => {
+                    const angle = (seg.value / 54320) * 360
+                    const startAngle = catCumAngle
+                    const endAngle = catCumAngle + angle
+                    catCumAngle = endAngle
+                    const toRad = (a) => (a * Math.PI) / 180
+                    const x1 = CAT_DONUT_CX + CAT_DONUT_R * Math.cos(toRad(startAngle))
+                    const y1 = CAT_DONUT_CY + CAT_DONUT_R * Math.sin(toRad(startAngle))
+                    const x2 = CAT_DONUT_CX + CAT_DONUT_R * Math.cos(toRad(endAngle))
+                    const y2 = CAT_DONUT_CY + CAT_DONUT_R * Math.sin(toRad(endAngle))
+                    const largeArc = angle > 180 ? 1 : 0
+                    return { ...seg, d: `M${x1},${y1} A${CAT_DONUT_R},${CAT_DONUT_R} 0 ${largeArc} 1 ${x2},${y2}` }
+                })
+
+                return (
+                    <div className="space-y-6">
+
+                        {/* Page Header */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)] tracking-tight">Analytics Overview</h1>
+                                <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">Track your store performance and growth.</p>
+                            </div>
+                            <div className="relative">
+                                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] transition-colors cursor-pointer">
+                                    <Clock className="h-3.5 w-3.5" /> May 20 - May 26, 2024 <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* 6 Stats Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {ANALYTICS_CARDS.map((card, i) => (
+                                <div key={i} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 hover:shadow-md transition-all duration-200">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-xl border shrink-0 ${card.color} ${card.bg}`}>{card.icon}</div>
+                                        <div className="min-w-0">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider leading-tight">{card.label}</div>
+                                            <div className={`font-['Outfit'] text-lg font-black text-[var(--text-primary)] leading-tight mt-1`}>{card.value}</div>
+                                            <div className={`text-[9px] font-semibold mt-1.5 flex items-center gap-1 ${card.isUp ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                {card.isUp ? '↑' : '↓'} {card.sub}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Charts Row: Sales Overview & Orders By Status */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                            {/* Sales Overview Line Chart */}
+                            <div className="lg:col-span-2 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Sales Overview</h3>
+                                    </div>
+                                    <div className="relative">
+                                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--card-border)] text-[10px] font-bold text-[var(--text-secondary)]">
+                                            {weekFilter} <ChevronDown className="h-3 w-3 text-[var(--text-muted)]" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Line Chart SVG */}
+                                <div className="relative mt-2">
+                                    <svg className="w-full overflow-visible" viewBox={`0 0 ${chartW} ${chartH}`} fill="none">
+                                        {/* Y Axis Grid lines */}
+                                        {[0, 0.25, 0.5, 0.75, 1].map((r, i) => (
+                                            <line key={i} x1="0" y1={chartH * r} x2={chartW} y2={chartH * r} stroke="var(--card-border)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+                                        ))}
+
+                                        {/* Gradient Area Fill */}
+                                        <defs>
+                                            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="var(--gold-accent)" stopOpacity="0.25" />
+                                                <stop offset="100%" stopColor="var(--gold-accent)" stopOpacity="0.00" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d={areaD} fill="url(#chartGrad)" />
+
+                                        {/* Smooth Path line */}
+                                        <path d={pathD} stroke="var(--gold-accent)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+                                        {/* Data points */}
+                                        {pts.map((p, i) => (
+                                            <g key={i}>
+                                                <circle cx={p.x} cy={p.y} r="5" fill="var(--gold-accent)" stroke="var(--card-bg)" strokeWidth="2" className="drop-shadow-md cursor-pointer hover:scale-125 transition-transform" />
+                                            </g>
+                                        ))}
+                                    </svg>
+
+                                    {/* Y-Axis Label overlays */}
+                                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between pointer-events-none text-[9px] font-bold text-[var(--text-muted)] -translate-x-1">
+                                        {yLabels.map((l, i) => <span key={i}>{l}</span>)}
+                                    </div>
+                                </div>
+
+                                {/* X-Axis Days Labels */}
+                                <div className="flex items-center justify-between px-2 mt-4 text-[9px] font-bold text-[var(--text-muted)] border-t border-[var(--card-border)]/50 pt-3">
+                                    {chartDays.map((d, i) => <span key={i}>{d}</span>)}
+                                </div>
+
+                                {/* Legend */}
+                                <div className="flex items-center justify-center gap-2 mt-4 text-[10px] font-bold text-[var(--text-muted)]">
+                                    <div className="h-1 w-4 bg-[var(--gold-accent)] rounded-full" />
+                                    <span>Sales (₹)</span>
+                                </div>
+                            </div>
+
+                            {/* Orders By Status Donut Chart */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm">
+                                <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight mb-6">Orders By Status</h3>
+                                <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-6">
+                                    {/* SVG Donut */}
+                                    <div className="relative shrink-0">
+                                        <svg width={160} height={160} viewBox="0 0 180 180">
+                                            {donutArcs.map((seg, i) => (
+                                                <path key={i} d={seg.d} fill="none" stroke={seg.color} strokeWidth={STROKE_W} strokeLinecap="butt" />
+                                            ))}
+                                            {/* Center label */}
+                                            <text x={DONUT_CX} y={DONUT_CY - 8} textAnchor="middle" className="font-black" fill="var(--text-primary)" fontSize="24" fontFamily="Outfit, sans-serif" fontWeight="900">{total}</text>
+                                            <text x={DONUT_CX} y={DONUT_CY + 12} textAnchor="middle" fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif" fontWeight="700">Total Orders</text>
+                                        </svg>
+                                    </div>
+                                    {/* Legend */}
+                                    <div className="space-y-2.5 w-full">
+                                        {donutSegments.map((seg, i) => (
+                                            <div key={i} className="flex items-center justify-between border-b border-[var(--card-border)]/40 pb-1.5 text-xs font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                                                    <span className="text-[var(--text-secondary)]">{seg.label}</span>
+                                                </div>
+                                                <span className="font-bold text-[var(--text-primary)]">{seg.value} <span className="text-[10px] text-[var(--text-muted)] font-normal">({seg.pct}%)</span></span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Third Row: Top Selling Products, Category Split & Traffic Sources */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                            {/* Top Selling Products */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Top Selling Products</h3>
+                                    <button onClick={() => setActiveNav('Products')} className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All</button>
+                                </div>
+                                <div className="space-y-4">
+                                    {TOP_PRODUCTS.map((prod, i) => (
+                                        <div key={i} className="flex items-center gap-3.5">
+                                            <div className="h-7 w-7 rounded-lg bg-[var(--bg-right-panel)] flex items-center justify-center text-[10px] font-black text-[var(--text-secondary)] border border-[var(--card-border)] shrink-0">{prod.rank}</div>
+                                            <div className="h-10 w-10 rounded-xl border border-[var(--card-border)] bg-[var(--bg-right-panel)] overflow-hidden shrink-0 flex items-center justify-center p-1">
+                                                <img src={prod.image} alt={prod.name} className="h-full w-full object-contain" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-xs font-bold text-[var(--text-primary)] truncate">{prod.name}</div>
+                                                <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{prod.desc}</div>
+                                                <div className="h-1.5 w-full bg-[var(--card-border)] rounded-full mt-1.5 overflow-hidden">
+                                                    <div className="h-full bg-[var(--gold-accent)] rounded-full" style={{ width: `${(prod.sales / 120) * 100}%` }} />
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-[10px] font-black text-[var(--text-muted)] uppercase">Sales</div>
+                                                <div className="text-xs font-black text-[var(--text-primary)] mt-0.5">{prod.sales}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Sales by Category Donut Chart */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Sales By Category</h3>
+                                    <button onClick={() => setActiveNav('Products')} className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All</button>
+                                </div>
+                                <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-6">
+                                    {/* SVG Donut */}
+                                    <div className="relative shrink-0">
+                                        <svg width={160} height={160} viewBox="0 0 180 180">
+                                            {catDonutArcs.map((seg, i) => (
+                                                <path key={i} d={seg.d} fill="none" stroke={seg.color} strokeWidth={CAT_STROKE_W} strokeLinecap="butt" />
+                                            ))}
+                                            {/* Center label */}
+                                            <text x={CAT_DONUT_CX} y={CAT_DONUT_CY - 8} textAnchor="middle" className="font-black" fill="var(--text-primary)" fontSize="20" fontFamily="Outfit, sans-serif" fontWeight="900">₹54,320</text>
+                                            <text x={CAT_DONUT_CX} y={CAT_DONUT_CY + 12} textAnchor="middle" fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif" fontWeight="700">Total Sales</text>
+                                        </svg>
+                                    </div>
+                                    {/* Legend */}
+                                    <div className="space-y-2.5 w-full">
+                                        {catSegments.map((seg, i) => (
+                                            <div key={i} className="flex items-center justify-between border-b border-[var(--card-border)]/40 pb-1.5 text-xs font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                                                    <span className="text-[var(--text-secondary)]">{seg.label}</span>
+                                                </div>
+                                                <span className="font-bold text-[var(--text-primary)]">₹{seg.value.toLocaleString('en-IN')} <span className="text-[10px] text-[var(--text-muted)] font-normal">({seg.pct}%)</span></span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Traffic Source Progress Bar Chart */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Traffic Source</h3>
+                                    <button className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All</button>
+                                </div>
+                                <div className="space-y-4">
+                                    {[
+                                        { source: 'Direct', visitors: 1250, pct: '53.2' },
+                                        { source: 'Search Engines', visitors: 680, pct: '28.9' },
+                                        { source: 'Social Media', visitors: 320, pct: '13.6' },
+                                        { source: 'Other', visitors: 100, pct: '4.3' }
+                                    ].map((ts, i) => (
+                                        <div key={i} className="space-y-1.5">
+                                            <div className="flex items-center justify-between text-xs font-semibold">
+                                                <span className="text-[var(--text-secondary)]">{ts.source}</span>
+                                                <span className="font-bold text-[var(--text-primary)]">{ts.visitors.toLocaleString()} <span className="text-[10px] text-[var(--text-muted)] font-normal">({ts.pct}%)</span></span>
+                                            </div>
+                                            <div className="h-2 w-full bg-[var(--card-border)] rounded-full overflow-hidden">
+                                                <div className="h-full bg-[var(--gold-accent)] rounded-full" style={{ width: `${ts.pct}%` }} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Banner Insights Card */}
+                        <div className="bg-orange-500/5 border border-orange-500/15 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                                    <Sparkles className="h-6 w-6 text-orange-500 animate-pulse" />
+                                </div>
+                                <div>
+                                    <h4 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)]">Insight for you</h4>
+                                    <p className="text-xs font-semibold text-[var(--text-muted)] mt-0.5">Great job! Your sales increased by 12.5% this week. Focus on top performing categories to maintain this growth.</p>
+                                </div>
+                            </div>
+                            <button className="px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-all duration-200 shrink-0">
+                                View Detailed Report
+                            </button>
+                        </div>
+                    </div>
+                )
+            })()}
+
             {/* ══════════════ DASHBOARD PAGE ═════════════─ */}
             {activeNav === 'Dashboard' && <>
 
