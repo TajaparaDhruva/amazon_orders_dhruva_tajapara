@@ -1311,7 +1311,7 @@ export default function SellerDashboard() {
                 }
 
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-6" onClick={() => custMoreMenu && setCustMoreMenu(null)}>
 
                         {/* Page Header */}
                         <div className="flex items-center justify-between">
@@ -1459,9 +1459,45 @@ export default function SellerDashboard() {
                                                 className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors" title="View Profile">
                                                 <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
                                             </button>
-                                            <button className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors">
-                                                <MoreHorizontal className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
-                                            </button>
+                                            <div className="relative">
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); setCustMoreMenu(prev => prev?.custId === cust.id ? null : { custId: cust.id }) }}
+                                                    className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors"
+                                                    title="Actions"
+                                                >
+                                                    <MoreHorizontal className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                                </button>
+                                                {custMoreMenu?.custId === cust.id && (
+                                                    <div
+                                                        className="absolute right-0 top-8 z-50 w-44 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-1.5 overflow-hidden text-left"
+                                                        onClick={e => e.stopPropagation()}
+                                                    >
+                                                        <button
+                                                            onClick={() => { setCustDetail(cust); setCustMoreMenu(null) }}
+                                                            className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer border-none bg-transparent"
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" /> View Profile
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                const next = cust.status === 'Active' ? 'Inactive' : 'Active'
+                                                                setCustomers(prev => prev.map(c => c.id === cust.id ? {...c, status:next} : c))
+                                                                setCustMoreMenu(null)
+                                                            }}
+                                                            className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer border-none bg-transparent"
+                                                        >
+                                                            <RotateCcw className="h-3.5 w-3.5 text-[var(--text-secondary)]" /> Mark {cust.status === 'Active' ? 'Inactive' : 'Active'}
+                                                        </button>
+                                                        <hr className="border-[var(--card-border)] my-1 opacity-60" />
+                                                        <button
+                                                            onClick={() => { setCustDeleteConfirm(cust); setCustMoreMenu(null) }}
+                                                            className="w-full text-left px-4 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 flex items-center gap-2 cursor-pointer border-none bg-transparent"
+                                                        >
+                                                            <X className="h-3.5 w-3.5 text-rose-500" /> Delete Customer
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -2363,6 +2399,57 @@ export default function SellerDashboard() {
                             </button>
                             <button
                                 onClick={() => handleProdDelete(deleteConfirm.id)}
+                                className="flex-1 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                            >
+                                <X className="h-3.5 w-3.5" /> Yes, Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── CUSTOMER DELETE CONFIRMATION MODAL ──────────────────────────────── */}
+            {custDeleteConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setCustDeleteConfirm(null)}>
+                    <div className="w-full max-w-sm bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+                        {/* Red danger header */}
+                        <div className="bg-rose-500/8 border-b border-rose-500/15 px-6 py-5 flex items-center gap-4">
+                            <div className="h-11 w-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                                <AlertTriangle className="h-5 w-5 text-rose-500" />
+                            </div>
+                            <div>
+                                <h3 className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">Delete Customer?</h3>
+                                <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">This action cannot be undone</p>
+                            </div>
+                        </div>
+
+                        {/* Customer preview */}
+                        <div className="px-6 py-5">
+                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--bg-right-panel)] border border-[var(--card-border)]">
+                                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[var(--card-border)] bg-[var(--card-bg)] shrink-0 flex items-center justify-center text-white font-black" style={{ backgroundColor: custDeleteConfirm.color }}>
+                                    {custDeleteConfirm.initials}
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="text-xs font-black text-[var(--text-primary)] truncate">{custDeleteConfirm.name}</div>
+                                    <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{custDeleteConfirm.email}</div>
+                                    <div className="text-[10px] font-semibold text-[var(--text-muted)]">{custDeleteConfirm.phone}</div>
+                                </div>
+                            </div>
+                            <p className="text-[11px] font-semibold text-[var(--text-muted)] mt-4 text-center leading-relaxed">
+                                You are about to permanently delete customer <span className="font-black text-[var(--text-primary)]">"{custDeleteConfirm.name}"</span> and remove them from your records.
+                            </p>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="px-6 pb-6 flex gap-3">
+                            <button
+                                onClick={() => setCustDeleteConfirm(null)}
+                                className="flex-1 py-3 rounded-2xl border border-[var(--card-border)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] cursor-pointer transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleCustDelete(custDeleteConfirm.id)}
                                 className="flex-1 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                             >
                                 <X className="h-3.5 w-3.5" /> Yes, Delete
