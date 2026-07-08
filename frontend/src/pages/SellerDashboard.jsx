@@ -879,7 +879,7 @@ export default function SellerDashboard() {
                 ]
 
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-6" onClick={() => { setAnalyticsWeekDropOpen(false); setDateRangeDropOpen(false); }}>
 
                         {/* Page Header */}
                         <div>
@@ -1729,9 +1729,31 @@ export default function SellerDashboard() {
                                 <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">Track your store performance and growth.</p>
                             </div>
                             <div className="relative">
-                                <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] transition-colors cursor-pointer">
-                                    <Clock className="h-3.5 w-3.5" /> May 20 - May 26, 2024 <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                <button
+                                    onClick={e => { e.stopPropagation(); setDateRangeDropOpen(o => !o) }}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] transition-all cursor-pointer select-none"
+                                >
+                                    <Clock className="h-3.5 w-3.5 text-[var(--gold-accent)]" />
+                                    <span>{selectedDateRange}</span>
+                                    <ChevronDown className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform duration-200 ${dateRangeDropOpen ? 'rotate-180' : ''}`} />
                                 </button>
+                                {dateRangeDropOpen && (
+                                    <div className="absolute right-0 top-11 z-30 w-52 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-1.5 overflow-hidden">
+                                        {['May 20 - May 26, 2024', 'May 13 - May 19, 2024', 'May 06 - May 12, 2024', 'April 2024', 'All Time'].map(range => (
+                                            <button
+                                                key={range}
+                                                onClick={() => { setSelectedDateRange(range); setDateRangeDropOpen(false) }}
+                                                className={`w-full text-left px-4 py-2 text-xs font-semibold ${
+                                                    selectedDateRange === range
+                                                        ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] font-bold'
+                                                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                } cursor-pointer border-none bg-transparent`}
+                                            >
+                                                {range}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -1763,9 +1785,30 @@ export default function SellerDashboard() {
                                         <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Sales Overview</h3>
                                     </div>
                                     <div className="relative">
-                                        <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--card-border)] text-[10px] font-bold text-[var(--text-secondary)]">
-                                            {weekFilter} <ChevronDown className="h-3 w-3 text-[var(--text-muted)]" />
+                                        <button
+                                            onClick={e => { e.stopPropagation(); setAnalyticsWeekDropOpen(o => !o) }}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--card-border)] text-[10px] font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] transition-all cursor-pointer select-none"
+                                        >
+                                            <span>{weekFilter}</span>
+                                            <ChevronDown className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform duration-200 ${analyticsWeekDropOpen ? 'rotate-180' : ''}`} />
                                         </button>
+                                        {analyticsWeekDropOpen && (
+                                            <div className="absolute right-0 top-9 z-30 w-32 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-xl py-1 overflow-hidden">
+                                                {['This Week', 'This Month', 'This Year'].map(opt => (
+                                                    <button
+                                                        key={opt}
+                                                        onClick={() => { setWeekFilter(opt); setAnalyticsWeekDropOpen(false) }}
+                                                        className={`w-full text-left px-4 py-2 text-xs font-semibold ${
+                                                            weekFilter === opt
+                                                                ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] font-bold'
+                                                                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                        } cursor-pointer border-none bg-transparent`}
+                                                    >
+                                                        {opt}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -1949,10 +1992,106 @@ export default function SellerDashboard() {
                                     <p className="text-xs font-semibold text-[var(--text-muted)] mt-0.5">Great job! Your sales increased by 12.5% this week. Focus on top performing categories to maintain this growth.</p>
                                 </div>
                             </div>
-                            <button className="px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-all duration-200 shrink-0">
+                            <button
+                                onClick={() => setIsDetailedReportOpen(true)}
+                                className="px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-all duration-200 shrink-0 cursor-pointer"
+                            >
                                 View Detailed Report
                             </button>
                         </div>
+
+                        {/* ── DETAILED REPORT MODAL ────────────────────────────────────────── */}
+                        {isDetailedReportOpen && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setIsDetailedReportOpen(false)}>
+                                <div className="w-full max-w-2xl bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+                                    
+                                    {/* Header */}
+                                    <div className="px-6 py-5 border-b border-[var(--card-border)] flex items-center justify-between bg-[var(--bg-right-panel)]/40">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-10 w-10 rounded-2xl bg-[var(--gold-accent)]/10 border border-[var(--gold-accent)]/20 flex items-center justify-center shrink-0">
+                                                <BarChart2 className="h-5 w-5 text-[var(--gold-accent)]" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">Detailed Analytics Report</h3>
+                                                <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">Performance breakdown for {selectedDateRange}</p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => setIsDetailedReportOpen(false)}
+                                            className="h-8 w-8 rounded-full border border-[var(--card-border)] hover:bg-[var(--bg-right-panel)] flex items-center justify-center text-[var(--text-secondary)] transition-colors cursor-pointer">
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+
+                                    {/* Body / Table */}
+                                    <div className="p-6 overflow-y-auto space-y-6">
+                                        {/* Performance stats row */}
+                                        <div className="grid grid-cols-4 gap-4">
+                                            {[
+                                                { label: 'Sales Volume', value: formatCurrency(totalRevenue), color: 'text-emerald-500' },
+                                                { label: 'Order Volume', value: totalOrders, color: 'text-blue-500' },
+                                                { label: 'Conversion Rate', value: conversionRate, color: 'text-violet-500' },
+                                                { label: 'AOV', value: formatCurrency(avgOrderValue), color: 'text-orange-500' }
+                                            ].map((stat, i) => (
+                                                <div key={i} className="p-3 border border-[var(--card-border)] bg-[var(--bg-right-panel)]/30 rounded-2xl">
+                                                    <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{stat.label}</span>
+                                                    <div className={`font-['Outfit'] text-sm font-black mt-1 ${stat.color}`}>{stat.value}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Detailed Table */}
+                                        <div className="border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                                            <div className="grid grid-cols-5 px-4 py-3 bg-[var(--bg-right-panel)]/40 border-b border-[var(--card-border)] text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">
+                                                <div>Date</div>
+                                                <div className="text-right">Sales</div>
+                                                <div className="text-right">Orders</div>
+                                                <div className="text-right">Views</div>
+                                                <div className="text-right">Conv. Rate</div>
+                                            </div>
+                                            <div className="divide-y divide-[var(--card-border)]/40 text-xs font-semibold text-[var(--text-secondary)]">
+                                                {[
+                                                    { date: '26 May, 2024', sales: 11000, orders: 32, views: 480, conv: '6.67%' },
+                                                    { date: '25 May, 2024', sales: 10200, orders: 28, views: 450, conv: '6.22%' },
+                                                    { date: '24 May, 2024', sales: 18000, orders: 42, views: 560, conv: '7.50%' },
+                                                    { date: '23 May, 2024', sales: 12000, orders: 30, views: 420, conv: '7.14%' },
+                                                    { date: '22 May, 2024', sales: 9000,  orders: 22, views: 390, conv: '5.64%' },
+                                                    { date: '21 May, 2024', sales: 10500, orders: 26, views: 410, conv: '6.34%' },
+                                                    { date: '20 May, 2024', sales: 9100,  orders: 21, views: 380, conv: '5.53%' }
+                                                ].map((row, idx) => (
+                                                    <div key={idx} className="grid grid-cols-5 px-4 py-3.5 hover:bg-[var(--bg-right-panel)]/30 transition-colors">
+                                                        <div className="font-bold text-[var(--text-primary)]">{row.date}</div>
+                                                        <div className="text-right font-bold text-[var(--text-primary)]">₹{row.sales.toLocaleString('en-IN')}</div>
+                                                        <div className="text-right">{row.orders}</div>
+                                                        <div className="text-right">{row.views}</div>
+                                                        <div className="text-right text-emerald-500 font-bold">{row.conv}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="px-6 py-4 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]/40 flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-[var(--text-muted)]">Data exported from VenderFlow Live Metrics API</span>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setIsDetailedReportOpen(false)}
+                                                className="px-4 py-2 border border-[var(--card-border)] hover:bg-[var(--bg-right-panel)] rounded-xl text-xs font-bold text-[var(--text-secondary)] cursor-pointer">
+                                                Close
+                                            </button>
+                                            <button onClick={() => {
+                                                const csv = "Date,Sales,Orders,Views,ConversionRate\n26 May 2024,11000,32,480,6.67%\n25 May 2024,10200,28,450,6.22%\n24 May 2024,18000,42,560,7.50%";
+                                                const blob = new Blob([csv], { type: 'text/csv' });
+                                                const url = URL.createObjectURL(blob);
+                                                const a = document.createElement('a'); a.href = url; a.download = 'analytics_report.csv'; a.click();
+                                            }}
+                                                className="px-4 py-2 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] rounded-xl text-xs font-bold text-white shadow-md cursor-pointer">
+                                                Export CSV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 )
             })()}
