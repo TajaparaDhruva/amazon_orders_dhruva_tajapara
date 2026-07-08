@@ -158,6 +158,12 @@ export default function SellerDashboard() {
         setCustDeleteConfirm(null)
     }
 
+    // Analytics page filter and report states
+    const [analyticsWeekDropOpen, setAnalyticsWeekDropOpen] = useState(false)
+    const [selectedDateRange, setSelectedDateRange] = useState('May 20 - May 26, 2024')
+    const [dateRangeDropOpen, setDateRangeDropOpen] = useState(false)
+    const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false)
+
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
     const openAdd  = () => setProdModal({ mode:'add',  product: { ...EMPTY_PROD } })
