@@ -56,25 +56,9 @@ function App() {
                         }
                     />
 
-                    {/* Protected Customer Dashboard */}
-                    <Route
-                        path="/dashboard/customer"
-                        element={
-                            <ProtectedRoute requiredRole="user">
-                                <CustomerDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    {/* Protected Product Detail */}
-                    <Route
-                        path="/product/:id"
-                        element={
-                            <ProtectedRoute requiredRole="user">
-                                <ProductDetail />
-                            </ProtectedRoute>
-                        }
-                    />
+                    {/* Public Customer Storefront (Direct Access without Login) */}
+                    <Route path="/dashboard/customer" element={<CustomerDashboard />} />
+                    <Route path="/product/:id" element={<ProductDetail />} />
 
                     {/* Protected Shopping Cart */}
                     <Route
