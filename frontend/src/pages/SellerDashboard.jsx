@@ -9,7 +9,7 @@ import {
     BarChart2, ArrowUpRight, ArrowDownRight, Sparkles,
     Shield, CheckCircle, RotateCcw, TrendingDown,
     Search, SlidersHorizontal, Download, Edit2, MoreHorizontal,
-    ChevronLeft, ChevronRight
+    ChevronLeft, ChevronRight, MapPin
 } from 'lucide-react'
 
 import { ALL_PRODUCTS } from '../data/dashboardData'
@@ -68,6 +68,22 @@ const MOCK_ALL_ORDERS = [
     { OrderID:'VF10225', customer:'Mohit Verma',   email:'moh***@gmail.com',  phone:'+91 44321 09876', initials:'MV', color:'#f43f5e', items:[{name:'Electric Kettle',img:'https://images.unsplash.com/photo-1577334716219-3375b050d7a3?w=80&q=80'}],                                                                                                 itemCount:1, amount:83,   payment:'COD',    payBadge:'COD',    OrderStatus:'Pending',   statusNote:'Awaiting payment',        OrderDate:new Date('2024-05-21T09:05:00') },
 ]
 
+// ─── Mock Customers List ─────────────────────────────────────────────────
+const MOCK_CUSTOMERS = [
+    { id:'c1',  name:'Riya Kapoor',  initials:'RK', color:'#f97316', email:'riya.kapoor@email.com',  phone:'+91 98765 43210', city:'Rajkot',     state:'Gujarat',     orders:5,  totalSpent:5582,  status:'Active',   badge:'New',    joinedDate:new Date('2024-05-25') },
+    { id:'c2',  name:'Aman Mehta',   initials:'AM', color:'#22c55e', email:'aman.mehta@email.com',   phone:'+91 87654 32109', city:'Ahmedabad',  state:'Gujarat',     orders:3,  totalSpent:3247,  status:'Active',   badge:null,     joinedDate:new Date('2024-05-24') },
+    { id:'c3',  name:'Sneha Patel',  initials:'SP', color:'#a855f7', email:'sneha.patel@email.com',  phone:'+91 91234 56789', city:'Surat',      state:'Gujarat',     orders:8,  totalSpent:9862,  status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-20') },
+    { id:'c4',  name:'Vivek Gupta',  initials:'VG', color:'#3b82f6', email:'vivek.gupta@email.com',  phone:'+91 99887 76655', city:'Vadodara',   state:'Gujarat',     orders:2,  totalSpent:1498,  status:'Inactive', badge:null,     joinedDate:new Date('2024-05-18') },
+    { id:'c5',  name:'Neha Joshi',   initials:'NJ', color:'#ec4899', email:'neha.joshi@email.com',   phone:'+91 78965 43211', city:'Jamnagar',   state:'Gujarat',     orders:4,  totalSpent:2987,  status:'Active',   badge:null,     joinedDate:new Date('2024-05-15') },
+    { id:'c6',  name:'Raj Sharma',   initials:'RS', color:'#14b8a6', email:'raj.sharma@email.com',   phone:'+91 88765 43210', city:'Mumbai',     state:'Maharashtra', orders:6,  totalSpent:7340,  status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-12') },
+    { id:'c7',  name:'Priya Singh',  initials:'PS', color:'#f59e0b', email:'priya.singh@email.com',  phone:'+91 77654 32109', city:'Pune',       state:'Maharashtra', orders:9,  totalSpent:12450, status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-10') },
+    { id:'c8',  name:'Arjun Nair',   initials:'AN', color:'#6366f1', email:'arjun.nair@email.com',   phone:'+91 66543 21098', city:'Chennai',    state:'Tamil Nadu',  orders:1,  totalSpent:849,   status:'Active',   badge:'New',    joinedDate:new Date('2024-05-08') },
+    { id:'c9',  name:'Kavya Reddy',  initials:'KR', color:'#10b981', email:'kavya.reddy@email.com',  phone:'+91 55432 10987', city:'Hyderabad',  state:'Telangana',   orders:7,  totalSpent:8920,  status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-05') },
+    { id:'c10', name:'Mohit Verma',  initials:'MV', color:'#f43f5e', email:'mohit.verma@email.com',  phone:'+91 44321 09876', city:'Delhi',      state:'Delhi',       orders:3,  totalSpent:2130,  status:'Inactive', badge:null,     joinedDate:new Date('2024-05-03') },
+    { id:'c11', name:'Ankita Das',   initials:'AD', color:'#0ea5e9', email:'ankita.das@email.com',   phone:'+91 33210 98765', city:'Kolkata',    state:'West Bengal', orders:5,  totalSpent:4670,  status:'Active',   badge:null,     joinedDate:new Date('2024-05-01') },
+    { id:'c12', name:'Siddharth K',  initials:'SK', color:'#d97706', email:'siddharth.k@email.com',  phone:'+91 22109 87654', city:'Bangalore',  state:'Karnataka',   orders:12, totalSpent:18230, status:'Active',   badge:'Repeat', joinedDate:new Date('2024-04-28') },
+]
+
 // Nav links
 const NAV_LINKS = ['Dashboard', 'Products', 'Orders', 'Customers', 'Analytics']
 
@@ -124,6 +140,29 @@ export default function SellerDashboard() {
     const [ordDetail, setOrdDetail]       = useState(null)  // null | order object (side drawer)
     const [allOrders, setAllOrders]       = useState(MOCK_ALL_ORDERS)
     const ORD_PER_PAGE = 5
+
+    // Customers page state
+    const [custSearch, setCustSearch]   = useState('')
+    const [custStatus, setCustStatus]   = useState('All Status')
+    const [custLocation, setCustLocation] = useState('All Locations')
+    const [custPage, setCustPage]       = useState(1)
+    const [custDetail, setCustDetail]   = useState(null) // null | customer
+    const [customers, setCustomers]     = useState(MOCK_CUSTOMERS)
+    const [custMoreMenu, setCustMoreMenu]           = useState(null) // null | { custId }
+    const [custDeleteConfirm, setCustDeleteConfirm] = useState(null) // null | customer object
+    const CUST_PER_PAGE = 5
+
+    const handleCustDelete = (custId) => {
+        setCustomers(prev => prev.filter(c => c.id !== custId))
+        setCustMoreMenu(null)
+        setCustDeleteConfirm(null)
+    }
+
+    // Analytics page filter and report states
+    const [analyticsWeekDropOpen, setAnalyticsWeekDropOpen] = useState(false)
+    const [selectedDateRange, setSelectedDateRange] = useState('May 20 - May 26, 2024')
+    const [dateRangeDropOpen, setDateRangeDropOpen] = useState(false)
+    const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false)
 
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
@@ -317,10 +356,18 @@ export default function SellerDashboard() {
     const formatCurrency = (val) =>
         new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val || 0)
 
-    // ─── SVG Line Chart (reactive to weekFilter) ─────────────────────────────────
+    // ─── SVG Line Chart (reactive to weekFilter & date range) ──────────────────────
     const chartW = 500, chartH = 180
+    
+    // Scale factor based on selectedDateRange
+    let rangeScale = 1.0;
+    if (selectedDateRange === 'May 13 - May 19, 2024') rangeScale = 42180 / 54320;
+    else if (selectedDateRange === 'May 06 - May 12, 2024') rangeScale = 48920 / 54320;
+    else if (selectedDateRange === 'April 2024') rangeScale = 185430 / 54320;
+    else if (selectedDateRange === 'All Time') rangeScale = (stats.totalRevenue || 54320) / 54320;
+
     const activeChartData = CHART_DATA[weekFilter] || CHART_DATA['This Week']
-    const chartPoints = activeChartData.points
+    const chartPoints = activeChartData.points.map(v => Math.round(v * rangeScale))
     const chartDays   = activeChartData.days
     const maxVal = Math.max(...chartPoints) * 1.1
     const minVal = 0
@@ -340,15 +387,22 @@ export default function SellerDashboard() {
     // ─── Donut Chart ─────────────────────────────────────────────────────────────
     const total = stats.totalOrders || 156
     const delivered = stats.deliveredOrders || 98
-    const processing = stats.processingOrders || 34
+    const shipped = stats.shippedOrders || 0
     const pending = stats.pendingOrders || 12
     const cancelled = stats.cancelledOrders || 12
+    const returned = stats.returnedOrders || 0
+    const processing = stats.processingOrders || 34
+    const confirmed = stats.confirmedOrders || 0
+
     const donutSegments = [
         { value: delivered,   color: '#10b981', label: 'Delivered',   pct: ((delivered / total) * 100).toFixed(1) },
-        { value: processing,  color: '#3b82f6', label: 'Processing',  pct: ((processing / total) * 100).toFixed(1) },
+        { value: shipped,     color: '#a855f7', label: 'Shipped',     pct: ((shipped / total) * 100).toFixed(1) },
         { value: pending,     color: '#f59e0b', label: 'Pending',     pct: ((pending / total) * 100).toFixed(1) },
         { value: cancelled,   color: '#f43f5e', label: 'Cancelled',   pct: ((cancelled / total) * 100).toFixed(1) },
-    ]
+        { value: returned,    color: '#ec4899', label: 'Returned',    pct: ((returned / total) * 100).toFixed(1) },
+        { value: processing,  color: '#3b82f6', label: 'Processing',  pct: ((processing / total) * 100).toFixed(1) },
+        { value: confirmed,   color: '#14b8a6', label: 'Confirmed',   pct: ((confirmed / total) * 100).toFixed(1) },
+    ].filter(seg => seg.value > 0)
     const DONUT_R = 70, DONUT_CX = 90, DONUT_CY = 90, STROKE_W = 22
     let cumAngle = -90
     const donutArcs = donutSegments.map(seg => {
@@ -427,12 +481,6 @@ export default function SellerDashboard() {
                         {/* Theme Toggle */}
                         <button onClick={toggleTheme} className="h-9 w-9 rounded-xl border border-[var(--card-border)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-right-panel)] transition-colors">
                             {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-neutral-500" />}
-                        </button>
-
-                        {/* Notifications */}
-                        <button className="relative h-9 w-9 rounded-xl border border-[var(--card-border)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-right-panel)] transition-colors">
-                            <Bell className="h-4 w-4 text-[var(--text-secondary)]" />
-                            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">6</span>
                         </button>
 
                         {/* Profile Dropdown */}
@@ -839,7 +887,7 @@ export default function SellerDashboard() {
                 ]
 
                 return (
-                    <div className="space-y-6">
+                    <div className="space-y-6" onClick={() => { setAnalyticsWeekDropOpen(false); setDateRangeDropOpen(false); }}>
 
                         {/* Page Header */}
                         <div>
@@ -1238,7 +1286,928 @@ export default function SellerDashboard() {
                 )
             })()}
 
-            {/* ══════════════ DASHBOARD PAGE ══════════════ */}
+            {/* ══════════════ CUSTOMERS PAGE ══════════════ */}
+            {activeNav === 'Customers' && (() => {
+                const CUST_STATUSES   = ['All Status','Active','Inactive']
+                const CUST_LOCATIONS  = ['All Locations','Gujarat','Maharashtra','Tamil Nadu','Delhi','Karnataka','Telangana','West Bengal']
+
+                const filtered = customers.filter(c => {
+                    const q = custSearch.toLowerCase()
+                    const matchQ = !q || c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.includes(q)
+                    const matchS = custStatus   === 'All Status'    || c.status === custStatus
+                    const matchL = custLocation === 'All Locations' || c.state  === custLocation
+                    return matchQ && matchS && matchL
+                })
+
+                const totalPages = Math.max(1, Math.ceil(filtered.length / CUST_PER_PAGE))
+                const safePage   = Math.min(custPage, totalPages)
+                const paginated  = filtered.slice((safePage - 1) * CUST_PER_PAGE, safePage * CUST_PER_PAGE)
+
+                const totalSpent = customers.reduce((s, c) => s + c.totalSpent, 0)
+                const avgOrder   = Math.round(totalSpent / customers.reduce((s,c) => s + c.orders, 0))
+                const repeatCust = customers.filter(c => c.badge === 'Repeat').length
+                const newCust    = customers.filter(c => c.badge === 'New').length
+
+                const STAT_CARDS = [
+                    { label:'Total Customers',   value: customers.length,   sub:'All time customers',       icon:<Users className="h-5 w-5" />,     color:'text-orange-500',  bg:'bg-orange-500/10 border-orange-500/20' },
+                    { label:'New This Month',     value: newCust,            sub:'Joined this month',        icon:<Users className="h-5 w-5" />,     color:'text-blue-500',    bg:'bg-blue-500/10 border-blue-500/20' },
+                    { label:'Repeat Customers',   value: repeatCust,         sub:'Purchased more than once', icon:<ShoppingBag className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20' },
+                    { label:'Total Spent',        value: `₹${totalSpent.toLocaleString('en-IN')}`, sub:'By all customers', icon:<TrendingUp className="h-5 w-5" />, color:'text-violet-500', bg:'bg-violet-500/10 border-violet-500/20' },
+                    { label:'Average Order Value',value: `₹${avgOrder}`,     sub:'Per order',                icon:<Star className="h-5 w-5" />,      color:'text-amber-500',   bg:'bg-amber-500/10 border-amber-500/20' },
+                ]
+
+                const handleExportCust = () => {
+                    const headers = ['Name','Email','Phone','City','State','Orders','Total Spent','Status','Joined']
+                    const rows = customers.map(c => [c.name, c.email, c.phone, c.city, c.state, c.orders, c.totalSpent, c.status, c.joinedDate.toLocaleDateString('en-IN')])
+                    const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
+                    const blob = new Blob([csv], { type: 'text/csv' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a'); a.href = url; a.download = 'customers_export.csv'; a.click()
+                    URL.revokeObjectURL(url)
+                }
+
+                return (
+                    <div className="space-y-6" onClick={() => custMoreMenu && setCustMoreMenu(null)}>
+
+                        {/* Page Header */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)] tracking-tight">Customers</h1>
+                                <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">View and manage all your store customers.</p>
+                            </div>
+                            <button onClick={handleExportCust}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-all cursor-pointer">
+                                <Download className="h-3.5 w-3.5" /> Export Customers
+                            </button>
+                        </div>
+
+                        {/* Stat Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            {STAT_CARDS.map((card, i) => (
+                                <div key={i} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 hover:shadow-md transition-all">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-xl border shrink-0 ${card.color} ${card.bg}`}>{card.icon}</div>
+                                        <div className="min-w-0">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider leading-tight">{card.label}</div>
+                                            <div className={`font-['Outfit'] text-xl font-black ${card.color} leading-tight mt-1`}>{card.value}</div>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-1">{card.sub}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Search & Filters */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div className="relative flex-1 max-w-sm">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                <input type="text" placeholder="Search by name, email or phone..."
+                                    value={custSearch}
+                                    onChange={e => { setCustSearch(e.target.value); setCustPage(1) }}
+                                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--gold-accent)] transition-colors" />
+                            </div>
+                            <div className="relative">
+                                <select value={custStatus} onChange={e => { setCustStatus(e.target.value); setCustPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors">
+                                    {CUST_STATUSES.map(s => <option key={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <div className="relative">
+                                <select value={custLocation} onChange={e => { setCustLocation(e.target.value); setCustPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors">
+                                    {CUST_LOCATIONS.map(l => <option key={l}>{l}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] bg-[var(--gold-bg-pill)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-colors cursor-pointer">
+                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                            </button>
+                        </div>
+
+                        {/* Customer Table */}
+                        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
+                            {/* Table Header */}
+                            <div className="grid items-center border-b border-[var(--card-border)] px-5 py-3 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider bg-[var(--bg-right-panel)]/40"
+                                style={{ gridTemplateColumns: '2fr 1.6fr 1.2fr 0.7fr 1fr 0.8fr 1fr 0.6fr' }}>
+                                <div>Customer</div>
+                                <div>Contact</div>
+                                <div>Location</div>
+                                <div>Orders</div>
+                                <div>Total Spent</div>
+                                <div>Status</div>
+                                <div>Joined On</div>
+                                <div className="text-right">Actions</div>
+                            </div>
+
+                            {/* Rows */}
+                            <div className="divide-y divide-[var(--card-border)]/50">
+                                {paginated.length === 0 ? (
+                                    <div className="py-16 flex flex-col items-center gap-3 text-[var(--text-muted)]">
+                                        <Users className="h-8 w-8 opacity-30" />
+                                        <span className="text-xs font-semibold">No customers found</span>
+                                    </div>
+                                ) : paginated.map(cust => (
+                                    <div key={cust.id}
+                                        className="grid items-center px-5 py-4 hover:bg-[var(--bg-right-panel)]/60 transition-colors cursor-pointer"
+                                        style={{ gridTemplateColumns: '2fr 1.6fr 1.2fr 0.7fr 1fr 0.8fr 1fr 0.6fr' }}
+                                        onClick={() => setCustDetail(cust)}
+                                    >
+                                        {/* Customer */}
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="h-9 w-9 rounded-full flex items-center justify-center text-white text-[11px] font-black shrink-0 shadow-sm"
+                                                style={{ backgroundColor: cust.color }}>
+                                                {cust.initials}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-xs font-bold text-[var(--text-primary)] truncate">{cust.name}</span>
+                                                    {cust.badge && (
+                                                        <span className={`shrink-0 px-1.5 py-0.5 rounded-[5px] text-[8px] font-black border ${
+                                                            cust.badge === 'New'
+                                                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+                                                                : 'bg-violet-500/10 text-violet-600 border-violet-500/20'
+                                                        }`}>{cust.badge}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact */}
+                                        <div className="min-w-0">
+                                            <div className="text-[10px] font-semibold text-[var(--text-secondary)] truncate">{cust.email}</div>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{cust.phone}</div>
+                                        </div>
+
+                                        {/* Location */}
+                                        <div className="flex items-start gap-1">
+                                            <MapPin className="h-3 w-3 text-[var(--text-muted)] mt-0.5 shrink-0" />
+                                            <div>
+                                                <div className="text-[10px] font-semibold text-[var(--text-secondary)] truncate">{cust.city}, {cust.state}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Orders */}
+                                        <div className="text-xs font-black text-[var(--text-primary)]">{cust.orders}</div>
+
+                                        {/* Total Spent */}
+                                        <div className="text-xs font-black text-[var(--text-primary)]">
+                                            ₹{cust.totalSpent.toLocaleString('en-IN')}
+                                        </div>
+
+                                        {/* Status */}
+                                        <div>
+                                            <span className={`inline-block px-2.5 py-1 rounded-xl text-[9px] font-black border ${
+                                                cust.status === 'Active'
+                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                                                    : 'bg-neutral-500/10 text-neutral-500 border-neutral-500/20'
+                                            }`}>{cust.status}</span>
+                                        </div>
+
+                                        {/* Joined */}
+                                        <div className="text-[10px] font-bold text-[var(--text-secondary)]">
+                                            {cust.joinedDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                                            <button onClick={() => setCustDetail(cust)}
+                                                className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors" title="View Profile">
+                                                <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                            </button>
+                                            <div className="relative">
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); setCustMoreMenu(prev => prev?.custId === cust.id ? null : { custId: cust.id }) }}
+                                                    className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors"
+                                                    title="Actions"
+                                                >
+                                                    <MoreHorizontal className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                                </button>
+                                                {custMoreMenu?.custId === cust.id && (
+                                                    <div
+                                                        className="absolute right-0 top-8 z-50 w-44 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-1.5 overflow-hidden text-left"
+                                                        onClick={e => e.stopPropagation()}
+                                                    >
+                                                        <button
+                                                            onClick={() => { setCustDetail(cust); setCustMoreMenu(null) }}
+                                                            className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer border-none bg-transparent"
+                                                        >
+                                                            <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" /> View Profile
+                                                        </button>
+                                                        <button
+                                                            onClick={() => {
+                                                                const next = cust.status === 'Active' ? 'Inactive' : 'Active'
+                                                                setCustomers(prev => prev.map(c => c.id === cust.id ? {...c, status:next} : c))
+                                                                setCustMoreMenu(null)
+                                                            }}
+                                                            className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer border-none bg-transparent"
+                                                        >
+                                                            <RotateCcw className="h-3.5 w-3.5 text-[var(--text-secondary)]" /> Mark {cust.status === 'Active' ? 'Inactive' : 'Active'}
+                                                        </button>
+                                                        <hr className="border-[var(--card-border)] my-1 opacity-60" />
+                                                        <button
+                                                            onClick={() => { setCustDeleteConfirm(cust); setCustMoreMenu(null) }}
+                                                            className="w-full text-left px-4 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 flex items-center gap-2 cursor-pointer border-none bg-transparent"
+                                                        >
+                                                            <X className="h-3.5 w-3.5 text-rose-500" /> Delete Customer
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination Footer */}
+                            <div className="flex items-center justify-between px-5 py-3.5 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]/30">
+                                <span className="text-[10px] font-semibold text-[var(--text-muted)]">
+                                    Showing {filtered.length === 0 ? 0 : Math.min((safePage-1)*CUST_PER_PAGE+1, filtered.length)} to {Math.min(safePage*CUST_PER_PAGE, filtered.length)} of {filtered.length} customers
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <button disabled={safePage === 1} onClick={() => setCustPage(p => Math.max(1,p-1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                                        <ChevronLeft className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                        const pg = i + 1
+                                        return (
+                                            <button key={pg} onClick={() => setCustPage(pg)}
+                                                className={`h-7 w-7 rounded-lg text-[10px] font-black cursor-pointer transition-colors ${
+                                                    safePage === pg
+                                                        ? 'bg-[var(--gold-accent)] text-white border border-[var(--gold-accent)]'
+                                                        : 'border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                }`}>{pg}</button>
+                                        )
+                                    })}
+                                    {totalPages > 5 && <span className="text-xs font-bold text-[var(--text-muted)]">...</span>}
+                                    {totalPages > 5 && (
+                                        <button onClick={() => setCustPage(totalPages)}
+                                            className={`h-7 w-7 rounded-lg text-[10px] font-black border cursor-pointer transition-colors ${
+                                                safePage === totalPages ? 'bg-[var(--gold-accent)] text-white border-[var(--gold-accent)]' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                            }`}>{totalPages}</button>
+                                    )}
+                                    <button disabled={safePage === totalPages} onClick={() => setCustPage(p => Math.min(totalPages, p+1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                                        <ChevronRight className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── CUSTOMER DETAIL DRAWER ────────────────────── */}
+                        {custDetail && (
+                            <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setCustDetail(null)}>
+                                <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+                                <div className="relative w-full max-w-[420px] h-full flex flex-col shadow-2xl"
+                                    style={{ background:'var(--card-bg)', borderLeft:'1px solid var(--card-border)', overflowY:'auto' }}
+                                    onClick={e => e.stopPropagation()}>
+
+                                    {/* Sticky close */}
+                                    <div className="sticky top-0 z-20 flex items-center justify-end px-5 pt-6 pb-0 pointer-events-none">
+                                        <button onClick={() => setCustDetail(null)}
+                                            className="pointer-events-auto h-8 w-8 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] shadow-md flex items-center justify-center text-[var(--text-muted)] hover:text-rose-500 cursor-pointer transition-all hover:scale-110">
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+
+                                    {/* Hero */}
+                                    <div className="relative overflow-hidden -mt-8" style={{ background:`linear-gradient(135deg, ${custDetail.color}22 0%, ${custDetail.color}06 100%)`, borderBottom:'1px solid var(--card-border)' }}>
+                                        <div className="absolute top-0 right-0 h-32 w-32 rounded-full blur-3xl opacity-20" style={{ background:custDetail.color }} />
+                                        <div className="px-6 pt-10 pb-6 relative z-10">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className="h-14 w-14 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg ring-4 ring-white/20"
+                                                    style={{ backgroundColor:custDetail.color }}>
+                                                    {custDetail.initials}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">{custDetail.name}</span>
+                                                        {custDetail.badge && (
+                                                            <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black border ${
+                                                                custDetail.badge === 'New' ? 'bg-blue-500/10 text-blue-600 border-blue-500/25' : 'bg-violet-500/10 text-violet-600 border-violet-500/25'
+                                                            }`}>{custDetail.badge}</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)] mt-1">{custDetail.email}</div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)]">{custDetail.phone}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2.5">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-xl text-[9px] font-black border ${
+                                                    custDetail.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25' : 'bg-neutral-500/10 text-neutral-500 border-neutral-500/25'
+                                                }`}>{custDetail.status}</span>
+                                                <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-muted)]">
+                                                    <MapPin className="h-3.5 w-3.5" />{custDetail.city}, {custDetail.state}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Body */}
+                                    <div className="p-5 space-y-5 flex-1">
+                                        {/* Quick stats */}
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[
+                                                { label:'Orders',      value: custDetail.orders,                                       color:'text-blue-500',    bg:'bg-blue-500/5' },
+                                                { label:'Total Spent', value:`₹${custDetail.totalSpent.toLocaleString('en-IN')}`, color:'text-[var(--gold-accent)]', bg:'bg-[var(--gold-accent)]/5' },
+                                                { label:'Joined',      value: custDetail.joinedDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}), color:'text-[var(--text-primary)]', bg:'bg-[var(--bg-right-panel)]' },
+                                            ].map((s,i) => (
+                                                <div key={i} className={`rounded-2xl border border-[var(--card-border)] p-3 text-center ${s.bg}`}>
+                                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{s.label}</div>
+                                                    <div className={`font-['Outfit'] text-base font-black mt-1 ${s.color}`}>{s.value}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Contact details */}
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
+                                            <div className="px-4 py-3 border-b border-[var(--card-border)] bg-[var(--bg-right-panel)]/40">
+                                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Contact Information</div>
+                                            </div>
+                                            <div className="divide-y divide-[var(--card-border)]/50">
+                                                {[
+                                                    { icon:<Bell className="h-4 w-4" />, label:'Email', value:custDetail.email },
+                                                    { icon:<Users className="h-4 w-4" />, label:'Phone', value:custDetail.phone },
+                                                    { icon:<MapPin className="h-4 w-4" />, label:'Location', value:`${custDetail.city}, ${custDetail.state}` },
+                                                ].map((row,i) => (
+                                                    <div key={i} className="flex items-center gap-3.5 px-4 py-3.5">
+                                                        <div className="text-[var(--text-muted)] shrink-0">{row.icon}</div>
+                                                        <div className="min-w-0">
+                                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">{row.label}</div>
+                                                            <div className="text-xs font-bold text-[var(--text-primary)] mt-1 truncate">{row.value}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Spending bar */}
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl p-4 shadow-sm">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Spending vs Top Customer</div>
+                                                <div className="text-[10px] font-black text-[var(--gold-accent)]">{Math.round((custDetail.totalSpent / Math.max(...customers.map(c=>c.totalSpent))) * 100)}%</div>
+                                            </div>
+                                            <div className="h-2 rounded-full bg-[var(--card-border)]">
+                                                <div className="h-2 rounded-full transition-all duration-500"
+                                                    style={{ width:`${Math.round((custDetail.totalSpent / Math.max(...customers.map(c=>c.totalSpent))) * 100)}%`, background:'var(--gold-accent)' }} />
+                                            </div>
+                                            <div className="flex items-center justify-between mt-2">
+                                                <span className="text-[9px] font-semibold text-[var(--text-muted)]">₹0</span>
+                                                <span className="text-[9px] font-semibold text-[var(--text-muted)]">₹{Math.max(...customers.map(c=>c.totalSpent)).toLocaleString('en-IN')}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Action buttons */}
+                                        <div className="flex gap-3 pt-2">
+                                            <button
+                                                onClick={() => {
+                                                    const next = custDetail.status === 'Active' ? 'Inactive' : 'Active'
+                                                    setCustomers(prev => prev.map(c => c.id === custDetail.id ? {...c, status:next} : c))
+                                                    setCustDetail(prev => ({...prev, status:next}))
+                                                }}
+                                                className={`flex-1 py-3 rounded-2xl text-xs font-black border cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${
+                                                    custDetail.status === 'Active'
+                                                        ? 'bg-rose-500/10 border-rose-500/25 text-rose-600 hover:bg-rose-500/20'
+                                                        : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 hover:bg-emerald-500/20'
+                                                }`}>
+                                                {custDetail.status === 'Active' ? 'Mark as Inactive' : 'Mark as Active'}
+                                            </button>
+                                            <button onClick={() => setCustDetail(null)}
+                                                className="flex-1 py-3 rounded-2xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] hover:shadow-lg text-white text-xs font-black cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md">
+                                                Close Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )
+            })()}
+
+            {/* ══════════════ ANALYTICS PAGE ══════════════ */}
+            {activeNav === 'Analytics' && (() => {
+                const ANALYTICS_DATA = {
+                    'May 20 - May 26, 2024': {
+                        totalRevenue: 54320,
+                        totalOrders: 156,
+                        totalCustomers: 128,
+                        productViews: 2350,
+                        conversionRate: "3.24%",
+                        avgOrderValue: 862,
+                        salesGrowth: '12.5%',
+                        ordersGrowth: '8.3%',
+                        customersGrowth: '10.2%',
+                        viewsGrowth: '15.7%',
+                        convGrowth: '2.1%',
+                        aovGrowth: '-3.2%',
+                        categories: [
+                            { label: 'Home Appliances', value: 18620, color: '#10b981', pct: '34.3' },
+                            { label: 'Furniture',       value: 12450, color: '#3b82f6', pct: '22.9' },
+                            { label: 'Footwear',        value: 8830,  color: '#f59e0b', pct: '16.3' },
+                            { label: 'Bags',            value: 7560,  color: '#a855f7', pct: '13.9' },
+                            { label: 'Toys & Games',    value: 6860,  color: '#f43f5e', pct: '12.6' },
+                        ]
+                    },
+                    'May 13 - May 19, 2024': {
+                        totalRevenue: 42180,
+                        totalOrders: 120,
+                        totalCustomers: 98,
+                        productViews: 1890,
+                        conversionRate: "2.85%",
+                        avgOrderValue: 835,
+                        salesGrowth: '9.4%',
+                        ordersGrowth: '6.1%',
+                        customersGrowth: '8.5%',
+                        viewsGrowth: '11.2%',
+                        convGrowth: '1.8%',
+                        aovGrowth: '-1.5%',
+                        categories: [
+                            { label: 'Home Appliances', value: 14200, color: '#10b981', pct: '33.7' },
+                            { label: 'Furniture',       value: 9800,  color: '#3b82f6', pct: '23.2' },
+                            { label: 'Footwear',        value: 6900,  color: '#f59e0b', pct: '16.4' },
+                            { label: 'Bags',            value: 6180,  color: '#a855f7', pct: '14.7' },
+                            { label: 'Toys & Games',    value: 5100,  color: '#f43f5e', pct: '12.0' },
+                        ]
+                    },
+                    'May 06 - May 12, 2024': {
+                        totalRevenue: 48920,
+                        totalOrders: 135,
+                        totalCustomers: 110,
+                        productViews: 2120,
+                        conversionRate: "3.12%",
+                        avgOrderValue: 855,
+                        salesGrowth: '11.0%',
+                        ordersGrowth: '7.4%',
+                        customersGrowth: '9.8%',
+                        viewsGrowth: '13.2%',
+                        convGrowth: '2.0%',
+                        aovGrowth: '-2.2%',
+                        categories: [
+                            { label: 'Home Appliances', value: 16500, color: '#10b981', pct: '33.7' },
+                            { label: 'Furniture',       value: 11200, color: '#3b82f6', pct: '22.9' },
+                            { label: 'Footwear',        value: 7900,  color: '#f59e0b', pct: '16.1' },
+                            { label: 'Bags',            value: 6900,  color: '#a855f7', pct: '14.1' },
+                            { label: 'Toys & Games',    value: 6420,  color: '#f43f5e', pct: '13.2' },
+                        ]
+                    },
+                    'April 2024': {
+                        totalRevenue: 185430,
+                        totalOrders: 520,
+                        totalCustomers: 410,
+                        productViews: 8450,
+                        conversionRate: "3.10%",
+                        avgOrderValue: 853,
+                        salesGrowth: '22.4%',
+                        ordersGrowth: '15.6%',
+                        customersGrowth: '18.4%',
+                        viewsGrowth: '25.0%',
+                        convGrowth: '4.2%',
+                        aovGrowth: '-2.8%',
+                        categories: [
+                            { label: 'Home Appliances', value: 63400, color: '#10b981', pct: '34.2' },
+                            { label: 'Furniture',       value: 42100, color: '#3b82f6', pct: '22.7' },
+                            { label: 'Footwear',        value: 30200, color: '#f59e0b', pct: '16.3' },
+                            { label: 'Bags',            value: 25830, color: '#a855f7', pct: '13.9' },
+                            { label: 'Toys & Games',    value: 23900, color: '#f43f5e', pct: '12.9' },
+                        ]
+                    }
+                }
+
+                const activeData = ANALYTICS_DATA[selectedDateRange] || {
+                    totalRevenue: stats.totalRevenue || 54320,
+                    totalOrders: stats.totalOrders || 156,
+                    totalCustomers: stats.totalCustomers || 128,
+                    productViews: stats.productViews || 2350,
+                    conversionRate: "3.24%",
+                    avgOrderValue: Math.round((stats.totalRevenue || 54320) / (stats.totalOrders || 156)) || 862,
+                    salesGrowth: stats.revenueGrowth ? `${stats.revenueGrowth}%` : '12.5%',
+                    ordersGrowth: stats.ordersGrowth ? `${stats.ordersGrowth}%` : '8.3%',
+                    customersGrowth: stats.customersGrowth ? `${stats.customersGrowth}%` : '10.2%',
+                    viewsGrowth: stats.viewsGrowth ? `${stats.viewsGrowth}%` : '15.7%',
+                    convGrowth: '2.1%',
+                    aovGrowth: '-3.2%',
+                    categories: [
+                        { label: 'Home Appliances', value: Math.round((stats.totalRevenue || 54320) * 0.343), color: '#10b981', pct: '34.3' },
+                        { label: 'Furniture',       value: Math.round((stats.totalRevenue || 54320) * 0.229), color: '#3b82f6', pct: '22.9' },
+                        { label: 'Footwear',        value: Math.round((stats.totalRevenue || 54320) * 0.163), color: '#f59e0b', pct: '16.3' },
+                        { label: 'Bags',            value: Math.round((stats.totalRevenue || 54320) * 0.139), color: '#a855f7', pct: '13.9' },
+                        { label: 'Toys & Games',    value: Math.round((stats.totalRevenue || 54320) * 0.126), color: '#f43f5e', pct: '12.6' },
+                    ]
+                }
+
+                const totalRevenue = activeData.totalRevenue
+                const totalOrders = activeData.totalOrders
+                const totalCustomers = activeData.totalCustomers
+                const productViews = activeData.productViews
+                const conversionRate = activeData.conversionRate
+                const avgOrderValue = activeData.avgOrderValue
+
+                const ANALYTICS_CARDS = [
+                    { label:'Total Sales',     value: formatCurrency(totalRevenue), sub: `${activeData.salesGrowth} vs last week`, icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.salesGrowth.startsWith('-') },
+                    { label:'Total Orders',    value: totalOrders.toLocaleString(),  sub: `${activeData.ordersGrowth} vs last week`,  icon:<ShoppingBag className="h-5 w-5" />, color:'text-blue-500', bg:'bg-blue-500/10 border-blue-500/20', isUp: !activeData.ordersGrowth.startsWith('-') },
+                    { label:'Total Customers', value: totalCustomers.toLocaleString(), sub: `${activeData.customersGrowth} vs last week`, icon:<Users className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.customersGrowth.startsWith('-') },
+                    { label:'Views',           value: productViews.toLocaleString(),  sub: `${activeData.viewsGrowth} vs last week`, icon:<Eye className="h-5 w-5" />, color:'text-violet-500', bg:'bg-violet-500/10 border-violet-500/20', isUp: !activeData.viewsGrowth.startsWith('-') },
+                    { label:'Conversion Rate', value: conversionRate,                 sub: `${activeData.convGrowth} vs last week`,  icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.convGrowth.startsWith('-') },
+                    { label:'Average Order Value', value: formatCurrency(avgOrderValue), sub: `${activeData.aovGrowth} vs last week`, icon:<Star className="h-5 w-5" />, color: activeData.aovGrowth.startsWith('-') ? 'text-rose-500' : 'text-emerald-500', bg: activeData.aovGrowth.startsWith('-') ? 'bg-rose-500/10 border-rose-500/20' : 'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.aovGrowth.startsWith('-') }
+                ]
+
+                const catSegments = activeData.categories
+                const CAT_DONUT_R = 70, CAT_DONUT_CX = 90, CAT_DONUT_CY = 90, CAT_STROKE_W = 22
+                let catCumAngle = -90
+                const catDonutArcs = catSegments.map(seg => {
+                    const angle = (seg.value / totalRevenue) * 360
+                    const startAngle = catCumAngle
+                    const endAngle = catCumAngle + angle
+                    catCumAngle = endAngle
+                    const toRad = (a) => (a * Math.PI) / 180
+                    const x1 = CAT_DONUT_CX + CAT_DONUT_R * Math.cos(toRad(startAngle))
+                    const y1 = CAT_DONUT_CY + CAT_DONUT_R * Math.sin(toRad(startAngle))
+                    const x2 = CAT_DONUT_CX + CAT_DONUT_R * Math.cos(toRad(endAngle))
+                    const y2 = CAT_DONUT_CY + CAT_DONUT_R * Math.sin(toRad(endAngle))
+                    const largeArc = angle > 180 ? 1 : 0
+                    return { ...seg, d: `M${x1},${y1} A${CAT_DONUT_R},${CAT_DONUT_R} 0 ${largeArc} 1 ${x2},${y2}` }
+                })
+
+                return (
+                    <div className="space-y-6">
+
+                        {/* Page Header */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)] tracking-tight">Analytics Overview</h1>
+                                <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">Track your store performance and growth.</p>
+                            </div>
+                            <div className="relative">
+                                <button
+                                    onClick={e => { e.stopPropagation(); setDateRangeDropOpen(o => !o) }}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] transition-all cursor-pointer select-none"
+                                >
+                                    <Clock className="h-3.5 w-3.5 text-[var(--gold-accent)]" />
+                                    <span>{selectedDateRange}</span>
+                                    <ChevronDown className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform duration-200 ${dateRangeDropOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                {dateRangeDropOpen && (
+                                    <div className="absolute right-0 top-11 z-30 w-52 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-1.5 overflow-hidden">
+                                        {['May 20 - May 26, 2024', 'May 13 - May 19, 2024', 'May 06 - May 12, 2024', 'April 2024', 'All Time'].map(range => (
+                                            <button
+                                                key={range}
+                                                onClick={() => { setSelectedDateRange(range); setDateRangeDropOpen(false) }}
+                                                className={`w-full text-left px-4 py-2 text-xs font-semibold ${
+                                                    selectedDateRange === range
+                                                        ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] font-bold'
+                                                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                } cursor-pointer border-none bg-transparent`}
+                                            >
+                                                {range}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* 6 Stats Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                            {ANALYTICS_CARDS.map((card, i) => (
+                                <div key={i} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 hover:shadow-md transition-all duration-200">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-xl border shrink-0 ${card.color} ${card.bg}`}>{card.icon}</div>
+                                        <div className="min-w-0">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider leading-tight">{card.label}</div>
+                                            <div className={`font-['Outfit'] text-lg font-black text-[var(--text-primary)] leading-tight mt-1`}>{card.value}</div>
+                                            <div className={`text-[9px] font-semibold mt-1.5 flex items-center gap-1 ${card.isUp ? 'text-emerald-500' : 'text-rose-500'}`}>
+                                                {card.isUp ? '↑' : '↓'} {card.sub}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Charts Row: Sales Overview & Orders By Status */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                            {/* Sales Overview Line Chart */}
+                            <div className="lg:col-span-2 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-4">
+                                    <div>
+                                        <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Sales Overview</h3>
+                                    </div>
+                                    <div className="relative">
+                                        <button
+                                            onClick={e => { e.stopPropagation(); setAnalyticsWeekDropOpen(o => !o) }}
+                                            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[var(--card-border)] text-[10px] font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] transition-all cursor-pointer select-none"
+                                        >
+                                            <span>{weekFilter}</span>
+                                            <ChevronDown className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform duration-200 ${analyticsWeekDropOpen ? 'rotate-180' : ''}`} />
+                                        </button>
+                                        {analyticsWeekDropOpen && (
+                                            <div className="absolute right-0 top-9 z-30 w-32 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-xl py-1 overflow-hidden">
+                                                {['This Week', 'This Month', 'This Year'].map(opt => (
+                                                    <button
+                                                        key={opt}
+                                                        onClick={() => { setWeekFilter(opt); setAnalyticsWeekDropOpen(false) }}
+                                                        className={`w-full text-left px-4 py-2 text-xs font-semibold ${
+                                                            weekFilter === opt
+                                                                ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)] font-bold'
+                                                                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                        } cursor-pointer border-none bg-transparent`}
+                                                    >
+                                                        {opt}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Line Chart SVG */}
+                                <div className="relative mt-2">
+                                    <svg className="w-full overflow-visible" viewBox={`0 0 ${chartW} ${chartH}`} fill="none">
+                                        {/* Y Axis Grid lines */}
+                                        {[0, 0.25, 0.5, 0.75, 1].map((r, i) => (
+                                            <line key={i} x1="0" y1={chartH * r} x2={chartW} y2={chartH * r} stroke="var(--card-border)" strokeWidth="1" strokeDasharray="4 4" opacity="0.4" />
+                                        ))}
+
+                                        {/* Gradient Area Fill */}
+                                        <defs>
+                                            <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="0%" stopColor="var(--gold-accent)" stopOpacity="0.25" />
+                                                <stop offset="100%" stopColor="var(--gold-accent)" stopOpacity="0.00" />
+                                            </linearGradient>
+                                        </defs>
+                                        <path d={areaD} fill="url(#chartGrad)" />
+
+                                        {/* Smooth Path line */}
+                                        <path d={pathD} stroke="var(--gold-accent)" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+
+                                        {/* Data points */}
+                                        {pts.map((p, i) => (
+                                            <g key={i}>
+                                                <circle cx={p.x} cy={p.y} r="5" fill="var(--gold-accent)" stroke="var(--card-bg)" strokeWidth="2" className="drop-shadow-md cursor-pointer hover:scale-125 transition-transform" />
+                                            </g>
+                                        ))}
+                                    </svg>
+
+                                    {/* Y-Axis Label overlays */}
+                                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between pointer-events-none text-[9px] font-bold text-[var(--text-muted)] -translate-x-1">
+                                        {yLabels.map((l, i) => <span key={i}>{l}</span>)}
+                                    </div>
+                                </div>
+
+                                {/* X-Axis Days Labels */}
+                                <div className="flex items-center justify-between px-2 mt-4 text-[9px] font-bold text-[var(--text-muted)] border-t border-[var(--card-border)]/50 pt-3">
+                                    {chartDays.map((d, i) => <span key={i}>{d}</span>)}
+                                </div>
+
+                                {/* Legend */}
+                                <div className="flex items-center justify-center gap-2 mt-4 text-[10px] font-bold text-[var(--text-muted)]">
+                                    <div className="h-1 w-4 bg-[var(--gold-accent)] rounded-full" />
+                                    <span>Sales (₹)</span>
+                                </div>
+                            </div>
+
+                            {/* Orders By Status Donut Chart */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm">
+                                <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight mb-6">Orders By Status</h3>
+                                <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-6">
+                                    {/* SVG Donut */}
+                                    <div className="relative shrink-0">
+                                        <svg width={160} height={160} viewBox="0 0 180 180">
+                                            {donutArcs.map((seg, i) => (
+                                                <path key={i} d={seg.d} fill="none" stroke={seg.color} strokeWidth={STROKE_W} strokeLinecap="butt" />
+                                            ))}
+                                            {/* Center label */}
+                                            <text x={DONUT_CX} y={DONUT_CY - 8} textAnchor="middle" className="font-black" fill="var(--text-primary)" fontSize="24" fontFamily="Outfit, sans-serif" fontWeight="900">{total}</text>
+                                            <text x={DONUT_CX} y={DONUT_CY + 12} textAnchor="middle" fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif" fontWeight="700">Total Orders</text>
+                                        </svg>
+                                    </div>
+                                    {/* Legend */}
+                                    <div className="space-y-2.5 w-full">
+                                        {donutSegments.map((seg, i) => (
+                                            <div key={i} className="flex items-center justify-between border-b border-[var(--card-border)]/40 pb-1.5 text-xs font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                                                    <span className="text-[var(--text-secondary)]">{seg.label}</span>
+                                                </div>
+                                                <span className="font-bold text-[var(--text-primary)]">{seg.value} <span className="text-[10px] text-[var(--text-muted)] font-normal">({seg.pct}%)</span></span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Third Row: Top Selling Products, Category Split & Traffic Sources */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                            {/* Top Selling Products */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Top Selling Products</h3>
+                                    <button onClick={() => setActiveNav('Products')} className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All</button>
+                                </div>
+                                <div className="space-y-4">
+                                    {TOP_PRODUCTS.map((prod, i) => (
+                                        <div key={i} className="flex items-center gap-3.5">
+                                            <div className="h-7 w-7 rounded-lg bg-[var(--bg-right-panel)] flex items-center justify-center text-[10px] font-black text-[var(--text-secondary)] border border-[var(--card-border)] shrink-0">{prod.rank}</div>
+                                            <div className="h-10 w-10 rounded-xl border border-[var(--card-border)] bg-[var(--bg-right-panel)] overflow-hidden shrink-0 flex items-center justify-center p-1">
+                                                <img src={prod.image} alt={prod.name} className="h-full w-full object-contain" />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="text-xs font-bold text-[var(--text-primary)] truncate">{prod.name}</div>
+                                                <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{prod.desc}</div>
+                                                <div className="h-1.5 w-full bg-[var(--card-border)] rounded-full mt-1.5 overflow-hidden">
+                                                    <div className="h-full bg-[var(--gold-accent)] rounded-full" style={{ width: `${(prod.sales / 120) * 100}%` }} />
+                                                </div>
+                                            </div>
+                                            <div className="text-right">
+                                                <div className="text-[10px] font-black text-[var(--text-muted)] uppercase">Sales</div>
+                                                <div className="text-xs font-black text-[var(--text-primary)] mt-0.5">{prod.sales}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
+                            {/* Sales by Category Donut Chart */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Sales By Category</h3>
+                                    <button onClick={() => setActiveNav('Products')} className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All</button>
+                                </div>
+                                <div className="flex flex-col sm:flex-row lg:flex-col items-center justify-center gap-6">
+                                    {/* SVG Donut */}
+                                    <div className="relative shrink-0">
+                                        <svg width={160} height={160} viewBox="0 0 180 180">
+                                            {catDonutArcs.map((seg, i) => (
+                                                <path key={i} d={seg.d} fill="none" stroke={seg.color} strokeWidth={CAT_STROKE_W} strokeLinecap="butt" />
+                                            ))}
+                                            {/* Center label */}
+                                            <text x={CAT_DONUT_CX} y={CAT_DONUT_CY - 8} textAnchor="middle" className="font-black" fill="var(--text-primary)" fontSize="20" fontFamily="Outfit, sans-serif" fontWeight="900">₹54,320</text>
+                                            <text x={CAT_DONUT_CX} y={CAT_DONUT_CY + 12} textAnchor="middle" fill="var(--text-muted)" fontSize="9" fontFamily="Inter, sans-serif" fontWeight="700">Total Sales</text>
+                                        </svg>
+                                    </div>
+                                    {/* Legend */}
+                                    <div className="space-y-2.5 w-full">
+                                        {catSegments.map((seg, i) => (
+                                            <div key={i} className="flex items-center justify-between border-b border-[var(--card-border)]/40 pb-1.5 text-xs font-semibold">
+                                                <div className="flex items-center gap-2">
+                                                    <div className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                                                    <span className="text-[var(--text-secondary)]">{seg.label}</span>
+                                                </div>
+                                                <span className="font-bold text-[var(--text-primary)]">₹{seg.value.toLocaleString('en-IN')} <span className="text-[10px] text-[var(--text-muted)] font-normal">({seg.pct}%)</span></span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Traffic Source Progress Bar Chart */}
+                            <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl p-6 shadow-sm flex flex-col justify-between">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Traffic Source</h3>
+                                    <button className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All</button>
+                                </div>
+                                <div className="space-y-4">
+                                    {[
+                                        { source: 'Direct', visitors: 1250, pct: '53.2' },
+                                        { source: 'Search Engines', visitors: 680, pct: '28.9' },
+                                        { source: 'Social Media', visitors: 320, pct: '13.6' },
+                                        { source: 'Other', visitors: 100, pct: '4.3' }
+                                    ].map((ts, i) => (
+                                        <div key={i} className="space-y-1.5">
+                                            <div className="flex items-center justify-between text-xs font-semibold">
+                                                <span className="text-[var(--text-secondary)]">{ts.source}</span>
+                                                <span className="font-bold text-[var(--text-primary)]">{ts.visitors.toLocaleString()} <span className="text-[10px] text-[var(--text-muted)] font-normal">({ts.pct}%)</span></span>
+                                            </div>
+                                            <div className="h-2 w-full bg-[var(--card-border)] rounded-full overflow-hidden">
+                                                <div className="h-full bg-[var(--gold-accent)] rounded-full" style={{ width: `${ts.pct}%` }} />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Bottom Banner Insights Card */}
+                        <div className="bg-orange-500/5 border border-orange-500/15 rounded-3xl p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="h-12 w-12 rounded-2xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+                                    <Sparkles className="h-6 w-6 text-orange-500 animate-pulse" />
+                                </div>
+                                <div>
+                                    <h4 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)]">Insight for you</h4>
+                                    <p className="text-xs font-semibold text-[var(--text-muted)] mt-0.5">Great job! Your sales increased by 12.5% this week. Focus on top performing categories to maintain this growth.</p>
+                                </div>
+                            </div>
+                            <button
+                                onClick={() => setIsDetailedReportOpen(true)}
+                                className="px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-all duration-200 shrink-0 cursor-pointer"
+                            >
+                                View Detailed Report
+                            </button>
+                        </div>
+
+                        {/* ── DETAILED REPORT MODAL ────────────────────────────────────────── */}
+                        {isDetailedReportOpen && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setIsDetailedReportOpen(false)}>
+                                <div className="w-full max-w-2xl bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]" onClick={e => e.stopPropagation()}>
+                                    
+                                    {/* Header */}
+                                    <div className="px-6 py-5 border-b border-[var(--card-border)] flex items-center justify-between bg-[var(--bg-right-panel)]/40">
+                                        <div className="flex items-center gap-3">
+                                            <div className="h-10 w-10 rounded-2xl bg-[var(--gold-accent)]/10 border border-[var(--gold-accent)]/20 flex items-center justify-center shrink-0">
+                                                <BarChart2 className="h-5 w-5 text-[var(--gold-accent)]" />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">Detailed Analytics Report</h3>
+                                                <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">Performance breakdown for {selectedDateRange}</p>
+                                            </div>
+                                        </div>
+                                        <button onClick={() => setIsDetailedReportOpen(false)}
+                                            className="h-8 w-8 rounded-full border border-[var(--card-border)] hover:bg-[var(--bg-right-panel)] flex items-center justify-center text-[var(--text-secondary)] transition-colors cursor-pointer">
+                                            <X className="h-4 w-4" />
+                                        </button>
+                                    </div>
+
+                                    {/* Body / Table */}
+                                    <div className="p-6 overflow-y-auto space-y-6">
+                                        {/* Performance stats row */}
+                                        <div className="grid grid-cols-4 gap-4">
+                                            {[
+                                                { label: 'Sales Volume', value: formatCurrency(totalRevenue), color: 'text-emerald-500' },
+                                                { label: 'Order Volume', value: totalOrders, color: 'text-blue-500' },
+                                                { label: 'Conversion Rate', value: conversionRate, color: 'text-violet-500' },
+                                                { label: 'AOV', value: formatCurrency(avgOrderValue), color: 'text-orange-500' }
+                                            ].map((stat, i) => (
+                                                <div key={i} className="p-3 border border-[var(--card-border)] bg-[var(--bg-right-panel)]/30 rounded-2xl">
+                                                    <span className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{stat.label}</span>
+                                                    <div className={`font-['Outfit'] text-sm font-black mt-1 ${stat.color}`}>{stat.value}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Detailed Table */}
+                                        <div className="border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                                            <div className="grid grid-cols-5 px-4 py-3 bg-[var(--bg-right-panel)]/40 border-b border-[var(--card-border)] text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">
+                                                <div>Date</div>
+                                                <div className="text-right">Sales</div>
+                                                <div className="text-right">Orders</div>
+                                                <div className="text-right">Views</div>
+                                                <div className="text-right">Conv. Rate</div>
+                                            </div>
+                                            <div className="divide-y divide-[var(--card-border)]/40 text-xs font-semibold text-[var(--text-secondary)]">
+                                                {[
+                                                    { date: '26 May, 2024', sales: 11000, orders: 32, views: 480, conv: '6.67%' },
+                                                    { date: '25 May, 2024', sales: 10200, orders: 28, views: 450, conv: '6.22%' },
+                                                    { date: '24 May, 2024', sales: 18000, orders: 42, views: 560, conv: '7.50%' },
+                                                    { date: '23 May, 2024', sales: 12000, orders: 30, views: 420, conv: '7.14%' },
+                                                    { date: '22 May, 2024', sales: 9000,  orders: 22, views: 390, conv: '5.64%' },
+                                                    { date: '21 May, 2024', sales: 10500, orders: 26, views: 410, conv: '6.34%' },
+                                                    { date: '20 May, 2024', sales: 9100,  orders: 21, views: 380, conv: '5.53%' }
+                                                ].map((row, idx) => (
+                                                    <div key={idx} className="grid grid-cols-5 px-4 py-3.5 hover:bg-[var(--bg-right-panel)]/30 transition-colors">
+                                                        <div className="font-bold text-[var(--text-primary)]">{row.date}</div>
+                                                        <div className="text-right font-bold text-[var(--text-primary)]">₹{row.sales.toLocaleString('en-IN')}</div>
+                                                        <div className="text-right">{row.orders}</div>
+                                                        <div className="text-right">{row.views}</div>
+                                                        <div className="text-right text-emerald-500 font-bold">{row.conv}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Footer */}
+                                    <div className="px-6 py-4 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]/40 flex items-center justify-between">
+                                        <span className="text-[10px] font-semibold text-[var(--text-muted)]">Data exported from VenderFlow Live Metrics API</span>
+                                        <div className="flex gap-2">
+                                            <button onClick={() => setIsDetailedReportOpen(false)}
+                                                className="px-4 py-2 border border-[var(--card-border)] hover:bg-[var(--bg-right-panel)] rounded-xl text-xs font-bold text-[var(--text-secondary)] cursor-pointer">
+                                                Close
+                                            </button>
+                                            <button onClick={() => {
+                                                const csv = "Date,Sales,Orders,Views,ConversionRate\n26 May 2024,11000,32,480,6.67%\n25 May 2024,10200,28,450,6.22%\n24 May 2024,18000,42,560,7.50%";
+                                                const blob = new Blob([csv], { type: 'text/csv' });
+                                                const url = URL.createObjectURL(blob);
+                                                const a = document.createElement('a'); a.href = url; a.download = 'analytics_report.csv'; a.click();
+                                            }}
+                                                className="px-4 py-2 bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] rounded-xl text-xs font-bold text-white shadow-md cursor-pointer">
+                                                Export CSV
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )
+            })()}
+
+            {/* ══════════════ DASHBOARD PAGE ═════════════─ */}
             {activeNav === 'Dashboard' && <>
 
                 {/* ── WELCOME BANNER ───────────────────────────────────────────── */}
@@ -1967,6 +2936,57 @@ export default function SellerDashboard() {
                             </button>
                             <button
                                 onClick={() => handleProdDelete(deleteConfirm.id)}
+                                className="flex-1 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                            >
+                                <X className="h-3.5 w-3.5" /> Yes, Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── CUSTOMER DELETE CONFIRMATION MODAL ──────────────────────────────── */}
+            {custDeleteConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setCustDeleteConfirm(null)}>
+                    <div className="w-full max-w-sm bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+                        {/* Red danger header */}
+                        <div className="bg-rose-500/8 border-b border-rose-500/15 px-6 py-5 flex items-center gap-4">
+                            <div className="h-11 w-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                                <AlertTriangle className="h-5 w-5 text-rose-500" />
+                            </div>
+                            <div>
+                                <h3 className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">Delete Customer?</h3>
+                                <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">This action cannot be undone</p>
+                            </div>
+                        </div>
+
+                        {/* Customer preview */}
+                        <div className="px-6 py-5">
+                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--bg-right-panel)] border border-[var(--card-border)]">
+                                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[var(--card-border)] bg-[var(--card-bg)] shrink-0 flex items-center justify-center text-white font-black" style={{ backgroundColor: custDeleteConfirm.color }}>
+                                    {custDeleteConfirm.initials}
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="text-xs font-black text-[var(--text-primary)] truncate">{custDeleteConfirm.name}</div>
+                                    <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{custDeleteConfirm.email}</div>
+                                    <div className="text-[10px] font-semibold text-[var(--text-muted)]">{custDeleteConfirm.phone}</div>
+                                </div>
+                            </div>
+                            <p className="text-[11px] font-semibold text-[var(--text-muted)] mt-4 text-center leading-relaxed">
+                                You are about to permanently delete customer <span className="font-black text-[var(--text-primary)]">"{custDeleteConfirm.name}"</span> and remove them from your records.
+                            </p>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="px-6 pb-6 flex gap-3">
+                            <button
+                                onClick={() => setCustDeleteConfirm(null)}
+                                className="flex-1 py-3 rounded-2xl border border-[var(--card-border)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] cursor-pointer transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleCustDelete(custDeleteConfirm.id)}
                                 className="flex-1 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
                             >
                                 <X className="h-3.5 w-3.5" /> Yes, Delete
