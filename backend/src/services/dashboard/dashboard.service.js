@@ -15,7 +15,7 @@ const getDashboardOverviewService = async (query = {}) => {
         if (query.endDate) filter.OrderDate.$lte = new Date(query.endDate);
     }
 
-    const [orderMetrics, totalUsers, totalSellers] = await Promise.all([
+    const [orderMetrics, statusCounts, totalUsers, totalSellers] = await Promise.all([
         Order.aggregate([
             { $match: filter },
             {
@@ -32,11 +32,24 @@ const getDashboardOverviewService = async (query = {}) => {
                 }
             }
         ]),
+        Order.aggregate([
+            { $match: filter },
+            { $group: { _id: '$OrderStatus', count: { $sum: 1 } } }
+        ]),
         User.countDocuments({ role: 'user', isDeleted: { $ne: true } }),
         User.countDocuments({ role: 'seller', isDeleted: { $ne: true } })
     ]);
 
     const metrics = orderMetrics[0] || { totalRevenue: 0, totalOrders: 0, pendingShipments: 0, deliveredOrders: 0 };
+
+    const statusMap = {};
+    if (statusCounts && statusCounts.length > 0) {
+        statusCounts.forEach(item => {
+            if (item._id) {
+                statusMap[item._id.toLowerCase()] = item.count;
+            }
+        });
+    }
 
     // Get MoM sales count comparison (this month vs last month)
     const startOfThisMonth = new Date();
@@ -64,7 +77,13 @@ const getDashboardOverviewService = async (query = {}) => {
         totalCustomers: totalUsers,
         totalSellers: totalSellers,
         pendingShipments: metrics.pendingShipments,
-        deliveredOrders: metrics.deliveredOrders,
+        deliveredOrders: statusMap['delivered'] || 0,
+        processingOrders: statusMap['processing'] || 0,
+        pendingOrders: statusMap['pending'] || 0,
+        cancelledOrders: statusMap['cancelled'] || 0,
+        shippedOrders: statusMap['shipped'] || 0,
+        returnedOrders: statusMap['returned'] || 0,
+        confirmedOrders: statusMap['confirmed'] || 0,
         momGrowthRate,
         currentMonthOrders: thisMonthOrders,
         previousMonthOrders: lastMonthOrders

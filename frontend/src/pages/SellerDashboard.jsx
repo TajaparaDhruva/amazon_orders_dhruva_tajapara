@@ -365,15 +365,22 @@ export default function SellerDashboard() {
     // ─── Donut Chart ─────────────────────────────────────────────────────────────
     const total = stats.totalOrders || 156
     const delivered = stats.deliveredOrders || 98
-    const processing = stats.processingOrders || 34
+    const shipped = stats.shippedOrders || 0
     const pending = stats.pendingOrders || 12
     const cancelled = stats.cancelledOrders || 12
+    const returned = stats.returnedOrders || 0
+    const processing = stats.processingOrders || 34
+    const confirmed = stats.confirmedOrders || 0
+
     const donutSegments = [
         { value: delivered,   color: '#10b981', label: 'Delivered',   pct: ((delivered / total) * 100).toFixed(1) },
-        { value: processing,  color: '#3b82f6', label: 'Processing',  pct: ((processing / total) * 100).toFixed(1) },
+        { value: shipped,     color: '#a855f7', label: 'Shipped',     pct: ((shipped / total) * 100).toFixed(1) },
         { value: pending,     color: '#f59e0b', label: 'Pending',     pct: ((pending / total) * 100).toFixed(1) },
         { value: cancelled,   color: '#f43f5e', label: 'Cancelled',   pct: ((cancelled / total) * 100).toFixed(1) },
-    ]
+        { value: returned,    color: '#ec4899', label: 'Returned',    pct: ((returned / total) * 100).toFixed(1) },
+        { value: processing,  color: '#3b82f6', label: 'Processing',  pct: ((processing / total) * 100).toFixed(1) },
+        { value: confirmed,   color: '#14b8a6', label: 'Confirmed',   pct: ((confirmed / total) * 100).toFixed(1) },
+    ].filter(seg => seg.value > 0)
     const DONUT_R = 70, DONUT_CX = 90, DONUT_CY = 90, STROKE_W = 22
     let cumAngle = -90
     const donutArcs = donutSegments.map(seg => {
@@ -1500,12 +1507,12 @@ export default function SellerDashboard() {
                         {custDetail && (
                             <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setCustDetail(null)}>
                                 <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
-                                <div className="relative w-full max-w-[400px] h-full flex flex-col shadow-2xl"
+                                <div className="relative w-full max-w-[420px] h-full flex flex-col shadow-2xl"
                                     style={{ background:'var(--card-bg)', borderLeft:'1px solid var(--card-border)', overflowY:'auto' }}
                                     onClick={e => e.stopPropagation()}>
 
                                     {/* Sticky close */}
-                                    <div className="sticky top-0 z-20 flex items-center justify-end px-4 pt-4 pb-0 pointer-events-none">
+                                    <div className="sticky top-0 z-20 flex items-center justify-end px-5 pt-6 pb-0 pointer-events-none">
                                         <button onClick={() => setCustDetail(null)}
                                             className="pointer-events-auto h-8 w-8 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] shadow-md flex items-center justify-center text-[var(--text-muted)] hover:text-rose-500 cursor-pointer transition-all hover:scale-110">
                                             <X className="h-3.5 w-3.5" />
@@ -1514,7 +1521,7 @@ export default function SellerDashboard() {
 
                                     {/* Hero */}
                                     <div className="relative overflow-hidden -mt-8" style={{ background:`linear-gradient(135deg, ${custDetail.color}22 0%, ${custDetail.color}06 100%)`, borderBottom:'1px solid var(--card-border)' }}>
-                                        <div className="absolute top-0 right-0 h-28 w-28 rounded-full blur-3xl opacity-20" style={{ background:custDetail.color }} />
+                                        <div className="absolute top-0 right-0 h-32 w-32 rounded-full blur-3xl opacity-20" style={{ background:custDetail.color }} />
                                         <div className="px-6 pt-10 pb-6 relative z-10">
                                             <div className="flex items-center gap-4 mb-4">
                                                 <div className="h-14 w-14 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg ring-4 ring-white/20"
@@ -1523,30 +1530,30 @@ export default function SellerDashboard() {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <div className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">{custDetail.name}</div>
+                                                        <span className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">{custDetail.name}</span>
                                                         {custDetail.badge && (
-                                                            <span className={`px-1.5 py-0.5 rounded-[5px] text-[8px] font-black border ${
-                                                                custDetail.badge === 'New' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 'bg-violet-500/10 text-violet-600 border-violet-500/20'
+                                                            <span className={`px-2 py-0.5 rounded-lg text-[9px] font-black border ${
+                                                                custDetail.badge === 'New' ? 'bg-blue-500/10 text-blue-600 border-blue-500/25' : 'bg-violet-500/10 text-violet-600 border-violet-500/25'
                                                             }`}>{custDetail.badge}</span>
                                                         )}
                                                     </div>
-                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)] mt-0.5">{custDetail.email}</div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)] mt-1">{custDetail.email}</div>
                                                     <div className="text-[11px] font-semibold text-[var(--text-muted)]">{custDetail.phone}</div>
                                                 </div>
                                             </div>
-                                            <div className="flex items-center gap-2">
-                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-[9px] font-black border ${
-                                                    custDetail.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-neutral-500/10 text-neutral-500 border-neutral-500/20'
+                                            <div className="flex items-center gap-2.5">
+                                                <span className={`inline-flex items-center px-3 py-1 rounded-xl text-[9px] font-black border ${
+                                                    custDetail.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/25' : 'bg-neutral-500/10 text-neutral-500 border-neutral-500/25'
                                                 }`}>{custDetail.status}</span>
-                                                <span className="flex items-center gap-1 text-[10px] font-semibold text-[var(--text-muted)]">
-                                                    <MapPin className="h-3 w-3" />{custDetail.city}, {custDetail.state}
+                                                <span className="flex items-center gap-1 text-[11px] font-semibold text-[var(--text-muted)]">
+                                                    <MapPin className="h-3.5 w-3.5" />{custDetail.city}, {custDetail.state}
                                                 </span>
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Body */}
-                                    <div className="p-5 space-y-4">
+                                    <div className="p-5 space-y-5 flex-1">
                                         {/* Quick stats */}
                                         <div className="grid grid-cols-3 gap-3">
                                             {[
@@ -1556,27 +1563,27 @@ export default function SellerDashboard() {
                                             ].map((s,i) => (
                                                 <div key={i} className={`rounded-2xl border border-[var(--card-border)] p-3 text-center ${s.bg}`}>
                                                     <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{s.label}</div>
-                                                    <div className={`font-['Outfit'] text-sm font-black mt-1 ${s.color}`}>{s.value}</div>
+                                                    <div className={`font-['Outfit'] text-base font-black mt-1 ${s.color}`}>{s.value}</div>
                                                 </div>
                                             ))}
                                         </div>
 
                                         {/* Contact details */}
-                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
-                                            <div className="px-4 py-3 border-b border-[var(--card-border)]">
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
+                                            <div className="px-4 py-3 border-b border-[var(--card-border)] bg-[var(--bg-right-panel)]/40">
                                                 <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Contact Information</div>
                                             </div>
-                                            <div className="divide-y divide-[var(--card-border)]/40">
+                                            <div className="divide-y divide-[var(--card-border)]/50">
                                                 {[
-                                                    { icon:<Bell className="h-3.5 w-3.5" />, label:'Email', value:custDetail.email },
-                                                    { icon:<Users className="h-3.5 w-3.5" />, label:'Phone', value:custDetail.phone },
-                                                    { icon:<MapPin className="h-3.5 w-3.5" />, label:'Location', value:`${custDetail.city}, ${custDetail.state}` },
+                                                    { icon:<Bell className="h-4 w-4" />, label:'Email', value:custDetail.email },
+                                                    { icon:<Users className="h-4 w-4" />, label:'Phone', value:custDetail.phone },
+                                                    { icon:<MapPin className="h-4 w-4" />, label:'Location', value:`${custDetail.city}, ${custDetail.state}` },
                                                 ].map((row,i) => (
-                                                    <div key={i} className="flex items-center gap-3 px-4 py-3">
+                                                    <div key={i} className="flex items-center gap-3.5 px-4 py-3.5">
                                                         <div className="text-[var(--text-muted)] shrink-0">{row.icon}</div>
-                                                        <div>
+                                                        <div className="min-w-0">
                                                             <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">{row.label}</div>
-                                                            <div className="text-xs font-semibold text-[var(--text-primary)] mt-0.5">{row.value}</div>
+                                                            <div className="text-xs font-bold text-[var(--text-primary)] mt-1 truncate">{row.value}</div>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -1584,7 +1591,7 @@ export default function SellerDashboard() {
                                         </div>
 
                                         {/* Spending bar */}
-                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl p-4">
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl p-4 shadow-sm">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Spending vs Top Customer</div>
                                                 <div className="text-[10px] font-black text-[var(--gold-accent)]">{Math.round((custDetail.totalSpent / Math.max(...customers.map(c=>c.totalSpent))) * 100)}%</div>
@@ -1599,24 +1606,24 @@ export default function SellerDashboard() {
                                             </div>
                                         </div>
 
-                                        {/* Toggle Status */}
-                                        <div className="flex gap-3">
+                                        {/* Action buttons */}
+                                        <div className="flex gap-3 pt-2">
                                             <button
                                                 onClick={() => {
                                                     const next = custDetail.status === 'Active' ? 'Inactive' : 'Active'
                                                     setCustomers(prev => prev.map(c => c.id === custDetail.id ? {...c, status:next} : c))
                                                     setCustDetail(prev => ({...prev, status:next}))
                                                 }}
-                                                className={`flex-1 py-3 rounded-2xl text-xs font-black border cursor-pointer transition-all ${
+                                                className={`flex-1 py-3 rounded-2xl text-xs font-black border cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] ${
                                                     custDetail.status === 'Active'
-                                                        ? 'bg-rose-500/5 border-rose-500/20 text-rose-600 hover:bg-rose-500/10'
-                                                        : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10'
+                                                        ? 'bg-rose-500/10 border-rose-500/25 text-rose-600 hover:bg-rose-500/20'
+                                                        : 'bg-emerald-500/10 border-emerald-500/25 text-emerald-600 hover:bg-emerald-500/20'
                                                 }`}>
                                                 {custDetail.status === 'Active' ? 'Mark as Inactive' : 'Mark as Active'}
                                             </button>
                                             <button onClick={() => setCustDetail(null)}
-                                                className="flex-1 py-3 rounded-2xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg">
-                                                Close
+                                                className="flex-1 py-3 rounded-2xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] hover:shadow-lg text-white text-xs font-black cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] shadow-md">
+                                                Close Details
                                             </button>
                                         </div>
                                     </div>
