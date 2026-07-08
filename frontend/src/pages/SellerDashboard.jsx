@@ -45,9 +45,14 @@ const TOP_PRODUCTS = [
     { rank: 4, name: 'Puzzle 1000pc', desc: 'Multicolor', sales: 52, maxSales: 120, image: 'https://images.unsplash.com/photo-1606092195730-5d7b9af1efc5?w=100&q=80' },
 ]
 
-// Weekly sales chart data points (₹)
-const CHART_POINTS = [9500, 11200, 10800, 13400, 18200, 15600, 14800]
-const CHART_DAYS   = ['20 May', '21 May', '22 May', '23 May', '24 May', '25 May', '26 May']
+// Chart data per filter option
+const CHART_DATA = {
+    'This Week':  { points: [9500,  11200, 10800, 13400, 18200, 15600, 14800], days: ['20 May','21 May','22 May','23 May','24 May','25 May','26 May'] },
+    'Last Week':  { points: [7200,  8400,  9100,  8700,  11300, 10500, 9800 ], days: ['13 May','14 May','15 May','16 May','17 May','18 May','19 May'] },
+    'This Month': { points: [42000, 58000, 51000, 67000, 73000, 61000, 78000], days: ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6','Week 7'] },
+    'Last Month': { points: [38000, 45000, 49000, 44000, 55000, 52000, 61000], days: ['Week 1','Week 2','Week 3','Week 4','Week 5','Week 6','Week 7'] },
+    'This Year':  { points: [120000,98000,145000,132000,168000,155000,189000], days: ['Jan','Feb','Mar','Apr','May','Jun','Jul'] },
+}
 
 // Nav links
 const NAV_LINKS = ['Dashboard', 'Products', 'Orders', 'Customers', 'Analytics']
@@ -57,6 +62,9 @@ export default function SellerDashboard() {
     const navigate = useNavigate()
 
     const [isDark, setIsDark] = useState(() => localStorage.getItem('vf_dark_mode') === 'true')
+    const [weekFilter, setWeekFilter] = useState('This Week')
+    const [weekDropOpen, setWeekDropOpen] = useState(false)
+    const weekDropRef = useRef(null)
     const [activeNav, setActiveNav] = useState('Dashboard')
     const [isProfileOpen, setIsProfileOpen] = useState(false)
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -92,6 +100,7 @@ export default function SellerDashboard() {
     const [prodModal, setProdModal] = useState(null)        // null | { mode:'add'|'edit', product? }
     const [viewModal, setViewModal]   = useState(null)      // null | product
     const [moreMenu, setMoreMenu]     = useState(null)      // null | { prodId, x, y }
+    const [deleteConfirm, setDeleteConfirm] = useState(null) // null | product object
 
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
@@ -114,6 +123,7 @@ export default function SellerDashboard() {
     const handleProdDelete = (prodId) => {
         setSellerProducts(prev => prev.filter(p => p.id !== prodId))
         setMoreMenu(null)
+        setDeleteConfirm(null)
     }
 
     const handleProdDuplicate = (prod) => {
@@ -162,6 +172,9 @@ export default function SellerDashboard() {
         const handler = (e) => {
             if (profileRef.current && !profileRef.current.contains(e.target)) {
                 setIsProfileOpen(false)
+            }
+            if (weekDropRef.current && !weekDropRef.current.contains(e.target)) {
+                setWeekDropOpen(false)
             }
         }
         document.addEventListener('mousedown', handler)
@@ -281,16 +294,25 @@ export default function SellerDashboard() {
     const formatCurrency = (val) =>
         new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val || 0)
 
-    // ─── SVG Line Chart ──────────────────────────────────────────────────────────
+    // ─── SVG Line Chart (reactive to weekFilter) ─────────────────────────────────
     const chartW = 500, chartH = 180
-    const maxVal = Math.max(...CHART_POINTS) * 1.1
+    const activeChartData = CHART_DATA[weekFilter] || CHART_DATA['This Week']
+    const chartPoints = activeChartData.points
+    const chartDays   = activeChartData.days
+    const maxVal = Math.max(...chartPoints) * 1.1
     const minVal = 0
-    const pts = CHART_POINTS.map((v, i) => ({
-        x: (i / (CHART_POINTS.length - 1)) * chartW,
+    const pts = chartPoints.map((v, i) => ({
+        x: (i / (chartPoints.length - 1)) * chartW,
         y: chartH - ((v - minVal) / (maxVal - minVal)) * chartH
     }))
     const pathD = pts.map((p, i) => (i === 0 ? `M${p.x},${p.y}` : `L${p.x},${p.y}`)).join(' ')
     const areaD = `${pathD} L${chartW},${chartH} L0,${chartH} Z`
+    // Dynamic Y-axis labels based on max value
+    const yMax = Math.max(...chartPoints)
+    const yStep = yMax / 4
+    const yLabels = [yMax, yMax * 0.75, yMax * 0.5, yMax * 0.25, 0].map(v =>
+        v >= 100000 ? `₹${(v/100000).toFixed(1)}L` : v >= 1000 ? `₹${Math.round(v/1000)}K` : `₹${Math.round(v)}`
+    )
 
     // ─── Donut Chart ─────────────────────────────────────────────────────────────
     const total = stats.totalOrders || 156
@@ -700,7 +722,7 @@ export default function SellerDashboard() {
                                                             </button>
                                                             <hr className="border-[var(--card-border)] my-1 opacity-60" />
                                                             <button
-                                                                onClick={() => handleProdDelete(prod.id)}
+                                                                onClick={() => { setDeleteConfirm(prod); setMoreMenu(null) }}
                                                                 className="w-full text-left px-4 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 flex items-center gap-2 cursor-pointer"
                                                             >
                                                                 <X className="h-3.5 w-3.5" /> Delete
@@ -777,7 +799,7 @@ export default function SellerDashboard() {
                             </div>
                             <div className="flex items-center gap-3">
                                 <button
-                                    onClick={() => setIsCreateModalOpen(true)}
+                                    onClick={() => { setActiveNav('Products'); openAdd() }}
                                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black transition-all shadow-md hover:shadow-lg cursor-pointer"
                                 >
                                     <Plus className="h-4 w-4" /> Add New Product
@@ -866,23 +888,45 @@ export default function SellerDashboard() {
                     <div className="lg:col-span-3 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-6 shadow-sm">
                         <div className="flex items-center justify-between mb-6">
                             <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Sales Overview</h3>
-                            <div className="flex items-center gap-1.5 bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-lg px-3 py-1.5 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                                <span className="text-[10px] font-bold text-[var(--text-secondary)]">This Week</span>
-                                <ChevronDown className="h-3.5 w-3.5 text-[var(--text-muted)]" />
+                            <div className="relative" ref={weekDropRef}>
+                                <button
+                                    onClick={() => setWeekDropOpen(o => !o)}
+                                    className="flex items-center gap-1.5 bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-lg px-3 py-1.5 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                                >
+                                    <span className="text-[10px] font-bold text-[var(--text-secondary)]">{weekFilter}</span>
+                                    <ChevronDown className={`h-3.5 w-3.5 text-[var(--text-muted)] transition-transform ${weekDropOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                {weekDropOpen && (
+                                    <div className="absolute right-0 mt-1.5 w-36 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-xl py-1 z-50 overflow-hidden">
+                                        {['This Week', 'Last Week', 'This Month', 'Last Month', 'This Year'].map(opt => (
+                                            <button
+                                                key={opt}
+                                                onClick={() => { setWeekFilter(opt); setWeekDropOpen(false) }}
+                                                className={`w-full text-left px-3.5 py-2 text-[10px] font-bold transition-colors cursor-pointer ${
+                                                    weekFilter === opt
+                                                        ? 'bg-[var(--gold-bg-pill)] text-[var(--gold-accent)]'
+                                                        : 'text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                }`}
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
                         <div className="relative" style={{ height: 200 }}>
                             {/* Y-axis labels */}
                             <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-[9px] font-bold text-[var(--text-muted)] pr-2 select-none" style={{ paddingBottom: 20 }}>
-                                {['₹20K', '₹15K', '₹10K', '₹5K', '₹0'].map(l => <span key={l}>{l}</span>)}
+                                {yLabels.map(l => <span key={l}>{l}</span>)}
                             </div>
                             {/* Chart SVG */}
                             <div className="absolute inset-0 pl-8 pb-6">
                                 <svg viewBox={`0 0 ${chartW} ${chartH}`} className="w-full h-full overflow-visible">
                                     <defs>
                                         <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="0%" stopColor="#8D5A2B" stopOpacity="0.12" />
+                                            <stop offset="0%" stopColor="#8D5A2B" stopOpacity="0.14" />
                                             <stop offset="100%" stopColor="#8D5A2B" stopOpacity="0" />
                                         </linearGradient>
                                     </defs>
@@ -895,15 +939,17 @@ export default function SellerDashboard() {
                                     <path d={areaD} fill="url(#areaGrad)" />
                                     {/* Line */}
                                     <path d={pathD} fill="none" stroke="#8D5A2B" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                                    {/* Dots */}
+                                    {/* Dots with tooltip on hover */}
                                     {pts.map((p, i) => (
-                                        <circle key={i} cx={p.x} cy={p.y} r="4.5" fill="#8D5A2B" stroke="white" strokeWidth="2.2" />
+                                        <g key={i}>
+                                            <circle cx={p.x} cy={p.y} r="4.5" fill="#8D5A2B" stroke="white" strokeWidth="2.2" />
+                                        </g>
                                     ))}
                                 </svg>
                             </div>
                             {/* X-axis labels */}
                             <div className="absolute bottom-0 left-8 right-0 flex justify-between text-[9px] font-bold text-[var(--text-muted)] select-none">
-                                {CHART_DAYS.map(d => <span key={d}>{d}</span>)}
+                                {chartDays.map(d => <span key={d}>{d}</span>)}
                             </div>
                         </div>
                     </div>
@@ -1003,7 +1049,7 @@ export default function SellerDashboard() {
                     <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
                         <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--card-border)]">
                             <h3 className="font-['Outfit'] text-sm font-black text-[var(--text-primary)] tracking-tight">Top Selling Products</h3>
-                            <button className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All Products</button>
+                            <button onClick={() => setActiveNav('Products')} className="text-xs font-bold text-[var(--gold-accent)] hover:underline cursor-pointer">View All Products</button>
                         </div>
                         <div className="divide-y divide-[var(--card-border)]/50">
                             {TOP_PRODUCTS.map((prod, i) => {
@@ -1180,6 +1226,289 @@ export default function SellerDashboard() {
                                 </button>
                             </div>
                         </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ── ADD / EDIT PRODUCT MODAL ──────────────────────────────────────── */}
+            {prodModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setProdModal(null)}>
+                    <div
+                        className="w-full max-w-2xl bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-2xl overflow-hidden"
+                        onClick={e => e.stopPropagation()}
+                        style={{ maxHeight: '90vh', overflowY: 'auto' }}
+                    >
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between px-8 py-5 border-b border-[var(--card-border)] bg-[var(--bg-right-panel)]">
+                            <div className="flex items-center gap-3">
+                                <div className="h-9 w-9 rounded-xl bg-[var(--gold-accent)]/10 border border-[var(--gold-accent)]/20 flex items-center justify-center">
+                                    {prodModal.mode === 'add'
+                                        ? <Plus className="h-4.5 w-4.5 text-[var(--gold-accent)]" />
+                                        : <Edit2 className="h-4 w-4 text-[var(--gold-accent)]" />}
+                                </div>
+                                <div>
+                                    <h3 className="font-['Outfit'] text-base font-black text-[var(--text-primary)] leading-tight">
+                                        {prodModal.mode === 'add' ? 'Add New Product' : 'Edit Product'}
+                                    </h3>
+                                    <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">
+                                        {prodModal.mode === 'add' ? 'Fill in details to list a new product' : 'Update product information'}
+                                    </p>
+                                </div>
+                            </div>
+                            <button onClick={() => setProdModal(null)} className="h-8 w-8 rounded-xl hover:bg-[var(--card-border)]/30 flex items-center justify-center text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition-colors">
+                                <X className="h-4 w-4" />
+                            </button>
+                        </div>
+
+                        <form onSubmit={e => { e.preventDefault(); handleProdSave() }}>
+                            <div className="p-8 grid grid-cols-3 gap-6">
+
+                                {/* Left – Image Preview */}
+                                <div className="col-span-1 flex flex-col gap-4">
+                                    <div className="aspect-square rounded-2xl border-2 border-dashed border-[var(--card-border)] bg-[var(--bg-right-panel)] overflow-hidden flex items-center justify-center">
+                                        {prodModal.product.image ? (
+                                            <img
+                                                src={prodModal.product.image}
+                                                alt="preview"
+                                                className="h-full w-full object-contain p-3"
+                                                onError={e => e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=300&q=80'}
+                                            />
+                                        ) : (
+                                            <div className="flex flex-col items-center gap-2 text-[var(--text-muted)]">
+                                                <Package className="h-8 w-8 opacity-30" />
+                                                <span className="text-[9px] font-bold uppercase tracking-wider">No Image</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div>
+                                        <label className="block mb-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Image URL</label>
+                                        <input type="url" placeholder="https://..."
+                                            value={prodModal.product.image}
+                                            onChange={e => setProdModal(m => ({ ...m, product: { ...m.product, image: e.target.value } }))}
+                                            className="w-full px-3 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] outline-none text-[10px] font-semibold placeholder-[var(--text-muted)] focus:border-[var(--gold-accent)] focus:ring-2 focus:ring-[var(--gold-accent)]/10 transition-all"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Right – Fields */}
+                                <div className="col-span-2 space-y-4">
+
+                                    {/* Product Name */}
+                                    <div>
+                                        <label className="block mb-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Product Name <span className="text-rose-500">*</span></label>
+                                        <input type="text" required placeholder="e.g. Wireless Noise-Cancelling Earbuds"
+                                            value={prodModal.product.name}
+                                            onChange={e => setProdModal(m => ({ ...m, product: { ...m.product, name: e.target.value } }))}
+                                            className="w-full px-4 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] outline-none text-xs font-semibold placeholder-[var(--text-muted)] focus:border-[var(--gold-accent)] focus:ring-2 focus:ring-[var(--gold-accent)]/10 transition-all"
+                                        />
+                                    </div>
+
+                                    {/* Brand + Category */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block mb-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Brand</label>
+                                            <input type="text" placeholder="e.g. Sony"
+                                                value={prodModal.product.brand}
+                                                onChange={e => setProdModal(m => ({ ...m, product: { ...m.product, brand: e.target.value } }))}
+                                                className="w-full px-4 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] outline-none text-xs font-semibold placeholder-[var(--text-muted)] focus:border-[var(--gold-accent)] focus:ring-2 focus:ring-[var(--gold-accent)]/10 transition-all"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block mb-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Category</label>
+                                            <div className="relative">
+                                                <select value={prodModal.product.category}
+                                                    onChange={e => setProdModal(m => ({ ...m, product: { ...m.product, category: e.target.value } }))}
+                                                    className="w-full appearance-none px-4 py-3 pr-8 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] outline-none text-xs font-semibold cursor-pointer focus:border-[var(--gold-accent)] focus:ring-2 focus:ring-[var(--gold-accent)]/10 transition-all">
+                                                    {['Electronics','Fashion','Home & Living','Beauty','Sports','Automotive','Furniture','Footwear','Bags','Toys & Games'].map(c => <option key={c}>{c}</option>)}
+                                                </select>
+                                                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Price + Stock */}
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <label className="block mb-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Price (₹) <span className="text-rose-500">*</span></label>
+                                            <div className="relative">
+                                                <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-xs font-black text-[var(--text-muted)]">₹</span>
+                                                <input type="number" min={0} required placeholder="1499"
+                                                    value={prodModal.product.price}
+                                                    onChange={e => setProdModal(m => ({ ...m, product: { ...m.product, price: e.target.value } }))}
+                                                    className="w-full pl-7 pr-4 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] outline-none text-xs font-semibold placeholder-[var(--text-muted)] focus:border-[var(--gold-accent)] focus:ring-2 focus:ring-[var(--gold-accent)]/10 transition-all"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block mb-1.5 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Stock Qty</label>
+                                            <input type="number" min={0} placeholder="50"
+                                                value={prodModal.product.stock}
+                                                onChange={e => setProdModal(m => ({ ...m, product: { ...m.product, stock: e.target.value } }))}
+                                                className="w-full px-4 py-3 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--text-primary)] outline-none text-xs font-semibold placeholder-[var(--text-muted)] focus:border-[var(--gold-accent)] focus:ring-2 focus:ring-[var(--gold-accent)]/10 transition-all"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Stock visual indicator */}
+                                    {prodModal.product.stock !== '' && (
+                                        <div className={`flex items-center gap-2 px-3.5 py-2.5 rounded-xl border text-[10px] font-bold ${
+                                            Number(prodModal.product.stock) === 0
+                                                ? 'bg-rose-500/5 border-rose-500/20 text-rose-500'
+                                                : Number(prodModal.product.stock) < 15
+                                                ? 'bg-amber-500/5 border-amber-500/20 text-amber-600'
+                                                : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600'
+                                        }`}>
+                                            <div className={`h-2 w-2 rounded-full ${
+                                                Number(prodModal.product.stock) === 0 ? 'bg-rose-500'
+                                                : Number(prodModal.product.stock) < 15 ? 'bg-amber-500'
+                                                : 'bg-emerald-500'
+                                            }`} />
+                                            {Number(prodModal.product.stock) === 0
+                                                ? 'Out of Stock — product will be hidden from store'
+                                                : Number(prodModal.product.stock) < 15
+                                                ? `Low stock — only ${prodModal.product.stock} units remaining`
+                                                : `In Stock — ${prodModal.product.stock} units available`}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="flex items-center justify-between px-8 py-5 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]">
+                                <p className="text-[9px] font-semibold text-[var(--text-muted)]"><span className="text-rose-500">*</span> Required fields</p>
+                                <div className="flex items-center gap-3">
+                                    <button type="button" onClick={() => setProdModal(null)}
+                                        className="px-5 py-2.5 rounded-xl border border-[var(--card-border)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--card-border)]/20 cursor-pointer transition-colors">
+                                        Cancel
+                                    </button>
+                                    <button type="submit"
+                                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg">
+                                        {prodModal.mode === 'add'
+                                            ? <><Plus className="h-3.5 w-3.5" /> Add Product</>
+                                            : <><Check className="h-3.5 w-3.5" /> Save Changes</>}
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
+            {/* ── VIEW PRODUCT MODAL ───────────────────────────────────────────── */}
+            {viewModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm" onClick={() => setViewModal(null)}>
+                    <div className="w-full max-w-md bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                        {/* Product image banner */}
+                        <div className="relative h-52 bg-[var(--bg-right-panel)] flex items-center justify-center border-b border-[var(--card-border)]">
+                            <img
+                                src={viewModal.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}
+                                alt={viewModal.name}
+                                className="h-full w-full object-contain p-6"
+                                onError={e => e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80'}
+                            />
+                            <button onClick={() => setViewModal(null)} className="absolute top-3 right-3 h-8 w-8 rounded-xl bg-[var(--card-bg)] border border-[var(--card-border)] flex items-center justify-center text-[var(--text-secondary)] hover:text-rose-500 cursor-pointer transition-colors">
+                                <X className="h-4 w-4" />
+                            </button>
+                            {/* Stock badge */}
+                            <div className={`absolute top-3 left-3 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
+                                viewModal.stock === 0 ? 'bg-rose-500/10 text-rose-500 border-rose-500/20'
+                                : viewModal.stock < 15 ? 'bg-amber-500/10 text-amber-500 border-amber-500/20'
+                                : 'bg-emerald-500/10 text-emerald-500 border-emerald-500/20'
+                            }`}>
+                                {viewModal.stock === 0 ? 'Out of Stock' : viewModal.stock < 15 ? 'Low Stock' : 'In Stock'}
+                            </div>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div>
+                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider mb-0.5">{viewModal.sku}</div>
+                                <h2 className="font-['Outfit'] text-lg font-black text-[var(--text-primary)] leading-tight">{viewModal.name}</h2>
+                                <div className="text-xs font-semibold text-[var(--text-secondary)] mt-1">{viewModal.brand} &bull; {viewModal.subcategory || viewModal.category}</div>
+                            </div>
+                            <div className="grid grid-cols-3 gap-3">
+                                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-3 text-center">
+                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">Price</div>
+                                    <div className="font-['Outfit'] text-base font-black text-[var(--gold-accent)] mt-1">₹{Number(viewModal.price).toLocaleString('en-IN')}</div>
+                                </div>
+                                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-3 text-center">
+                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">Stock</div>
+                                    <div className="font-['Outfit'] text-base font-black text-[var(--text-primary)] mt-1">{viewModal.stock}</div>
+                                </div>
+                                <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl p-3 text-center">
+                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">Category</div>
+                                    <div className="font-['Outfit'] text-xs font-black text-[var(--text-primary)] mt-1 truncate">{viewModal.subcategory || viewModal.category}</div>
+                                </div>
+                            </div>
+                            <div className="flex gap-3 pt-1">
+                                <button
+                                    onClick={() => { setViewModal(null); openEdit(viewModal) }}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl border border-[var(--card-border)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] cursor-pointer transition-colors"
+                                >
+                                    <Edit2 className="h-3.5 w-3.5" /> Edit Product
+                                </button>
+                                <button
+                                    onClick={() => setViewModal(null)}
+                                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black cursor-pointer transition-colors"
+                                >
+                                    <X className="h-3.5 w-3.5" /> Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* ── DELETE CONFIRMATION MODAL ──────────────────────────────────────── */}
+            {deleteConfirm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-md" onClick={() => setDeleteConfirm(null)}>
+                    <div className="w-full max-w-sm bg-[var(--card-bg)] border border-[var(--card-border)] rounded-3xl shadow-2xl overflow-hidden" onClick={e => e.stopPropagation()}>
+                        {/* Red danger header */}
+                        <div className="bg-rose-500/8 border-b border-rose-500/15 px-6 py-5 flex items-center gap-4">
+                            <div className="h-11 w-11 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center shrink-0">
+                                <AlertTriangle className="h-5 w-5 text-rose-500" />
+                            </div>
+                            <div>
+                                <h3 className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">Delete Product?</h3>
+                                <p className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">This action cannot be undone</p>
+                            </div>
+                        </div>
+
+                        {/* Product preview */}
+                        <div className="px-6 py-5">
+                            <div className="flex items-center gap-4 p-4 rounded-2xl bg-[var(--bg-right-panel)] border border-[var(--card-border)]">
+                                <div className="h-12 w-12 rounded-xl overflow-hidden border border-[var(--card-border)] bg-[var(--card-bg)] shrink-0 flex items-center justify-center p-1">
+                                    <img
+                                        src={deleteConfirm.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&q=80'}
+                                        alt={deleteConfirm.name}
+                                        className="h-full w-full object-contain"
+                                        onError={e => e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&q=80'}
+                                    />
+                                </div>
+                                <div className="min-w-0">
+                                    <div className="text-xs font-black text-[var(--text-primary)] truncate">{deleteConfirm.name.split('(')[0].trim()}</div>
+                                    <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{deleteConfirm.brand} · {deleteConfirm.sku}</div>
+                                    <div className="text-[10px] font-black text-[var(--gold-accent)] mt-0.5">₹{Number(deleteConfirm.price).toLocaleString('en-IN')}</div>
+                                </div>
+                            </div>
+                            <p className="text-[11px] font-semibold text-[var(--text-muted)] mt-4 text-center leading-relaxed">
+                                You are about to permanently remove <span className="font-black text-[var(--text-primary)]">"{deleteConfirm.name.split('(')[0].trim()}"</span> from your store. This cannot be recovered.
+                            </p>
+                        </div>
+
+                        {/* Action buttons */}
+                        <div className="px-6 pb-6 flex gap-3">
+                            <button
+                                onClick={() => setDeleteConfirm(null)}
+                                className="flex-1 py-3 rounded-2xl border border-[var(--card-border)] text-xs font-bold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] cursor-pointer transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={() => handleProdDelete(deleteConfirm.id)}
+                                className="flex-1 py-3 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-2"
+                            >
+                                <X className="h-3.5 w-3.5" /> Yes, Delete
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
