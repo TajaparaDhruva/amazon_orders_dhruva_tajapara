@@ -878,10 +878,10 @@ export default function CustomerDashboard() {
                                 className="flex items-center gap-2 text-left hover:opacity-95 transition-opacity"
                             >
                                 <div className="h-9 w-9 rounded-full bg-[var(--badge-bg)] border border-[var(--badge-border)] text-[var(--gold-accent)] flex items-center justify-center font-black text-xs">
-                                    DT
+                                    {user?.name ? user.name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2) : 'G'}
                                 </div>
                                 <div className="hidden lg:block leading-none">
-                                    <div className="text-xs font-bold text-[var(--text-primary)]">{user?.name || 'Dhruva'}</div>
+                                    <div className="text-xs font-bold text-[var(--text-primary)]">{user?.name || 'Guest User'}</div>
                                     <div className="text-[9px] font-semibold text-[var(--text-muted)] mt-0.5">Customer Portal</div>
                                 </div>
                                 <ChevronDown className="h-3 w-3 text-[var(--text-muted)]" />
@@ -901,13 +901,23 @@ export default function CustomerDashboard() {
                                         My Orders History
                                     </button>
                                     <hr className="border-[var(--card-border)] my-1.5 opacity-40" />
-                                    <button
-                                        onClick={handleLogout}
-                                        className="w-full text-left px-4 py-2 hover:bg-rose-500/5 text-xs font-bold flex items-center gap-2 text-rose-500"
-                                    >
-                                        <LogOut className="h-4 w-4" />
-                                        Logout Account
-                                    </button>
+                                    {user ? (
+                                        <button
+                                            onClick={handleLogout}
+                                            className="w-full text-left px-4 py-2 hover:bg-rose-500/5 text-xs font-bold flex items-center gap-2 text-rose-500"
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            Logout Account
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={() => navigate('/login')}
+                                            className="w-full text-left px-4 py-2 hover:bg-[var(--gold-accent)]/5 text-xs font-bold flex items-center gap-2 text-[var(--gold-accent)]"
+                                        >
+                                            <LogOut className="h-4 w-4 rotate-180" />
+                                            Sign In
+                                        </button>
+                                    )}
                                 </div>
                             )}
                         </div>
