@@ -7,7 +7,9 @@ import {
     TrendingUp, Eye, Star, Clock, RefreshCw, X,
     Check, Truck, CheckCircle2, AlertTriangle, ExternalLink,
     BarChart2, ArrowUpRight, ArrowDownRight, Sparkles,
-    Shield, CheckCircle, RotateCcw, TrendingDown
+    Shield, CheckCircle, RotateCcw, TrendingDown,
+    Search, SlidersHorizontal, Download, Edit2, MoreHorizontal,
+    ChevronLeft, ChevronRight
 } from 'lucide-react'
 
 import { ALL_PRODUCTS } from '../data/dashboardData'
@@ -64,6 +66,77 @@ export default function SellerDashboard() {
     const [stats, setStats] = useState(MOCK_STATS)
     const [products, setProducts] = useState(ALL_PRODUCTS)
     const [recentOrders, setRecentOrders] = useState(MOCK_RECENT_ORDERS)
+
+    // Products page state
+    const [prodSearch, setProdSearch] = useState('')
+    const [prodCategory, setProdCategory] = useState('All Categories')
+    const [prodStatus, setProdStatus] = useState('All Status')
+    const [prodPage, setProdPage] = useState(1)
+    const [selectedRows, setSelectedRows] = useState([])
+    const [activeToggles, setActiveToggles] = useState(() => {
+        const map = {}
+        ALL_PRODUCTS.forEach(p => { map[p.id] = p.stock !== 0 })
+        return map
+    })
+    const PROD_PER_PAGE = 5
+
+    // Seller product list (local, mutable)
+    const AUGMENTED = ALL_PRODUCTS.map((p, i) => ({
+        ...p,
+        sku: `VK-${1001 + i}`,
+        stock: [120,85,0,12,32,5,67,200,14,30,3,50,40,22,11,28,8,60,35,90][i] ?? 25,
+    }))
+    const [sellerProducts, setSellerProducts] = useState(AUGMENTED)
+
+    // Product modals state
+    const [prodModal, setProdModal] = useState(null)        // null | { mode:'add'|'edit', product? }
+    const [viewModal, setViewModal]   = useState(null)      // null | product
+    const [moreMenu, setMoreMenu]     = useState(null)      // null | { prodId, x, y }
+
+    const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
+
+    const openAdd  = () => setProdModal({ mode:'add',  product: { ...EMPTY_PROD } })
+    const openEdit = (prod) => setProdModal({ mode:'edit', product: { ...prod } })
+
+    const handleProdSave = () => {
+        const p = prodModal.product
+        if (!p.name || !p.price) return
+        if (prodModal.mode === 'add') {
+            const newP = { ...p, id: 'p-new-' + Date.now(), sku: `VK-${1001 + sellerProducts.length}`, price: Number(p.price), stock: Number(p.stock) || 0 }
+            setSellerProducts(prev => [newP, ...prev])
+            setActiveToggles(t => ({ ...t, [newP.id]: newP.stock > 0 }))
+        } else {
+            setSellerProducts(prev => prev.map(x => x.id === p.id ? { ...x, ...p, price: Number(p.price), stock: Number(p.stock) } : x))
+        }
+        setProdModal(null)
+    }
+
+    const handleProdDelete = (prodId) => {
+        setSellerProducts(prev => prev.filter(p => p.id !== prodId))
+        setMoreMenu(null)
+    }
+
+    const handleProdDuplicate = (prod) => {
+        const dup = { ...prod, id: 'p-dup-' + Date.now(), name: prod.name + ' (Copy)', sku: `VK-${1001 + sellerProducts.length}` }
+        setSellerProducts(prev => [dup, ...prev])
+        setActiveToggles(t => ({ ...t, [dup.id]: dup.stock > 0 }))
+        setMoreMenu(null)
+    }
+
+    // CSV Export
+    const handleExport = () => {
+        const headers = ['SKU','Name','Brand','Category','Price','Stock','Status']
+        const rows = sellerProducts.map(p => [
+            p.sku, `"${p.name}"`, `"${p.brand || ''}"`, p.category,
+            p.price, p.stock,
+            p.stock === 0 ? 'Out of Stock' : p.stock < 15 ? 'Low Stock' : 'In Stock'
+        ])
+        const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
+        const blob = new Blob([csv], { type: 'text/csv' })
+        const url  = URL.createObjectURL(blob)
+        const a = document.createElement('a'); a.href = url; a.download = 'products_export.csv'; a.click()
+        URL.revokeObjectURL(url)
+    }
 
     const [newOrderForm, setNewOrderForm] = useState({
         ProductName: '', Category: 'Electronics', Brand: '',
@@ -349,6 +422,339 @@ export default function SellerDashboard() {
             </header>
 
             <main className="max-w-7xl mx-auto px-6 pt-8 pb-12 space-y-8">
+
+            {/* ══════════════ PRODUCTS PAGE ══════════════ */}
+            {activeNav === 'Products' && (() => {
+                const PROD_CATEGORIES = ['All Categories', 'Electronics', 'Fashion', 'Home & Living', 'Beauty', 'Sports', 'Automotive']
+                const PROD_STATUSES   = ['All Status', 'Active', 'Out of Stock', 'Low Stock']
+
+                const getStockLabel = (stock) => {
+                    if (stock === 0) return { label: 'Out of Stock', cls: 'text-rose-500' }
+                    if (stock < 15) return { label: 'Low Stock', cls: 'text-amber-500' }
+                    return { label: 'In Stock', cls: 'text-emerald-500' }
+                }
+
+                const filtered = sellerProducts.filter(p => {
+                    const matchSearch = p.name.toLowerCase().includes(prodSearch.toLowerCase()) ||
+                        (p.sku || '').toLowerCase().includes(prodSearch.toLowerCase())
+                    const matchCat = prodCategory === 'All Categories' || p.category === prodCategory
+                    const stockInfo = getStockLabel(p.stock)
+                    const matchStatus = prodStatus === 'All Status' || stockInfo.label === prodStatus ||
+                        (prodStatus === 'Active' && p.stock > 0)
+                    return matchSearch && matchCat && matchStatus
+                })
+
+                const totalPages = Math.max(1, Math.ceil(filtered.length / PROD_PER_PAGE))
+                const safePage   = Math.min(prodPage, totalPages)
+                const paginated  = filtered.slice((safePage - 1) * PROD_PER_PAGE, safePage * PROD_PER_PAGE)
+
+                const totalRevenue = sellerProducts.reduce((s, p) => s + (p.price * (p.stock || 0)), 0)
+                const activeCount  = sellerProducts.filter(p => p.stock > 0).length
+                const outOfStock   = sellerProducts.filter(p => p.stock === 0).length
+                const lowStock     = sellerProducts.filter(p => p.stock > 0 && p.stock < 15).length
+
+                const PROD_STAT_CARDS = [
+                    { label: 'Total Products',  value: sellerProducts.length, sub: 'All products in store',   icon: <Package className="h-5 w-5" />,       color: 'text-orange-500',  bg: 'bg-orange-500/10 border-orange-500/20' },
+                    { label: 'Active Products',  value: activeCount,           sub: 'Currently active',        icon: <CheckCircle className="h-5 w-5" />,    color: 'text-emerald-500', bg: 'bg-emerald-500/10 border-emerald-500/20' },
+                    { label: 'Out of Stock',     value: outOfStock,            sub: 'Not available',           icon: <AlertTriangle className="h-5 w-5" />, color: 'text-rose-500',    bg: 'bg-rose-500/10 border-rose-500/20' },
+                    { label: 'Low Stock',        value: lowStock,              sub: 'Stock running low',       icon: <Clock className="h-5 w-5" />,          color: 'text-amber-500',   bg: 'bg-amber-500/10 border-amber-500/20' },
+                    { label: 'Total Revenue',    value: `₹${(totalRevenue/1000).toFixed(1)}K`, sub: '↑ 12.5% vs last week', icon: <TrendingUp className="h-5 w-5" />, color: 'text-violet-500', bg: 'bg-violet-500/10 border-violet-500/20', isRevenue: true },
+                ]
+
+                const getCategoryColor = (cat) => {
+                    const map = {
+                        'Electronics':   'bg-blue-500/10 text-blue-600 border-blue-500/20',
+                        'Fashion':       'bg-pink-500/10 text-pink-600 border-pink-500/20',
+                        'Home & Living': 'bg-teal-500/10 text-teal-600 border-teal-500/20',
+                        'Beauty':        'bg-rose-500/10 text-rose-600 border-rose-500/20',
+                        'Sports':        'bg-green-500/10 text-green-600 border-green-500/20',
+                        'Automotive':    'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+                        'Furniture':     'bg-amber-500/10 text-amber-600 border-amber-500/20',
+                        'Footwear':      'bg-cyan-500/10 text-cyan-600 border-cyan-500/20',
+                        'Bags':          'bg-orange-500/10 text-orange-600 border-orange-500/20',
+                        'Toys & Games':  'bg-purple-500/10 text-purple-600 border-purple-500/20',
+                        'Mobiles':       'bg-blue-500/10 text-blue-600 border-blue-500/20',
+                        'Laptops':       'bg-sky-500/10 text-sky-600 border-sky-500/20',
+                        'Headphones':    'bg-violet-500/10 text-violet-600 border-violet-500/20',
+                        'Smart Watches': 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20',
+                        'Cameras':       'bg-neutral-500/10 text-neutral-600 border-neutral-500/20',
+                        'Speakers':      'bg-teal-500/10 text-teal-600 border-teal-500/20',
+                        'Accessories':   'bg-gray-500/10 text-gray-600 border-gray-500/20',
+                        'TV & Audio':    'bg-purple-500/10 text-purple-600 border-purple-500/20',
+                    }
+                    return map[cat] || 'bg-neutral-500/10 text-neutral-600 border-neutral-500/20'
+                }
+
+                const allSelected = paginated.length > 0 && paginated.every(p => selectedRows.includes(p.id))
+                const toggleAll = () => {
+                    if (allSelected) setSelectedRows(r => r.filter(id => !paginated.find(p => p.id === id)))
+                    else setSelectedRows(r => [...new Set([...r, ...paginated.map(p => p.id)])])
+                }
+
+                return (
+                    <div className="space-y-6" onClick={() => moreMenu && setMoreMenu(null)}>
+
+                        {/* Page Header */}
+                        <div className="flex items-start justify-between">
+                            <div>
+                                <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)] tracking-tight">Products</h1>
+                                <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">Manage and organize all products in your store.</p>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={handleExport}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--card-border)] text-[var(--text-secondary)] text-xs font-bold hover:bg-[var(--bg-right-panel)] transition-colors cursor-pointer"
+                                >
+                                    <Download className="h-3.5 w-3.5" /> Export
+                                </button>
+                                <button
+                                    onClick={openAdd}
+                                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black transition-all shadow-md cursor-pointer"
+                                >
+                                    <Plus className="h-4 w-4" /> Add New Product
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* Stat Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            {PROD_STAT_CARDS.map((card, i) => (
+                                <div key={i} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 hover:shadow-md transition-all duration-200">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-xl border shrink-0 ${card.color} ${card.bg}`}>
+                                            {card.icon}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{card.label}</div>
+                                            <div className={`font-['Outfit'] text-2xl font-black ${card.color} leading-tight mt-0.5`}>{card.value}</div>
+                                            <div className={`text-[10px] font-semibold mt-1 ${card.isRevenue ? 'text-emerald-500' : 'text-[var(--text-muted)]'}`}>{card.sub}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Search & Filters */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div className="relative flex-1 max-w-sm">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                <input
+                                    type="text"
+                                    placeholder="Search products by name, SKU..."
+                                    value={prodSearch}
+                                    onChange={e => { setProdSearch(e.target.value); setProdPage(1) }}
+                                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--gold-accent)] transition-colors"
+                                />
+                            </div>
+                            <div className="relative">
+                                <select
+                                    value={prodCategory}
+                                    onChange={e => { setProdCategory(e.target.value); setProdPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors"
+                                >
+                                    {PROD_CATEGORIES.map(c => <option key={c}>{c}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <div className="relative">
+                                <select
+                                    value={prodStatus}
+                                    onChange={e => { setProdStatus(e.target.value); setProdPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors"
+                                >
+                                    {PROD_STATUSES.map(s => <option key={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--card-border)] text-[var(--text-secondary)] text-xs font-bold hover:bg-[var(--bg-right-panel)] transition-colors cursor-pointer">
+                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                            </button>
+                        </div>
+
+                        {/* Product Table */}
+                        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
+                            {/* Table Header */}
+                            <div className="grid items-center border-b border-[var(--card-border)] px-5 py-3 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider"
+                                style={{ gridTemplateColumns: '28px 2fr 1.1fr 1.1fr 0.8fr 1.2fr 0.9fr 0.9fr' }}>
+                                <div>
+                                    <input type="checkbox" checked={allSelected} onChange={toggleAll}
+                                        className="h-3.5 w-3.5 rounded accent-[var(--gold-accent)] cursor-pointer" />
+                                </div>
+                                <div>Product</div>
+                                <div>SKU</div>
+                                <div>Category</div>
+                                <div>Price</div>
+                                <div>Stock</div>
+                                <div>Status</div>
+                                <div className="text-right">Actions</div>
+                            </div>
+
+                            {/* Table Rows */}
+                            <div className="divide-y divide-[var(--card-border)]/50">
+                                {paginated.length === 0 ? (
+                                    <div className="py-16 flex flex-col items-center gap-3 text-[var(--text-muted)]">
+                                        <Package className="h-8 w-8 opacity-30" />
+                                        <span className="text-xs font-semibold">No products found</span>
+                                    </div>
+                                ) : paginated.map(prod => {
+                                    const stockInfo = getStockLabel(prod.stock)
+                                    const isActive  = activeToggles[prod.id] ?? prod.stock > 0
+                                    const isSelected = selectedRows.includes(prod.id)
+                                    const menuOpen  = moreMenu?.prodId === prod.id
+                                    return (
+                                        <div
+                                            key={prod.id}
+                                            className={`grid items-center px-5 py-3.5 hover:bg-[var(--bg-right-panel)]/60 transition-colors ${isSelected ? 'bg-[var(--gold-bg-pill)]' : ''}`}
+                                            style={{ gridTemplateColumns: '28px 2fr 1.1fr 1.1fr 0.8fr 1.2fr 0.9fr 0.9fr' }}
+                                        >
+                                            {/* Checkbox */}
+                                            <div>
+                                                <input type="checkbox" checked={isSelected}
+                                                    onChange={() => setSelectedRows(r => r.includes(prod.id) ? r.filter(id => id !== prod.id) : [...r, prod.id])}
+                                                    className="h-3.5 w-3.5 rounded accent-[var(--gold-accent)] cursor-pointer" />
+                                            </div>
+                                            {/* Product */}
+                                            <div className="flex items-center gap-3 min-w-0">
+                                                <div className="h-11 w-11 rounded-xl overflow-hidden border border-[var(--card-border)] bg-[var(--bg-right-panel)] shrink-0 flex items-center justify-center p-1">
+                                                    <img src={prod.image} alt={prod.name} className="h-full w-full object-contain"
+                                                        onError={e => e.target.src = 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=100&q=80'} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="text-xs font-bold text-[var(--text-primary)] truncate max-w-[180px]">{prod.name.split('(')[0].trim()}</div>
+                                                    <div className="text-[10px] font-semibold text-[var(--text-muted)] truncate max-w-[180px]">{prod.brand} | {prod.subcategory || prod.category}</div>
+                                                </div>
+                                            </div>
+                                            {/* SKU */}
+                                            <div className="text-[10px] font-mono font-bold text-[var(--text-secondary)]">{prod.sku}</div>
+                                            {/* Category */}
+                                            <div>
+                                                <span className={`inline-block px-2.5 py-0.5 rounded-[6px] text-[9px] font-black border ${getCategoryColor(prod.subcategory || prod.category)}`}>
+                                                    {prod.subcategory || prod.category}
+                                                </span>
+                                            </div>
+                                            {/* Price */}
+                                            <div className="text-xs font-black text-[var(--text-primary)]">₹{Number(prod.price).toLocaleString('en-IN')}</div>
+                                            {/* Stock */}
+                                            <div>
+                                                <div className="text-xs font-black text-[var(--text-primary)]">{prod.stock}</div>
+                                                <div className={`text-[10px] font-bold ${stockInfo.cls}`}>{stockInfo.label}</div>
+                                            </div>
+                                            {/* Toggle */}
+                                            <div>
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); setActiveToggles(t => ({ ...t, [prod.id]: !t[prod.id] })) }}
+                                                    className={`relative h-5 w-9 rounded-full transition-colors duration-300 cursor-pointer ${isActive ? 'bg-[var(--gold-accent)]' : 'bg-[var(--card-border)]'}`}
+                                                >
+                                                    <div className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all duration-300 ${isActive ? 'left-[18px]' : 'left-0.5'}`} />
+                                                </button>
+                                            </div>
+                                            {/* Actions */}
+                                            <div className="flex items-center justify-end gap-1 relative">
+                                                {/* Edit */}
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); openEdit(prod) }}
+                                                    className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors"
+                                                    title="Edit"
+                                                >
+                                                    <Edit2 className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                                </button>
+                                                {/* View */}
+                                                <button
+                                                    onClick={e => { e.stopPropagation(); setViewModal(prod) }}
+                                                    className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors"
+                                                    title="View"
+                                                >
+                                                    <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                                </button>
+                                                {/* More */}
+                                                <div className="relative">
+                                                    <button
+                                                        onClick={e => { e.stopPropagation(); setMoreMenu(prev => prev?.prodId === prod.id ? null : { prodId: prod.id }) }}
+                                                        className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors"
+                                                        title="More"
+                                                    >
+                                                        <MoreHorizontal className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                                    </button>
+                                                    {menuOpen && (
+                                                        <div
+                                                            className="absolute right-0 top-8 z-50 w-44 bg-[var(--card-bg)] border border-[var(--card-border)] rounded-xl shadow-2xl py-1.5 overflow-hidden"
+                                                            onClick={e => e.stopPropagation()}
+                                                        >
+                                                            <button
+                                                                onClick={() => { openEdit(prod); setMoreMenu(null) }}
+                                                                className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer"
+                                                            >
+                                                                <Edit2 className="h-3.5 w-3.5" /> Edit Product
+                                                            </button>
+                                                            <button
+                                                                onClick={() => { setViewModal(prod); setMoreMenu(null) }}
+                                                                className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer"
+                                                            >
+                                                                <Eye className="h-3.5 w-3.5" /> View Details
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleProdDuplicate(prod)}
+                                                                className="w-full text-left px-4 py-2 text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)] flex items-center gap-2 cursor-pointer"
+                                                            >
+                                                                <Plus className="h-3.5 w-3.5" /> Duplicate
+                                                            </button>
+                                                            <hr className="border-[var(--card-border)] my-1 opacity-60" />
+                                                            <button
+                                                                onClick={() => handleProdDelete(prod.id)}
+                                                                className="w-full text-left px-4 py-2 text-xs font-bold text-rose-500 hover:bg-rose-500/5 flex items-center gap-2 cursor-pointer"
+                                                            >
+                                                                <X className="h-3.5 w-3.5" /> Delete
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+
+                            {/* Pagination Footer */}
+                            <div className="flex items-center justify-between px-5 py-3.5 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]/30">
+                                <span className="text-[10px] font-semibold text-[var(--text-muted)]">
+                                    Showing {filtered.length === 0 ? 0 : Math.min((safePage - 1) * PROD_PER_PAGE + 1, filtered.length)} to {Math.min(safePage * PROD_PER_PAGE, filtered.length)} of {filtered.length} products
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <button disabled={safePage === 1} onClick={() => setProdPage(p => Math.max(1, p - 1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed transition-colors">
+                                        <ChevronLeft className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                        const page = i + 1
+                                        return (
+                                            <button key={page} onClick={() => setProdPage(page)}
+                                                className={`h-7 w-7 rounded-lg text-[10px] font-black transition-colors cursor-pointer ${
+                                                    safePage === page
+                                                        ? 'bg-[var(--gold-accent)] text-white border border-[var(--gold-accent)]'
+                                                        : 'border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                }`}>{page}</button>
+                                        )
+                                    })}
+                                    {totalPages > 5 && <span className="text-[var(--text-muted)] text-xs font-bold">...</span>}
+                                    {totalPages > 5 && (
+                                        <button onClick={() => setProdPage(totalPages)}
+                                            className={`h-7 w-7 rounded-lg text-[10px] font-black border cursor-pointer transition-colors ${
+                                                safePage === totalPages ? 'bg-[var(--gold-accent)] text-white border-[var(--gold-accent)]' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                            }`}>{totalPages}</button>
+                                    )}
+                                    <button disabled={safePage === totalPages} onClick={() => setProdPage(p => Math.min(totalPages, p + 1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed transition-colors">
+                                        <ChevronRight className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })()}
+
+            {/* ══════════════ DASHBOARD PAGE ══════════════ */}
+            {activeNav === 'Dashboard' && <>
 
                 {/* ── WELCOME BANNER ───────────────────────────────────────────── */}
                 <div className="relative bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl px-8 py-7 overflow-hidden shadow-sm">
@@ -690,6 +1096,8 @@ export default function SellerDashboard() {
                         </div>
                     </div>
                 </div>
+            </>}
+
             </main>
 
             {/* Footer */}
