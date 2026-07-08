@@ -13,7 +13,6 @@ import {
 } from 'lucide-react'
 
 import { ALL_PRODUCTS } from '../data/dashboardData'
-import CustomerDashboard from './CustomerDashboard'
 
 // ─── Mock / Fallback Data ──────────────────────────────────────────────────────
 const MOCK_STATS = {
@@ -89,8 +88,20 @@ const MOCK_CUSTOMERS = [
 const NAV_LINKS = ['Dashboard', 'Products', 'Orders', 'Customers', 'Analytics']
 
 export default function SellerDashboard() {
-    const { user, logout, api } = useAuth()
+    const { user, logout, loginAsDemoCustomer, api } = useAuth()
     const navigate = useNavigate()
+
+    const handleViewStore = async () => {
+        try {
+            setActionLoading(true)
+            await loginAsDemoCustomer()
+            navigate('/dashboard/customer')
+        } catch (err) {
+            alert('Failed to switch to customer store: ' + err.message)
+        } finally {
+            setActionLoading(false)
+        }
+    }
 
     const [isDark, setIsDark] = useState(() => localStorage.getItem('vf_dark_mode') === 'true')
     const [weekFilter, setWeekFilter] = useState('This Week')
@@ -164,7 +175,6 @@ export default function SellerDashboard() {
     const [selectedDateRange, setSelectedDateRange] = useState('May 20 - May 26, 2024')
     const [dateRangeDropOpen, setDateRangeDropOpen] = useState(false)
     const [isDetailedReportOpen, setIsDetailedReportOpen] = useState(false)
-    const [isPreviewMode, setIsPreviewMode] = useState(false)
 
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
@@ -433,30 +443,6 @@ export default function SellerDashboard() {
 
     // Initials helper
     const initials = (name) => (name || 'VD').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-
-    if (isPreviewMode) {
-        return (
-            <div className="min-h-screen bg-[var(--card-bg)] flex flex-col relative z-[9999]">
-                {/* Preview Mode Bar */}
-                <div className="bg-amber-500 text-white px-6 py-2.5 flex items-center justify-between text-xs font-bold shadow-md sticky top-0 z-[10000] border-b border-amber-600 font-['Outfit']">
-                    <div className="flex items-center gap-2">
-                        <Sparkles className="h-4 w-4 animate-pulse" />
-                        <span>Storefront Preview Mode — previewing your live shop catalog</span>
-                    </div>
-                    <button
-                        onClick={() => setIsPreviewMode(false)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 bg-white text-amber-600 rounded-xl hover:bg-neutral-100 transition-colors shadow-sm cursor-pointer border-none font-bold"
-                    >
-                        <X className="h-3.5 w-3.5" /> Close Preview
-                    </button>
-                </div>
-                {/* Storefront view container */}
-                <div className="flex-1 overflow-auto">
-                    <CustomerDashboard />
-                </div>
-            </div>
-        )
-    }
 
     return (
         <div className={`min-h-screen font-['Inter'] transition-colors duration-300 ${isDark ? 'theme-dark bg-[#1B0B0E] text-[#F7EFEF]' : 'bg-[#FAF7F5] text-[#1F1F1F]'}`}>
@@ -2263,7 +2249,7 @@ export default function SellerDashboard() {
                                     <Plus className="h-4 w-4" /> Add New Product
                                 </button>
                                 <button
-                                    onClick={() => setIsPreviewMode(true)}
+                                    onClick={handleViewStore}
                                     className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] bg-[var(--gold-bg-pill)] hover:bg-[var(--gold-accent)] hover:text-white text-xs font-black transition-all cursor-pointer"
                                 >
                                     <ExternalLink className="h-3.5 w-3.5" /> View My Store

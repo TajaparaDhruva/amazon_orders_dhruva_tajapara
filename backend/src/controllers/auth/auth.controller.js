@@ -129,4 +129,59 @@ const logout = async (req, res) => {
     }
 };
 
-module.exports = { register, login, logout };
+module.exports = {
+    demoCustomerLogin, register, login, logout };
+
+const demoCustomerLogin = async (req, res) => {
+    try {
+        const User = require('../../models/user.model');
+        const jwt = require('jsonwebtoken');
+        const { createSessionService } = require('../../services/auth/session.service');
+
+        let user = await User.findOne({ email: 'dhruvatajapara@gmail.com' });
+        if (!user) {
+            user = await User.findOne({ role: 'user' });
+        }
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'No demo customer account found'
+            });
+        }
+
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET || 'defaultsecret123',
+            { expiresIn: '7d' }
+        );
+
+        const ipAddress = req.ip || req.connection.remoteAddress;
+        const userAgent = req.headers['user-agent'];
+        const session = await createSessionService(user._id, { ipAddress, userAgent });
+
+        res.status(200).json({
+            success: true,
+            message: 'Logged in as Demo Customer successfully',
+            token,
+            refreshToken: session.refreshToken,
+            data: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                phone: user.phone,
+                role: user.role,
+                isEmailVerified: user.isEmailVerified,
+                isBanned: user.isBanned,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            }
+        });
+    } catch (err) {
+        console.error('Error in demoCustomerLogin:', err);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error',
+            error: err.message
+        });
+    }
+};

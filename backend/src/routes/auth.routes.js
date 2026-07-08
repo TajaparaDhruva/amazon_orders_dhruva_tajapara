@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { register, login, logout } = require('../controllers/auth/auth.controller');
+const { register, login, logout, demoCustomerLogin } = require('../controllers/auth/auth.controller');
 const { getProfile, updateProfile, deleteProfile } = require('../controllers/auth/profile.controller');
 const { forgotPassword, resetPassword, changePassword } = require('../controllers/auth/password.controller');
 const { sendOtp, verifyOtp, verifyEmail } = require('../controllers/auth/verification.controller');
@@ -21,6 +21,9 @@ router.post('/register', register);
 
 // POST /api/v1/auth/login
 router.post('/login', login);
+
+// POST /api/v1/auth/demo-customer-login
+router.post('/demo-customer-login', demoCustomerLogin);
 
 // POST /api/v1/auth/logout
 router.post('/logout', logout);

@@ -91,7 +91,16 @@ export function AuthProvider({ children }) {
         }
     }, [])
 
-    const value = { user, token, loading, login, register, logout, api }
+    const loginAsDemoCustomer = useCallback(async () => {
+        const { data } = await api.post('/auth/demo-customer-login')
+        if (data.success) {
+            persist(data.data, data.token)
+            return data.data
+        }
+        throw new Error(data.message || 'Demo login failed')
+    }, [])
+
+    const value = { user, token, loading, login, register, logout, loginAsDemoCustomer, api }
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
