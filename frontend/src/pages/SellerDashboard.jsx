@@ -148,7 +148,15 @@ export default function SellerDashboard() {
     const [custPage, setCustPage]       = useState(1)
     const [custDetail, setCustDetail]   = useState(null) // null | customer
     const [customers, setCustomers]     = useState(MOCK_CUSTOMERS)
+    const [custMoreMenu, setCustMoreMenu]           = useState(null) // null | { custId }
+    const [custDeleteConfirm, setCustDeleteConfirm] = useState(null) // null | customer object
     const CUST_PER_PAGE = 5
+
+    const handleCustDelete = (custId) => {
+        setCustomers(prev => prev.filter(c => c.id !== custId))
+        setCustMoreMenu(null)
+        setCustDeleteConfirm(null)
+    }
 
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
