@@ -91,16 +91,8 @@ export default function SellerDashboard() {
     const { user, logout, loginAsDemoCustomer, api } = useAuth()
     const navigate = useNavigate()
 
-    const handleViewStore = async () => {
-        try {
-            setActionLoading(true)
-            await loginAsDemoCustomer()
-            navigate('/dashboard/customer')
-        } catch (err) {
-            alert('Failed to switch to customer store: ' + err.message)
-        } finally {
-            setActionLoading(false)
-        }
+    const handleViewStore = () => {
+        navigate('/storefront')
     }
 
     const [isDark, setIsDark] = useState(() => localStorage.getItem('vf_dark_mode') === 'true')

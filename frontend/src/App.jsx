@@ -52,6 +52,9 @@ function App() {
                         }
                     />
 
+                    {/* Public Storefront Preview Route */}
+                    <Route path="/storefront" element={<CustomerDashboard />} />
+
                     {/* Protected Customer Dashboard */}
                     <Route
                         path="/dashboard/customer"
