@@ -2236,7 +2236,10 @@ export default function SellerDashboard() {
                                 >
                                     <Plus className="h-4 w-4" /> Add New Product
                                 </button>
-                                <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] bg-[var(--gold-bg-pill)] hover:bg-[var(--gold-accent)] hover:text-white text-xs font-black transition-all cursor-pointer">
+                                <button
+                                    onClick={() => window.open('/dashboard/customer', '_blank')}
+                                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] bg-[var(--gold-bg-pill)] hover:bg-[var(--gold-accent)] hover:text-white text-xs font-black transition-all cursor-pointer"
+                                >
                                     <ExternalLink className="h-3.5 w-3.5" /> View My Store
                                 </button>
                             </div>

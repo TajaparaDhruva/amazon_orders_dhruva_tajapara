@@ -27,7 +27,11 @@ function ProtectedRoute({ children, requiredRole }) {
     }
 
     if (requiredRole && user.role !== requiredRole) {
-        return <Navigate to={user.role === 'seller' ? '/dashboard/seller' : '/dashboard/customer'} replace />
+        if (requiredRole === 'user' && user.role === 'seller') {
+            // Let seller preview customer-facing pages
+        } else {
+            return <Navigate to={user.role === 'seller' ? '/dashboard/seller' : '/dashboard/customer'} replace />
+        }
     }
 
     return children
