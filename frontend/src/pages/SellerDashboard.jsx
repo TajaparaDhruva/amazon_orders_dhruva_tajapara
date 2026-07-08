@@ -9,7 +9,7 @@ import {
     BarChart2, ArrowUpRight, ArrowDownRight, Sparkles,
     Shield, CheckCircle, RotateCcw, TrendingDown,
     Search, SlidersHorizontal, Download, Edit2, MoreHorizontal,
-    ChevronLeft, ChevronRight
+    ChevronLeft, ChevronRight, MapPin
 } from 'lucide-react'
 
 import { ALL_PRODUCTS } from '../data/dashboardData'
@@ -68,6 +68,22 @@ const MOCK_ALL_ORDERS = [
     { OrderID:'VF10225', customer:'Mohit Verma',   email:'moh***@gmail.com',  phone:'+91 44321 09876', initials:'MV', color:'#f43f5e', items:[{name:'Electric Kettle',img:'https://images.unsplash.com/photo-1577334716219-3375b050d7a3?w=80&q=80'}],                                                                                                 itemCount:1, amount:83,   payment:'COD',    payBadge:'COD',    OrderStatus:'Pending',   statusNote:'Awaiting payment',        OrderDate:new Date('2024-05-21T09:05:00') },
 ]
 
+// ─── Mock Customers List ─────────────────────────────────────────────────
+const MOCK_CUSTOMERS = [
+    { id:'c1',  name:'Riya Kapoor',  initials:'RK', color:'#f97316', email:'riya.kapoor@email.com',  phone:'+91 98765 43210', city:'Rajkot',     state:'Gujarat',     orders:5,  totalSpent:5582,  status:'Active',   badge:'New',    joinedDate:new Date('2024-05-25') },
+    { id:'c2',  name:'Aman Mehta',   initials:'AM', color:'#22c55e', email:'aman.mehta@email.com',   phone:'+91 87654 32109', city:'Ahmedabad',  state:'Gujarat',     orders:3,  totalSpent:3247,  status:'Active',   badge:null,     joinedDate:new Date('2024-05-24') },
+    { id:'c3',  name:'Sneha Patel',  initials:'SP', color:'#a855f7', email:'sneha.patel@email.com',  phone:'+91 91234 56789', city:'Surat',      state:'Gujarat',     orders:8,  totalSpent:9862,  status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-20') },
+    { id:'c4',  name:'Vivek Gupta',  initials:'VG', color:'#3b82f6', email:'vivek.gupta@email.com',  phone:'+91 99887 76655', city:'Vadodara',   state:'Gujarat',     orders:2,  totalSpent:1498,  status:'Inactive', badge:null,     joinedDate:new Date('2024-05-18') },
+    { id:'c5',  name:'Neha Joshi',   initials:'NJ', color:'#ec4899', email:'neha.joshi@email.com',   phone:'+91 78965 43211', city:'Jamnagar',   state:'Gujarat',     orders:4,  totalSpent:2987,  status:'Active',   badge:null,     joinedDate:new Date('2024-05-15') },
+    { id:'c6',  name:'Raj Sharma',   initials:'RS', color:'#14b8a6', email:'raj.sharma@email.com',   phone:'+91 88765 43210', city:'Mumbai',     state:'Maharashtra', orders:6,  totalSpent:7340,  status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-12') },
+    { id:'c7',  name:'Priya Singh',  initials:'PS', color:'#f59e0b', email:'priya.singh@email.com',  phone:'+91 77654 32109', city:'Pune',       state:'Maharashtra', orders:9,  totalSpent:12450, status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-10') },
+    { id:'c8',  name:'Arjun Nair',   initials:'AN', color:'#6366f1', email:'arjun.nair@email.com',   phone:'+91 66543 21098', city:'Chennai',    state:'Tamil Nadu',  orders:1,  totalSpent:849,   status:'Active',   badge:'New',    joinedDate:new Date('2024-05-08') },
+    { id:'c9',  name:'Kavya Reddy',  initials:'KR', color:'#10b981', email:'kavya.reddy@email.com',  phone:'+91 55432 10987', city:'Hyderabad',  state:'Telangana',   orders:7,  totalSpent:8920,  status:'Active',   badge:'Repeat', joinedDate:new Date('2024-05-05') },
+    { id:'c10', name:'Mohit Verma',  initials:'MV', color:'#f43f5e', email:'mohit.verma@email.com',  phone:'+91 44321 09876', city:'Delhi',      state:'Delhi',       orders:3,  totalSpent:2130,  status:'Inactive', badge:null,     joinedDate:new Date('2024-05-03') },
+    { id:'c11', name:'Ankita Das',   initials:'AD', color:'#0ea5e9', email:'ankita.das@email.com',   phone:'+91 33210 98765', city:'Kolkata',    state:'West Bengal', orders:5,  totalSpent:4670,  status:'Active',   badge:null,     joinedDate:new Date('2024-05-01') },
+    { id:'c12', name:'Siddharth K',  initials:'SK', color:'#d97706', email:'siddharth.k@email.com',  phone:'+91 22109 87654', city:'Bangalore',  state:'Karnataka',   orders:12, totalSpent:18230, status:'Active',   badge:'Repeat', joinedDate:new Date('2024-04-28') },
+]
+
 // Nav links
 const NAV_LINKS = ['Dashboard', 'Products', 'Orders', 'Customers', 'Analytics']
 
@@ -124,6 +140,15 @@ export default function SellerDashboard() {
     const [ordDetail, setOrdDetail]       = useState(null)  // null | order object (side drawer)
     const [allOrders, setAllOrders]       = useState(MOCK_ALL_ORDERS)
     const ORD_PER_PAGE = 5
+
+    // Customers page state
+    const [custSearch, setCustSearch]   = useState('')
+    const [custStatus, setCustStatus]   = useState('All Status')
+    const [custLocation, setCustLocation] = useState('All Locations')
+    const [custPage, setCustPage]       = useState(1)
+    const [custDetail, setCustDetail]   = useState(null) // null | customer
+    const [customers, setCustomers]     = useState(MOCK_CUSTOMERS)
+    const CUST_PER_PAGE = 5
 
     const EMPTY_PROD = { name:'', brand:'', category:'Electronics', subcategory:'', price:'', stock:'', image:'' }
 
@@ -1238,7 +1263,371 @@ export default function SellerDashboard() {
                 )
             })()}
 
-            {/* ══════════════ DASHBOARD PAGE ══════════════ */}
+            {/* ══════════════ CUSTOMERS PAGE ══════════════ */}
+            {activeNav === 'Customers' && (() => {
+                const CUST_STATUSES   = ['All Status','Active','Inactive']
+                const CUST_LOCATIONS  = ['All Locations','Gujarat','Maharashtra','Tamil Nadu','Delhi','Karnataka','Telangana','West Bengal']
+
+                const filtered = customers.filter(c => {
+                    const q = custSearch.toLowerCase()
+                    const matchQ = !q || c.name.toLowerCase().includes(q) || c.email.toLowerCase().includes(q) || c.phone.includes(q)
+                    const matchS = custStatus   === 'All Status'    || c.status === custStatus
+                    const matchL = custLocation === 'All Locations' || c.state  === custLocation
+                    return matchQ && matchS && matchL
+                })
+
+                const totalPages = Math.max(1, Math.ceil(filtered.length / CUST_PER_PAGE))
+                const safePage   = Math.min(custPage, totalPages)
+                const paginated  = filtered.slice((safePage - 1) * CUST_PER_PAGE, safePage * CUST_PER_PAGE)
+
+                const totalSpent = customers.reduce((s, c) => s + c.totalSpent, 0)
+                const avgOrder   = Math.round(totalSpent / customers.reduce((s,c) => s + c.orders, 0))
+                const repeatCust = customers.filter(c => c.badge === 'Repeat').length
+                const newCust    = customers.filter(c => c.badge === 'New').length
+
+                const STAT_CARDS = [
+                    { label:'Total Customers',   value: customers.length,   sub:'All time customers',       icon:<Users className="h-5 w-5" />,     color:'text-orange-500',  bg:'bg-orange-500/10 border-orange-500/20' },
+                    { label:'New This Month',     value: newCust,            sub:'Joined this month',        icon:<Users className="h-5 w-5" />,     color:'text-blue-500',    bg:'bg-blue-500/10 border-blue-500/20' },
+                    { label:'Repeat Customers',   value: repeatCust,         sub:'Purchased more than once', icon:<ShoppingBag className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20' },
+                    { label:'Total Spent',        value: `₹${totalSpent.toLocaleString('en-IN')}`, sub:'By all customers', icon:<TrendingUp className="h-5 w-5" />, color:'text-violet-500', bg:'bg-violet-500/10 border-violet-500/20' },
+                    { label:'Average Order Value',value: `₹${avgOrder}`,     sub:'Per order',                icon:<Star className="h-5 w-5" />,      color:'text-amber-500',   bg:'bg-amber-500/10 border-amber-500/20' },
+                ]
+
+                const handleExportCust = () => {
+                    const headers = ['Name','Email','Phone','City','State','Orders','Total Spent','Status','Joined']
+                    const rows = customers.map(c => [c.name, c.email, c.phone, c.city, c.state, c.orders, c.totalSpent, c.status, c.joinedDate.toLocaleDateString('en-IN')])
+                    const csv = [headers, ...rows].map(r => r.join(',')).join('\n')
+                    const blob = new Blob([csv], { type: 'text/csv' })
+                    const url = URL.createObjectURL(blob)
+                    const a = document.createElement('a'); a.href = url; a.download = 'customers_export.csv'; a.click()
+                    URL.revokeObjectURL(url)
+                }
+
+                return (
+                    <div className="space-y-6">
+
+                        {/* Page Header */}
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h1 className="font-['Outfit'] text-2xl font-black text-[var(--text-primary)] tracking-tight">Customers</h1>
+                                <p className="text-xs font-semibold text-[var(--text-muted)] mt-1">View and manage all your store customers.</p>
+                            </div>
+                            <button onClick={handleExportCust}
+                                className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-all cursor-pointer">
+                                <Download className="h-3.5 w-3.5" /> Export Customers
+                            </button>
+                        </div>
+
+                        {/* Stat Cards */}
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                            {STAT_CARDS.map((card, i) => (
+                                <div key={i} className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl p-4 hover:shadow-md transition-all">
+                                    <div className="flex items-start gap-3">
+                                        <div className={`p-2 rounded-xl border shrink-0 ${card.color} ${card.bg}`}>{card.icon}</div>
+                                        <div className="min-w-0">
+                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider leading-tight">{card.label}</div>
+                                            <div className={`font-['Outfit'] text-xl font-black ${card.color} leading-tight mt-1`}>{card.value}</div>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-1">{card.sub}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Search & Filters */}
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <div className="relative flex-1 max-w-sm">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)]" />
+                                <input type="text" placeholder="Search by name, email or phone..."
+                                    value={custSearch}
+                                    onChange={e => { setCustSearch(e.target.value); setCustPage(1) }}
+                                    className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-primary)] placeholder-[var(--text-muted)] outline-none focus:border-[var(--gold-accent)] transition-colors" />
+                            </div>
+                            <div className="relative">
+                                <select value={custStatus} onChange={e => { setCustStatus(e.target.value); setCustPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors">
+                                    {CUST_STATUSES.map(s => <option key={s}>{s}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <div className="relative">
+                                <select value={custLocation} onChange={e => { setCustLocation(e.target.value); setCustPage(1) }}
+                                    className="appearance-none pl-3.5 pr-8 py-2.5 rounded-xl border border-[var(--card-border)] bg-[var(--card-bg)] text-xs font-semibold text-[var(--text-secondary)] outline-none focus:border-[var(--gold-accent)] cursor-pointer transition-colors">
+                                    {CUST_LOCATIONS.map(l => <option key={l}>{l}</option>)}
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-[var(--text-muted)] pointer-events-none" />
+                            </div>
+                            <button className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-[var(--gold-accent)] text-[var(--gold-accent)] bg-[var(--gold-bg-pill)] text-xs font-bold hover:bg-[var(--gold-accent)] hover:text-white transition-colors cursor-pointer">
+                                <SlidersHorizontal className="h-3.5 w-3.5" /> Filters
+                            </button>
+                        </div>
+
+                        {/* Customer Table */}
+                        <div className="bg-[var(--card-bg)] border border-[var(--card-border)] rounded-2xl overflow-hidden shadow-sm">
+                            {/* Table Header */}
+                            <div className="grid items-center border-b border-[var(--card-border)] px-5 py-3 text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider bg-[var(--bg-right-panel)]/40"
+                                style={{ gridTemplateColumns: '2fr 1.6fr 1.2fr 0.7fr 1fr 0.8fr 1fr 0.6fr' }}>
+                                <div>Customer</div>
+                                <div>Contact</div>
+                                <div>Location</div>
+                                <div>Orders</div>
+                                <div>Total Spent</div>
+                                <div>Status</div>
+                                <div>Joined On</div>
+                                <div className="text-right">Actions</div>
+                            </div>
+
+                            {/* Rows */}
+                            <div className="divide-y divide-[var(--card-border)]/50">
+                                {paginated.length === 0 ? (
+                                    <div className="py-16 flex flex-col items-center gap-3 text-[var(--text-muted)]">
+                                        <Users className="h-8 w-8 opacity-30" />
+                                        <span className="text-xs font-semibold">No customers found</span>
+                                    </div>
+                                ) : paginated.map(cust => (
+                                    <div key={cust.id}
+                                        className="grid items-center px-5 py-4 hover:bg-[var(--bg-right-panel)]/60 transition-colors cursor-pointer"
+                                        style={{ gridTemplateColumns: '2fr 1.6fr 1.2fr 0.7fr 1fr 0.8fr 1fr 0.6fr' }}
+                                        onClick={() => setCustDetail(cust)}
+                                    >
+                                        {/* Customer */}
+                                        <div className="flex items-center gap-3 min-w-0">
+                                            <div className="h-9 w-9 rounded-full flex items-center justify-center text-white text-[11px] font-black shrink-0 shadow-sm"
+                                                style={{ backgroundColor: cust.color }}>
+                                                {cust.initials}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="flex items-center gap-1.5">
+                                                    <span className="text-xs font-bold text-[var(--text-primary)] truncate">{cust.name}</span>
+                                                    {cust.badge && (
+                                                        <span className={`shrink-0 px-1.5 py-0.5 rounded-[5px] text-[8px] font-black border ${
+                                                            cust.badge === 'New'
+                                                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+                                                                : 'bg-violet-500/10 text-violet-600 border-violet-500/20'
+                                                        }`}>{cust.badge}</span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* Contact */}
+                                        <div className="min-w-0">
+                                            <div className="text-[10px] font-semibold text-[var(--text-secondary)] truncate">{cust.email}</div>
+                                            <div className="text-[10px] font-semibold text-[var(--text-muted)] mt-0.5">{cust.phone}</div>
+                                        </div>
+
+                                        {/* Location */}
+                                        <div className="flex items-start gap-1">
+                                            <MapPin className="h-3 w-3 text-[var(--text-muted)] mt-0.5 shrink-0" />
+                                            <div>
+                                                <div className="text-[10px] font-semibold text-[var(--text-secondary)] truncate">{cust.city}, {cust.state}</div>
+                                            </div>
+                                        </div>
+
+                                        {/* Orders */}
+                                        <div className="text-xs font-black text-[var(--text-primary)]">{cust.orders}</div>
+
+                                        {/* Total Spent */}
+                                        <div className="text-xs font-black text-[var(--text-primary)]">
+                                            ₹{cust.totalSpent.toLocaleString('en-IN')}
+                                        </div>
+
+                                        {/* Status */}
+                                        <div>
+                                            <span className={`inline-block px-2.5 py-1 rounded-xl text-[9px] font-black border ${
+                                                cust.status === 'Active'
+                                                    ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
+                                                    : 'bg-neutral-500/10 text-neutral-500 border-neutral-500/20'
+                                            }`}>{cust.status}</span>
+                                        </div>
+
+                                        {/* Joined */}
+                                        <div className="text-[10px] font-bold text-[var(--text-secondary)]">
+                                            {cust.joinedDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'})}
+                                        </div>
+
+                                        {/* Actions */}
+                                        <div className="flex items-center justify-end gap-1" onClick={e => e.stopPropagation()}>
+                                            <button onClick={() => setCustDetail(cust)}
+                                                className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors" title="View Profile">
+                                                <Eye className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                            </button>
+                                            <button className="h-7 w-7 rounded-lg hover:bg-[var(--bg-right-panel)] flex items-center justify-center cursor-pointer transition-colors">
+                                                <MoreHorizontal className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            {/* Pagination Footer */}
+                            <div className="flex items-center justify-between px-5 py-3.5 border-t border-[var(--card-border)] bg-[var(--bg-right-panel)]/30">
+                                <span className="text-[10px] font-semibold text-[var(--text-muted)]">
+                                    Showing {filtered.length === 0 ? 0 : Math.min((safePage-1)*CUST_PER_PAGE+1, filtered.length)} to {Math.min(safePage*CUST_PER_PAGE, filtered.length)} of {filtered.length} customers
+                                </span>
+                                <div className="flex items-center gap-1.5">
+                                    <button disabled={safePage === 1} onClick={() => setCustPage(p => Math.max(1,p-1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                                        <ChevronLeft className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                    {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                                        const pg = i + 1
+                                        return (
+                                            <button key={pg} onClick={() => setCustPage(pg)}
+                                                className={`h-7 w-7 rounded-lg text-[10px] font-black cursor-pointer transition-colors ${
+                                                    safePage === pg
+                                                        ? 'bg-[var(--gold-accent)] text-white border border-[var(--gold-accent)]'
+                                                        : 'border border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                                }`}>{pg}</button>
+                                        )
+                                    })}
+                                    {totalPages > 5 && <span className="text-xs font-bold text-[var(--text-muted)]">...</span>}
+                                    {totalPages > 5 && (
+                                        <button onClick={() => setCustPage(totalPages)}
+                                            className={`h-7 w-7 rounded-lg text-[10px] font-black border cursor-pointer transition-colors ${
+                                                safePage === totalPages ? 'bg-[var(--gold-accent)] text-white border-[var(--gold-accent)]' : 'border-[var(--card-border)] text-[var(--text-secondary)] hover:bg-[var(--bg-right-panel)]'
+                                            }`}>{totalPages}</button>
+                                    )}
+                                    <button disabled={safePage === totalPages} onClick={() => setCustPage(p => Math.min(totalPages, p+1))}
+                                        className="h-7 w-7 rounded-lg border border-[var(--card-border)] flex items-center justify-center hover:bg-[var(--bg-right-panel)] disabled:opacity-40 cursor-pointer disabled:cursor-not-allowed">
+                                        <ChevronRight className="h-3.5 w-3.5 text-[var(--text-secondary)]" />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* ── CUSTOMER DETAIL DRAWER ────────────────────── */}
+                        {custDetail && (
+                            <div className="fixed inset-0 z-50 flex justify-end" onClick={() => setCustDetail(null)}>
+                                <div className="absolute inset-0 bg-black/60 backdrop-blur-md" />
+                                <div className="relative w-full max-w-[400px] h-full flex flex-col shadow-2xl"
+                                    style={{ background:'var(--card-bg)', borderLeft:'1px solid var(--card-border)', overflowY:'auto' }}
+                                    onClick={e => e.stopPropagation()}>
+
+                                    {/* Sticky close */}
+                                    <div className="sticky top-0 z-20 flex items-center justify-end px-4 pt-4 pb-0 pointer-events-none">
+                                        <button onClick={() => setCustDetail(null)}
+                                            className="pointer-events-auto h-8 w-8 rounded-full bg-[var(--card-bg)] border border-[var(--card-border)] shadow-md flex items-center justify-center text-[var(--text-muted)] hover:text-rose-500 cursor-pointer transition-all hover:scale-110">
+                                            <X className="h-3.5 w-3.5" />
+                                        </button>
+                                    </div>
+
+                                    {/* Hero */}
+                                    <div className="relative overflow-hidden -mt-8" style={{ background:`linear-gradient(135deg, ${custDetail.color}22 0%, ${custDetail.color}06 100%)`, borderBottom:'1px solid var(--card-border)' }}>
+                                        <div className="absolute top-0 right-0 h-28 w-28 rounded-full blur-3xl opacity-20" style={{ background:custDetail.color }} />
+                                        <div className="px-6 pt-10 pb-6 relative z-10">
+                                            <div className="flex items-center gap-4 mb-4">
+                                                <div className="h-14 w-14 rounded-2xl flex items-center justify-center text-white text-lg font-black shadow-lg ring-4 ring-white/20"
+                                                    style={{ backgroundColor:custDetail.color }}>
+                                                    {custDetail.initials}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="font-['Outfit'] text-base font-black text-[var(--text-primary)]">{custDetail.name}</div>
+                                                        {custDetail.badge && (
+                                                            <span className={`px-1.5 py-0.5 rounded-[5px] text-[8px] font-black border ${
+                                                                custDetail.badge === 'New' ? 'bg-blue-500/10 text-blue-600 border-blue-500/20' : 'bg-violet-500/10 text-violet-600 border-violet-500/20'
+                                                            }`}>{custDetail.badge}</span>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)] mt-0.5">{custDetail.email}</div>
+                                                    <div className="text-[11px] font-semibold text-[var(--text-muted)]">{custDetail.phone}</div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-[9px] font-black border ${
+                                                    custDetail.status === 'Active' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-neutral-500/10 text-neutral-500 border-neutral-500/20'
+                                                }`}>{custDetail.status}</span>
+                                                <span className="flex items-center gap-1 text-[10px] font-semibold text-[var(--text-muted)]">
+                                                    <MapPin className="h-3 w-3" />{custDetail.city}, {custDetail.state}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Body */}
+                                    <div className="p-5 space-y-4">
+                                        {/* Quick stats */}
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {[
+                                                { label:'Orders',      value: custDetail.orders,                                       color:'text-blue-500',    bg:'bg-blue-500/5' },
+                                                { label:'Total Spent', value:`₹${custDetail.totalSpent.toLocaleString('en-IN')}`, color:'text-[var(--gold-accent)]', bg:'bg-[var(--gold-accent)]/5' },
+                                                { label:'Joined',      value: custDetail.joinedDate.toLocaleDateString('en-IN',{day:'2-digit',month:'short'}), color:'text-[var(--text-primary)]', bg:'bg-[var(--bg-right-panel)]' },
+                                            ].map((s,i) => (
+                                                <div key={i} className={`rounded-2xl border border-[var(--card-border)] p-3 text-center ${s.bg}`}>
+                                                    <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-wider">{s.label}</div>
+                                                    <div className={`font-['Outfit'] text-sm font-black mt-1 ${s.color}`}>{s.value}</div>
+                                                </div>
+                                            ))}
+                                        </div>
+
+                                        {/* Contact details */}
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl overflow-hidden">
+                                            <div className="px-4 py-3 border-b border-[var(--card-border)]">
+                                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Contact Information</div>
+                                            </div>
+                                            <div className="divide-y divide-[var(--card-border)]/40">
+                                                {[
+                                                    { icon:<Bell className="h-3.5 w-3.5" />, label:'Email', value:custDetail.email },
+                                                    { icon:<Users className="h-3.5 w-3.5" />, label:'Phone', value:custDetail.phone },
+                                                    { icon:<MapPin className="h-3.5 w-3.5" />, label:'Location', value:`${custDetail.city}, ${custDetail.state}` },
+                                                ].map((row,i) => (
+                                                    <div key={i} className="flex items-center gap-3 px-4 py-3">
+                                                        <div className="text-[var(--text-muted)] shrink-0">{row.icon}</div>
+                                                        <div>
+                                                            <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">{row.label}</div>
+                                                            <div className="text-xs font-semibold text-[var(--text-primary)] mt-0.5">{row.value}</div>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* Spending bar */}
+                                        <div className="bg-[var(--bg-right-panel)] border border-[var(--card-border)] rounded-2xl p-4">
+                                            <div className="flex items-center justify-between mb-3">
+                                                <div className="text-[9px] font-black text-[var(--text-muted)] uppercase tracking-widest">Spending vs Top Customer</div>
+                                                <div className="text-[10px] font-black text-[var(--gold-accent)]">{Math.round((custDetail.totalSpent / Math.max(...customers.map(c=>c.totalSpent))) * 100)}%</div>
+                                            </div>
+                                            <div className="h-2 rounded-full bg-[var(--card-border)]">
+                                                <div className="h-2 rounded-full transition-all duration-500"
+                                                    style={{ width:`${Math.round((custDetail.totalSpent / Math.max(...customers.map(c=>c.totalSpent))) * 100)}%`, background:'var(--gold-accent)' }} />
+                                            </div>
+                                            <div className="flex items-center justify-between mt-2">
+                                                <span className="text-[9px] font-semibold text-[var(--text-muted)]">₹0</span>
+                                                <span className="text-[9px] font-semibold text-[var(--text-muted)]">₹{Math.max(...customers.map(c=>c.totalSpent)).toLocaleString('en-IN')}</span>
+                                            </div>
+                                        </div>
+
+                                        {/* Toggle Status */}
+                                        <div className="flex gap-3">
+                                            <button
+                                                onClick={() => {
+                                                    const next = custDetail.status === 'Active' ? 'Inactive' : 'Active'
+                                                    setCustomers(prev => prev.map(c => c.id === custDetail.id ? {...c, status:next} : c))
+                                                    setCustDetail(prev => ({...prev, status:next}))
+                                                }}
+                                                className={`flex-1 py-3 rounded-2xl text-xs font-black border cursor-pointer transition-all ${
+                                                    custDetail.status === 'Active'
+                                                        ? 'bg-rose-500/5 border-rose-500/20 text-rose-600 hover:bg-rose-500/10'
+                                                        : 'bg-emerald-500/5 border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10'
+                                                }`}>
+                                                {custDetail.status === 'Active' ? 'Mark as Inactive' : 'Mark as Active'}
+                                            </button>
+                                            <button onClick={() => setCustDetail(null)}
+                                                className="flex-1 py-3 rounded-2xl bg-[var(--gold-accent)] hover:bg-[var(--gold-hover)] text-white text-xs font-black cursor-pointer transition-all shadow-md hover:shadow-lg">
+                                                Close
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )
+            })()}
+
+            {/* ══════════════ DASHBOARD PAGE ═════════════─ */}
             {activeNav === 'Dashboard' && <>
 
                 {/* ── WELCOME BANNER ───────────────────────────────────────────── */}
