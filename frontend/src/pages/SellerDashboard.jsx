@@ -356,10 +356,18 @@ export default function SellerDashboard() {
     const formatCurrency = (val) =>
         new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(val || 0)
 
-    // ─── SVG Line Chart (reactive to weekFilter) ─────────────────────────────────
+    // ─── SVG Line Chart (reactive to weekFilter & date range) ──────────────────────
     const chartW = 500, chartH = 180
+    
+    // Scale factor based on selectedDateRange
+    let rangeScale = 1.0;
+    if (selectedDateRange === 'May 13 - May 19, 2024') rangeScale = 42180 / 54320;
+    else if (selectedDateRange === 'May 06 - May 12, 2024') rangeScale = 48920 / 54320;
+    else if (selectedDateRange === 'April 2024') rangeScale = 185430 / 54320;
+    else if (selectedDateRange === 'All Time') rangeScale = (stats.totalRevenue || 54320) / 54320;
+
     const activeChartData = CHART_DATA[weekFilter] || CHART_DATA['This Week']
-    const chartPoints = activeChartData.points
+    const chartPoints = activeChartData.points.map(v => Math.round(v * rangeScale))
     const chartDays   = activeChartData.days
     const maxVal = Math.max(...chartPoints) * 1.1
     const minVal = 0
@@ -1686,33 +1694,136 @@ export default function SellerDashboard() {
 
             {/* ══════════════ ANALYTICS PAGE ══════════════ */}
             {activeNav === 'Analytics' && (() => {
-                const totalRevenue = stats.totalRevenue || 54320
-                const totalOrders = stats.totalOrders || 156
-                const totalCustomers = stats.totalCustomers || 128
-                const productViews = stats.productViews || 2350
-                const conversionRate = "3.24%"
-                const avgOrderValue = Math.round(totalRevenue / totalOrders) || 862
+                const ANALYTICS_DATA = {
+                    'May 20 - May 26, 2024': {
+                        totalRevenue: 54320,
+                        totalOrders: 156,
+                        totalCustomers: 128,
+                        productViews: 2350,
+                        conversionRate: "3.24%",
+                        avgOrderValue: 862,
+                        salesGrowth: '12.5%',
+                        ordersGrowth: '8.3%',
+                        customersGrowth: '10.2%',
+                        viewsGrowth: '15.7%',
+                        convGrowth: '2.1%',
+                        aovGrowth: '-3.2%',
+                        categories: [
+                            { label: 'Home Appliances', value: 18620, color: '#10b981', pct: '34.3' },
+                            { label: 'Furniture',       value: 12450, color: '#3b82f6', pct: '22.9' },
+                            { label: 'Footwear',        value: 8830,  color: '#f59e0b', pct: '16.3' },
+                            { label: 'Bags',            value: 7560,  color: '#a855f7', pct: '13.9' },
+                            { label: 'Toys & Games',    value: 6860,  color: '#f43f5e', pct: '12.6' },
+                        ]
+                    },
+                    'May 13 - May 19, 2024': {
+                        totalRevenue: 42180,
+                        totalOrders: 120,
+                        totalCustomers: 98,
+                        productViews: 1890,
+                        conversionRate: "2.85%",
+                        avgOrderValue: 835,
+                        salesGrowth: '9.4%',
+                        ordersGrowth: '6.1%',
+                        customersGrowth: '8.5%',
+                        viewsGrowth: '11.2%',
+                        convGrowth: '1.8%',
+                        aovGrowth: '-1.5%',
+                        categories: [
+                            { label: 'Home Appliances', value: 14200, color: '#10b981', pct: '33.7' },
+                            { label: 'Furniture',       value: 9800,  color: '#3b82f6', pct: '23.2' },
+                            { label: 'Footwear',        value: 6900,  color: '#f59e0b', pct: '16.4' },
+                            { label: 'Bags',            value: 6180,  color: '#a855f7', pct: '14.7' },
+                            { label: 'Toys & Games',    value: 5100,  color: '#f43f5e', pct: '12.0' },
+                        ]
+                    },
+                    'May 06 - May 12, 2024': {
+                        totalRevenue: 48920,
+                        totalOrders: 135,
+                        totalCustomers: 110,
+                        productViews: 2120,
+                        conversionRate: "3.12%",
+                        avgOrderValue: 855,
+                        salesGrowth: '11.0%',
+                        ordersGrowth: '7.4%',
+                        customersGrowth: '9.8%',
+                        viewsGrowth: '13.2%',
+                        convGrowth: '2.0%',
+                        aovGrowth: '-2.2%',
+                        categories: [
+                            { label: 'Home Appliances', value: 16500, color: '#10b981', pct: '33.7' },
+                            { label: 'Furniture',       value: 11200, color: '#3b82f6', pct: '22.9' },
+                            { label: 'Footwear',        value: 7900,  color: '#f59e0b', pct: '16.1' },
+                            { label: 'Bags',            value: 6900,  color: '#a855f7', pct: '14.1' },
+                            { label: 'Toys & Games',    value: 6420,  color: '#f43f5e', pct: '13.2' },
+                        ]
+                    },
+                    'April 2024': {
+                        totalRevenue: 185430,
+                        totalOrders: 520,
+                        totalCustomers: 410,
+                        productViews: 8450,
+                        conversionRate: "3.10%",
+                        avgOrderValue: 853,
+                        salesGrowth: '22.4%',
+                        ordersGrowth: '15.6%',
+                        customersGrowth: '18.4%',
+                        viewsGrowth: '25.0%',
+                        convGrowth: '4.2%',
+                        aovGrowth: '-2.8%',
+                        categories: [
+                            { label: 'Home Appliances', value: 63400, color: '#10b981', pct: '34.2' },
+                            { label: 'Furniture',       value: 42100, color: '#3b82f6', pct: '22.7' },
+                            { label: 'Footwear',        value: 30200, color: '#f59e0b', pct: '16.3' },
+                            { label: 'Bags',            value: 25830, color: '#a855f7', pct: '13.9' },
+                            { label: 'Toys & Games',    value: 23900, color: '#f43f5e', pct: '12.9' },
+                        ]
+                    }
+                }
+
+                const activeData = ANALYTICS_DATA[selectedDateRange] || {
+                    totalRevenue: stats.totalRevenue || 54320,
+                    totalOrders: stats.totalOrders || 156,
+                    totalCustomers: stats.totalCustomers || 128,
+                    productViews: stats.productViews || 2350,
+                    conversionRate: "3.24%",
+                    avgOrderValue: Math.round((stats.totalRevenue || 54320) / (stats.totalOrders || 156)) || 862,
+                    salesGrowth: stats.revenueGrowth ? `${stats.revenueGrowth}%` : '12.5%',
+                    ordersGrowth: stats.ordersGrowth ? `${stats.ordersGrowth}%` : '8.3%',
+                    customersGrowth: stats.customersGrowth ? `${stats.customersGrowth}%` : '10.2%',
+                    viewsGrowth: stats.viewsGrowth ? `${stats.viewsGrowth}%` : '15.7%',
+                    convGrowth: '2.1%',
+                    aovGrowth: '-3.2%',
+                    categories: [
+                        { label: 'Home Appliances', value: Math.round((stats.totalRevenue || 54320) * 0.343), color: '#10b981', pct: '34.3' },
+                        { label: 'Furniture',       value: Math.round((stats.totalRevenue || 54320) * 0.229), color: '#3b82f6', pct: '22.9' },
+                        { label: 'Footwear',        value: Math.round((stats.totalRevenue || 54320) * 0.163), color: '#f59e0b', pct: '16.3' },
+                        { label: 'Bags',            value: Math.round((stats.totalRevenue || 54320) * 0.139), color: '#a855f7', pct: '13.9' },
+                        { label: 'Toys & Games',    value: Math.round((stats.totalRevenue || 54320) * 0.126), color: '#f43f5e', pct: '12.6' },
+                    ]
+                }
+
+                const totalRevenue = activeData.totalRevenue
+                const totalOrders = activeData.totalOrders
+                const totalCustomers = activeData.totalCustomers
+                const productViews = activeData.productViews
+                const conversionRate = activeData.conversionRate
+                const avgOrderValue = activeData.avgOrderValue
 
                 const ANALYTICS_CARDS = [
-                    { label:'Total Sales',     value: formatCurrency(totalRevenue), sub:'12.5% vs last week', icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp:true },
-                    { label:'Total Orders',    value: totalOrders.toLocaleString(),  sub:'8.3% vs last week',  icon:<ShoppingBag className="h-5 w-5" />, color:'text-blue-500', bg:'bg-blue-500/10 border-blue-500/20', isUp:true },
-                    { label:'Total Customers', value: totalCustomers.toLocaleString(), sub:'10.2% vs last week', icon:<Users className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp:true },
-                    { label:'Views',           value: productViews.toLocaleString(),  sub:'15.7% vs last week', icon:<Eye className="h-5 w-5" />, color:'text-violet-500', bg:'bg-violet-500/10 border-violet-500/20', isUp:true },
-                    { label:'Conversion Rate', value: conversionRate,                 sub:'2.1% vs last week',  icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp:true },
-                    { label:'Average Order Value', value: formatCurrency(avgOrderValue), sub:'3.2% vs last week', icon:<Star className="h-5 w-5" />, color:'text-rose-500', bg:'bg-rose-500/10 border-rose-500/20', isUp:false }
+                    { label:'Total Sales',     value: formatCurrency(totalRevenue), sub: `${activeData.salesGrowth} vs last week`, icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.salesGrowth.startsWith('-') },
+                    { label:'Total Orders',    value: totalOrders.toLocaleString(),  sub: `${activeData.ordersGrowth} vs last week`,  icon:<ShoppingBag className="h-5 w-5" />, color:'text-blue-500', bg:'bg-blue-500/10 border-blue-500/20', isUp: !activeData.ordersGrowth.startsWith('-') },
+                    { label:'Total Customers', value: totalCustomers.toLocaleString(), sub: `${activeData.customersGrowth} vs last week`, icon:<Users className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.customersGrowth.startsWith('-') },
+                    { label:'Views',           value: productViews.toLocaleString(),  sub: `${activeData.viewsGrowth} vs last week`, icon:<Eye className="h-5 w-5" />, color:'text-violet-500', bg:'bg-violet-500/10 border-violet-500/20', isUp: !activeData.viewsGrowth.startsWith('-') },
+                    { label:'Conversion Rate', value: conversionRate,                 sub: `${activeData.convGrowth} vs last week`,  icon:<TrendingUp className="h-5 w-5" />, color:'text-emerald-500', bg:'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.convGrowth.startsWith('-') },
+                    { label:'Average Order Value', value: formatCurrency(avgOrderValue), sub: `${activeData.aovGrowth} vs last week`, icon:<Star className="h-5 w-5" />, color: activeData.aovGrowth.startsWith('-') ? 'text-rose-500' : 'text-emerald-500', bg: activeData.aovGrowth.startsWith('-') ? 'bg-rose-500/10 border-rose-500/20' : 'bg-emerald-500/10 border-emerald-500/20', isUp: !activeData.aovGrowth.startsWith('-') }
                 ]
 
-                const catSegments = [
-                    { label: 'Home Appliances', value: 18620, color: '#10b981', pct: '34.3' },
-                    { label: 'Furniture',       value: 12450, color: '#3b82f6', pct: '22.9' },
-                    { label: 'Footwear',        value: 8830,  color: '#f59e0b', pct: '16.3' },
-                    { label: 'Bags',            value: 7560,  color: '#a855f7', pct: '13.9' },
-                    { label: 'Toys & Games',    value: 6860,  color: '#f43f5e', pct: '12.6' },
-                ]
+                const catSegments = activeData.categories
                 const CAT_DONUT_R = 70, CAT_DONUT_CX = 90, CAT_DONUT_CY = 90, CAT_STROKE_W = 22
                 let catCumAngle = -90
                 const catDonutArcs = catSegments.map(seg => {
-                    const angle = (seg.value / 54320) * 360
+                    const angle = (seg.value / totalRevenue) * 360
                     const startAngle = catCumAngle
                     const endAngle = catCumAngle + angle
                     catCumAngle = endAngle
