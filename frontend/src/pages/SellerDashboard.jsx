@@ -483,12 +483,6 @@ export default function SellerDashboard() {
                             {isDark ? <Sun className="h-4 w-4 text-amber-400" /> : <Moon className="h-4 w-4 text-neutral-500" />}
                         </button>
 
-                        {/* Notifications */}
-                        <button className="relative h-9 w-9 rounded-xl border border-[var(--card-border)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-right-panel)] transition-colors">
-                            <Bell className="h-4 w-4 text-[var(--text-secondary)]" />
-                            <span className="absolute -top-0.5 -right-0.5 h-4 w-4 bg-rose-500 text-white text-[8px] font-black rounded-full flex items-center justify-center">6</span>
-                        </button>
-
                         {/* Profile Dropdown */}
                         <div className="relative" ref={profileRef}>
                             <button
